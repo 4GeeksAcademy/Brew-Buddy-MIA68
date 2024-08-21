@@ -9,6 +9,7 @@ export const Home = () => {
 	return (
 		<div className="text-center mt-5">
 			<h1>Hello Brew Buddy!!</h1>
+			<h2>Test (delete this line) #Manny</h2>
 			<p>
 				<img src={rigoImageUrl} />
 			</p>
