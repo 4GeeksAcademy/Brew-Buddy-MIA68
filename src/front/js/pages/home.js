@@ -6,17 +6,16 @@ import "../../styles/home.css";
 
 export const Home = () => {
 	const { store, actions } = useContext(Context);
-
+	const eachBrewery = store.brewery_data.map((brewery_data, index) => (
+		<BreweryCard key={index} brewery_data={brewery_data} />
+	))
 	return (
 		<div className="text-center mt-5">
-			<h1>Hello Brew Buddy!! Ryan was here</h1>
+			<h1>Hello Brew Buddy!!</h1>
 			<p>
 				<img src={brewbuddyimg} />
 			</p>
 			<button onClick={actions.fetchBreweryInfo}>Fetch Brewery Info</button>
-			
-			<p>
-			</p>
 		</div>
 	);
 };
