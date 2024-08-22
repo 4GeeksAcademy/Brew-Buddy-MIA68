@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import { Context } from "../store/appContext";
 import rigoImageUrl from "../../img/rigo-baby.jpg";
+import brewbuddyimg from "../../img/DALL·E 2024-08-18.png"
 import "../../styles/home.css";
 
 export const Home = () => {
@@ -9,17 +10,15 @@ export const Home = () => {
 	return (
 		<div className="text-center mt-5">
 			<h1>Hello Brew Buddy!! Ryan was here</h1>
-			<h1> Justice was here </h1>
 			<p>
-				<img src={rigoImageUrl} />
+				<img src={brewbuddyimg} />
 			</p>
-			<div className="alert alert-info">
-				{store.message || "Loading message from the backend (make sure your python backend is running)..."}
-			</div>
+			<button onClick={actions.fetchBreweryInfo}>Fetch Brewery Info</button>
+			
 			<p>
 				This boilerplate comes with lots of documentation:{" "}
 				<a href="https://start.4geeksacademy.com/starters/react-flask">
-					Read documentation? Click above.
+					Read documentation
 				</a>
 			</p>
 		</div>
