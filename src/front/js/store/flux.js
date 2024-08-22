@@ -1,7 +1,27 @@
+class BreweryInfo {
+	constructor(resultFromServer){
+		this.id = resultFromServer.id;
+		this.name = resultFromServer.name;
+		this.brewery_type = resultFromServer.brewery_type;
+		this.address_1 = resultFromServer.address_1;
+		this.address_2 = resultFromServer.address_2;
+		this.address_3 = resultFromServer.address_3;
+		this.city = resultFromServer.city;
+		this.state_province = resultFromServer.state_province;
+		this.postal_code = resultFromServer.postal_code
+		this.country = resultFromServer.country;
+		this.longitude = resultFromServer.longitude;
+		this.latitude = resultFromServer.latitude;
+		this.phone = resultFromServer.phone
+		this.website_url = resultFromServer.website_url
+		this.state = resultFromServer.state;
+		this.street = resultFromServer.street
+	}
+}
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
-			message: null,
+			brewery_data: [],
 			demo: [
 				{
 					title: "FIRST",
