@@ -49,7 +49,7 @@ class FavoriteUsers(db.Model):
 class FavoriteBeers(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     owner_id = db.Column(db.Integer, db.ForeignKey("user.id"))
-    led_favorite_beers = db.Column(db.Integer, db.ForeignKey("beer.id"))
+    favorited_beer_id = db.Column(db.Integer, db.ForeignKey("beer.id"))
     #led_favorites_breweries = db.Column(db.Integer, db.ForeignKey(""))
 
     def __init__(self):
