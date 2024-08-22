@@ -10,26 +10,24 @@ class User(db.Model):
     favorite_users = db.relationship("FavoriteUsers", backref="owner", foreign_keys="FavoriteUsers.owner_id")
     favorited_by = db.relationship("FavoriteUsers", backref="favorited_user", foreign_keys="FavoriteUsers.favorited_user_id")
 
-    def __init__(self):
-        db.session.add(self)
-        try:
-            db.session.commit()
-        except Exception as error:
-            db.session.rollback()
-            raise Exception(error.args)
+    def __init__(self, email, password, is_active):
+        self.email = email
+        self.password = password
+        self.is_active = is_active
 
     def serialize(self):
-        bond_dictionaries = []
-        for bond in self.favorites:
-            bond_dictionaries.append(
-                bond.serialize()
+        favorite_dictionaries = []
+        for favorite in self.favorite_users:
+            favorite_dictionaries.append(
+                favorite.serialize()
             )
         return {
             "id": self.id,
             "email": self.email,
-            "favorites": bond_dictionaries
-            # do not serialize the password, its a security breach
+            "favorite_users": favorite_dictionaries
+            # do not serialize the password, it's a security breach
         }
+
     
 class FavoriteUsers(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -43,14 +41,13 @@ class FavoriteUsers(db.Model):
     def serialize(self):
         return {
             "id": self.id,
-            "favorite_users": self.favorited_user_id
+            "favorited_user_id": self.favorited_user_id
         }
     
 class FavoriteBeers(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     owner_id = db.Column(db.Integer, db.ForeignKey("user.id"))
     favorited_beer_id = db.Column(db.Integer, db.ForeignKey("beer.id"))
-    #led_favorites_breweries = db.Column(db.Integer, db.ForeignKey(""))
 
     def __init__(self):
         db.session.add(self)
@@ -59,10 +56,25 @@ class FavoriteBeers(db.Model):
     def serialize(self):
         return {
             "id": self.id,
-            "favorites_beers": self.led_favorite_beers
-            #"favorite_breweries": self.led_favorite_breweries
+            "favorites_beers": self.favorited_beer_id
         }
-    
+
+# PLACEHOLDER FOR FAVORITES BREWERIES LIST
+# class FavoriteBreweries(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     owner_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+#     favorited_brewery_id = db.Column(db.Integer, db.ForeignKey(""))
+
+#     def __init__(self):
+#         db.session.add(self)
+#         db.session.commit()
+
+#     def serialize(self):
+#         return {
+#             "id": self.id,
+#             "favorite_breweries": self.favorited_brewery_id
+#        }
+
 class Beer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     beer_name = db.Column(db.String(250))
