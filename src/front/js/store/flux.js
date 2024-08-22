@@ -18,10 +18,12 @@ class BreweryInfo {
 		this.street = resultFromServer.street
 	}
 }
+class Result {
+}
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
-			brewery_data: [],
+			breweryData: [],
 			demo: [
 				{
 					title: "FIRST",
@@ -36,7 +38,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			],
 			city: "Springfield",
 			state: "Michigan",
-			breweriesList: []
+			searchedBreweryData: []
 		},
 		actions: {
 			fetchBreweryInfo: async () => {
@@ -50,23 +52,38 @@ const getState = ({ getStore, getActions, setStore }) => {
 					let data = await resp.json();
 					console.log(data);
 					const brewery = new BreweryInfo(data);
+					setStore({ breweryData: data })
 					return brewery;
 				} catch (error) {
 					console.error("Error fetching brewery info", error);
 				}
 			},
 			searchFunction: async () => {
-				const store = getStore()
-				const breweries = []
-				const response = await fetch(`https://api.openbrewerydb.org/v1/breweries?by_city=${store.city}`)
-				const data = await response.json()
-				breweries.push(data)
-				console.log(breweries)
-				breweries.forEach(brewery => {
-					let individualBrewery = brewery
-					console.log(individualBrewery.name)
-				})
-			}
+				try {
+					const store = getStore();
+					const breweries = [];
+
+					const response = await fetch(`https://api.openbrewerydb.org/v1/breweries?by_city=${store.city}`, {
+						method: "GET",
+						headers: {
+							"Content-type": "application/json"
+						}
+					});
+					let data = await response.json();
+					console.log(data)
+					const brewery = new BreweryInfo(data);
+					data.forEach(element => {
+						if (element.state == store.state) {
+							breweries.push(element)
+						}
+					});
+					setStore({ searchedBreweryData: breweries })
+					console.log(store.searchedBreweryData)
+					return brewery
+				} catch (error) {
+					console.error("Error fetching brewery info", error);
+				}
+			},
 		}
 	};
 };
