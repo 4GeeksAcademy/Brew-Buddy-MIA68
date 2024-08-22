@@ -1,5 +1,5 @@
 class BreweryInfo {
-	constructor(resultFromServer){
+	constructor(resultFromServer) {
 		this.id = resultFromServer.id;
 		this.name = resultFromServer.name;
 		this.brewery_type = resultFromServer.brewery_type;
@@ -39,36 +39,21 @@ const getState = ({ getStore, getActions, setStore }) => {
 			breweriesList: []
 		},
 		actions: {
-			// Use getActions to call a function within a fuction
-			exampleFunction: () => {
-				getActions().changeColor(0, "green");
-			},
-			
-			getMessage: async () => {
-				try{
-					// fetching data from the backend
-					const resp = await fetch(process.env.BACKEND_URL + "/api/hello")
-					const data = await resp.json()
-					setStore({ message: data.message })
-					// don't forget to return something, that is how the async resolves
-					return data;
-				}catch(error){
-					console.log("Error loading message from backend", error)
+			fetchBreweryInfo: async () => {
+				try {
+					const resp = await fetch("https://api.openbrewerydb.org/v1/breweries?per_page=3", {
+						method: "GET",
+						headers: {
+							"Content-type": "application/json"
+						}
+					});
+					let data = await resp.json();
+					console.log(data);
+					const brewery = new BreweryInfo(data);
+					return brewery;
+				} catch (error) {
+					console.error("Error fetching brewery info", error);
 				}
-			},
-			changeColor: (index, color) => {
-				//get the store
-				const store = getStore();
-
-				//we have to loop the entire demo array to look for the respective index
-				//and change its color
-				const demo = store.demo.map((elm, i) => {
-					if (i === index) elm.background = color;
-					return elm;
-				});
-
-				//reset the global store
-				setStore({ demo: demo });
 			},
 			searchFunction: async () => {
 				const store = getStore()
