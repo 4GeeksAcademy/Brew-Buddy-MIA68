@@ -3,13 +3,16 @@ import { Context } from "../store/appContext";
 import rigoImageUrl from "../../img/rigo-baby.jpg";
 import "../../styles/home.css";
 
+
 export const Home = () => {
-	const { store, actions } = useContext(Context);
+	const { store, actions } = useContext(Context);;
+	
 
 	return (
 		<div className="text-center mt-5">
 			<h1>Hello Brew Buddy!! Ryan was here</h1>
 			<h1> Justice was here </h1>
+			<button onClick={actions.searchFunction}></button>
 			<p>
 				<img src={rigoImageUrl} />
 			</p>
@@ -22,6 +25,7 @@ export const Home = () => {
 					Read documentation
 				</a>
 			</p>
+			
 		</div>
 	);
 };

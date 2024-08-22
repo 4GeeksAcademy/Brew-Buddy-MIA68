@@ -13,7 +13,10 @@ const getState = ({ getStore, getActions, setStore }) => {
 					background: "white",
 					initial: "white"
 				}
-			]
+			],
+			city: "Springfield",
+			state: "Michigan",
+			breweriesList: []
 		},
 		actions: {
 			// Use getActions to call a function within a fuction
@@ -46,6 +49,18 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 				//reset the global store
 				setStore({ demo: demo });
+			},
+			searchFunction: async () => {
+				const store = getStore()
+				const breweries = []
+				const response = await fetch(`https://api.openbrewerydb.org/v1/breweries?by_city=${store.city}`)
+				const data = await response.json()
+				breweries.push(data)
+				console.log(breweries)
+				breweries.forEach(brewery => {
+					let individualBrewery = brewery
+					console.log(individualBrewery.name)
+				})
 			}
 		}
 	};
