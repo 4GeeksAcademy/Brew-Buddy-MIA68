@@ -1,5 +1,5 @@
 class BreweryInfo {
-	constructor(resultFromServer){
+	constructor(resultFromServer) {
 		this.id = resultFromServer.id;
 		this.name = resultFromServer.name;
 		this.brewery_type = resultFromServer.brewery_type;
@@ -18,10 +18,12 @@ class BreweryInfo {
 		this.street = resultFromServer.street
 	}
 }
+class Result {
+}
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
-			brewery_data: [],
+			breweryData: [],
 			demo: [
 				{
 					title: "FIRST",
@@ -47,6 +49,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					let data = await resp.json();
 					console.log(data);
 					const brewery = new BreweryInfo(data);
+					setStore({breweryData: data})
 					return brewery;
 				} catch (error) {
 					console.error("Error fetching brewery info", error);
