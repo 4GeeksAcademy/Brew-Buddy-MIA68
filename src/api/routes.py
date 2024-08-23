@@ -31,8 +31,9 @@ def get_all_beers():
     return jsonify([beer.serialize() for beer in beers]), 200
 
 # Access user's favorite beers list
-@api.route('/users/favorite_beers', methods=['GET'])
+@api.route('favorite_beers', methods=['GET'])
 def handle_get_favorite_beers():
+    return jsonify({"message": "Not implemented"}), 405
     current_user = get_current_user()
     if not current_user:
         return jsonify({"error": "User not authenticated"}), 401
@@ -41,8 +42,9 @@ def handle_get_favorite_beers():
     return jsonify([favorite_beer.serialize() for favorite_beer in favorite_beers]), 200
 
 # Access user's favorite users list
-@api.route('/users/favorite_users', methods=['GET'])
+@api.route('favorite_users', methods=['GET'])
 def handle_get_favorite_users():
+    return jsonify({"message": "Not implemented"}), 405
     current_user = get_current_user()
     if not current_user:
         return jsonify({"error": "User not authenticated"}), 401
@@ -51,8 +53,9 @@ def handle_get_favorite_users():
     return jsonify([favorite_user.serialize() for favorite_user in favorite_users]), 200
 
 # Add a favorite beer for the current user
-@api.route('/favorite_beers/<int:beer_id>', methods=['POST'])
+@api.route('favorite_beers/<int:beer_id>', methods=['POST'])
 def add_favorite_beer(beer_id):
+    return jsonify({"message": "Not implemented"}), 405
     current_user = get_current_user()
     if not current_user:
         return jsonify({"error": "User not authenticated"}), 401
@@ -63,8 +66,9 @@ def add_favorite_beer(beer_id):
     return jsonify({"done": True}), 201
 
 # Add a favorite user for the current user
-@api.route('/favorite_users/<int:user_id>', methods=['POST'])
+@api.route('favorite_users/<int:user_id>', methods=['POST'])
 def add_favorite_user(user_id):
+    return jsonify({"message": "Not implemented"}), 405
     current_user = get_current_user()
     if not current_user:
         return jsonify({"error": "User not authenticated"}), 401
@@ -75,8 +79,9 @@ def add_favorite_user(user_id):
     return jsonify({"done": True}), 201
 
 # Delete a favorite beer
-@api.route('/favorite_beers/<int:beer_id>', methods=['DELETE'])
+@api.route('favorite_beers/<int:beer_id>', methods=['DELETE'])
 def delete_favorite_beer(beer_id):
+    return jsonify({"message": "Not implemented"}), 405
     current_user = get_current_user()
     if not current_user:
         return jsonify({"error": "User not authenticated"}), 401
@@ -90,8 +95,9 @@ def delete_favorite_beer(beer_id):
         return jsonify({"error": "Favorite not found"}), 404
 
 # Delete a favorite user
-@api.route('/favorite_users/<int:user_id>', methods=['DELETE'])
+@api.route('favorite_users/<int:user_id>', methods=['DELETE'])
 def delete_favorite_user(user_id):
+    return jsonify({"message": "Not implemented"}), 405
     current_user = get_current_user()
     if not current_user:
         return jsonify({"error": "User not authenticated"}), 401
