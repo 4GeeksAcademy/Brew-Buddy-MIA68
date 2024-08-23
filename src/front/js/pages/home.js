@@ -21,7 +21,6 @@ export const Home = () => {
 				{eachBrewery}
 			</div>
 			<button onClick={actions.fetchBreweryInfo}>Fetch Brewery Info</button>
-
 		</div>
 	);
 };
