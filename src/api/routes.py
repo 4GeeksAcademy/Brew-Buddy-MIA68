@@ -2,7 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint, session
-from api.models import db, User, Beer
+from api.models import db, User, Beer, FavoriteUsers, FavoriteBeers
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 
@@ -38,7 +38,7 @@ def handle_get_favorite_beers():
         return jsonify({"error": "User not authenticated"}), 401
     
     favorite_beers = FavoriteBeers.query.filter_by(owner_id=current_user.id).all()
-    return jsonify([favorite_beers.serialize() for favorite_beer in favorite_beers]), 200
+    return jsonify([favorite_beer.serialize() for favorite_beer in favorite_beers]), 200
 
 # Access user's favorite users list
 @api.route('/users/favorite_users', methods=['GET'])
@@ -48,7 +48,7 @@ def handle_get_favorite_users():
         return jsonify({"error": "User not authenticated"}), 401
     
     favorite_users = FavoriteUsers.query.filter_by(owner_id=current_user.id).all()
-    return jsonify([favorite_users.serialize() for favorite_user in favorite_users]), 200
+    return jsonify([favorite_user.serialize() for favorite_user in favorite_users]), 200
 
 # Add a favorite beer for the current user
 @api.route('/favorite_beers/<int:beer_id>', methods=['POST'])
@@ -57,7 +57,7 @@ def add_favorite_beer(beer_id):
     if not current_user:
         return jsonify({"error": "User not authenticated"}), 401
     
-    new_favorite_beers = FavoriteBeers(owner_id=current_user.id, favorited_beer_id=beer_id)
+    new_favorite_beer = FavoriteBeers(owner_id=current_user.id, favorited_beer_id=beer_id)
     db.session.add(new_favorite_beer)
     db.session.commit()
     return jsonify({"done": True}), 201
@@ -81,9 +81,24 @@ def delete_favorite_beer(beer_id):
     if not current_user:
         return jsonify({"error": "User not authenticated"}), 401
     
-    favorite_beers = FavoriteBeers.query.filter_by(owner_id=current_user.id, favorited_beer_id=beer_id).first()
+    favorite_beer = FavoriteBeers.query.filter_by(owner_id=current_user.id, favorited_beer_id=beer_id).first()
     if favorite_beer:
         db.session.delete(favorite_beer)
+        db.session.commit()
+        return jsonify({"done": True}), 200
+    else:
+        return jsonify({"error": "Favorite not found"}), 404
+
+# Delete a favorite user
+@api.route('/favorite_users/<int:user_id>', methods=['DELETE'])
+def delete_favorite_user(user_id):
+    current_user = get_current_user()
+    if not current_user:
+        return jsonify({"error": "User not authenticated"}), 401
+    
+    favorite_user = FavoriteUsers.query.filter_by(owner_id=current_user.id, favorited_user_id=user_id).first()
+    if favorite_user:
+        db.session.delete(favorite_user)
         db.session.commit()
         return jsonify({"done": True}), 200
     else:
