@@ -41,6 +41,7 @@ def handle_get_favorite_beers():
     favorite_beers = FavoriteBeers.query.filter_by(owner_id=current_user.id).all()
     return jsonify([favorite_beer.serialize() for favorite_beer in favorite_beers]), 200
 
+#comment (please delete)
 # Access user's favorite users list
 @api.route('favorite_users', methods=['GET'])
 def handle_get_favorite_users():
