@@ -57,15 +57,14 @@ class FavoriteBeers(db.Model):
             "favorited_beer_id": self.favorited_beer_id
         }
 
-# PLACEHOLDER FOR FAVORITES BREWERIES LIST
+# PLACEHOLDER FOR USER'S FAVORITE BREWERIES LIST
 # class FavoriteBreweries(db.Model):
 #     id = db.Column(db.Integer, primary_key=True)
 #     owner_id = db.Column(db.Integer, db.ForeignKey("user.id"))
-#     favorited_brewery_id = db.Column(db.Integer, db.ForeignKey(""))
+#     favorited_brewery_id = db.Column(db.Integer, db.ForeignKey("brewery.id"))
 
-#     def __init__(self):
-#         db.session.add(self)
-#         db.session.commit()
+#     owner = db.relationship("User", back_populates="favorite_breweries", foreign_keys=[owner_id])
+#     brewery = db.relationship("Brewery", back_populates="favorited_by_users", foreign_keys=[favorited_brewery_id])
 
 #     def serialize(self):
 #         return {
