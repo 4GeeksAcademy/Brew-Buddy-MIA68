@@ -19,22 +19,19 @@ export const Navbar = () => {
 					</Link>
 				</div>
 			</div>
-			{/* <div className="container">
-				<Link to="/">
-					<span className="navbar-brand mb-0 h1">Brew Buddy</span>
-				</Link>
-				<div className="ml-auto">
-					<Link to="/demo">
-						<button className="btn btn-primary">Log In</button>
-					</Link>
-				</div>
-			</div> */}
+			
 			<ul className="nav nav-tabs mt-2 ps-3">
 				<li className="nav-item">
-					<a className="nav-link active" aria-current="page" href="#">Home</a>
+				<Link to="/home">
+						<button className="nav-link">Home</button>
+
+					</Link>
 				</li>
 				<li className="nav-item">
-					<a className="nav-link" href="#">Favorites</a>
+				<Link to="/favorites">
+						<button className="nav-link">Favorites</button>
+
+					</Link>
 				</li>
 				<li className="nav-item">
 					<a className="nav-link" href="#">Brews Near Me</a>
