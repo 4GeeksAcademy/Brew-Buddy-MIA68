@@ -7,7 +7,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(80), unique=False, nullable=False)
-    is_active = db.Column(db.Boolean(), unique=False, nullable=False)
+    is_active = db.Column(db.Boolean(), default=True, nullable=False)
 
     favorite_users = db.relationship("FavoriteUsers", back_populates="owner", foreign_keys="FavoriteUsers.owner_id")
     favorited_by = db.relationship("FavoriteUsers", back_populates="favorited_user", foreign_keys="FavoriteUsers.favorited_user_id")
@@ -17,6 +17,10 @@ class User(db.Model):
         self.email = email
         self.password = password
         self.is_active = is_active
+
+    # added repr to help with debugging by providing a readable string representation of the model instances
+    def __repr__(self):
+            return f'<User {self.email}>'
 
     def serialize(self):
         favorite_users_dictionaries = [favorite.serialize() for favorite in self.favorite_users]
@@ -28,6 +32,9 @@ class User(db.Model):
             "favorite_beers": favorite_beers_dictionaries
             # do not serialize the password, it's a security breach
         }
+    
+    # def is_active(self):
+    # return self.is_active
 
 class FavoriteUsers(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -36,6 +43,10 @@ class FavoriteUsers(db.Model):
 
     owner = db.relationship("User", back_populates="favorite_users", foreign_keys=[owner_id])
     favorited_user = db.relationship("User", back_populates="favorited_by", foreign_keys=[favorited_user_id])
+
+    # added repr to help with debugging by providing a readable string representation of the model instances
+    def __repr__(self):
+        return f'<FavoriteUsers owner_id={self.owner_id} favorited_user_id={self.favorited_user_id}>'
 
     def serialize(self):
         return {
@@ -50,6 +61,10 @@ class FavoriteBeers(db.Model):
 
     owner = db.relationship("User", back_populates="favorite_beers", foreign_keys=[owner_id])
     beer = db.relationship("Beer", back_populates="favorited_by_users", foreign_keys=[favorited_beer_id])
+
+    # added repr to help with debugging by providing a readable string representation of the model instances
+    def __repr__(self):
+        return f'<FavoriteBeers owner_id={self.owner_id} favorited_beer_id={self.favorited_beer_id}>'
 
     def serialize(self):
         return {
@@ -86,6 +101,10 @@ class Beer(db.Model):
         self.type = type
         self.flavor = flavor
         self.ABV = ABV
+
+    # added repr to help with debugging by providing a readable string representation of the model instances
+    def __repr__(self):
+        return f'<Beer {self.beer_name}>'
 
     def serialize(self):
         return {
