@@ -28,7 +28,7 @@ def handle_signup():
 
     return jsonify(response_body), 200
 
-# User log in route with password hashing
+# User log in route with password hashing - for active users only
 @api.route('/login', methods=['POST'])
 def handle_login():
     body = request.get_json()
@@ -36,14 +36,21 @@ def handle_login():
     password = hashlib.sha256(body["password"].encode("utf-8")).hexdigest()
     user = User.query.filter_by(email = email).first()
     if user and user.password == password:
-        access_token = create_access_token(identity = user.id)
-        return jsonify(access_token=access_token), 200
-    return jsonify({"error": "Invalid credentials"}), 401
+        if user.is_active:
+            access_token = create_access_token(identity=user.id)
+            return jsonify(access_token=access_token)
+        else:
+            return jsonify({"error": "User is not active"}), 403
+    else:
+        return jsonify({"error": "Invalid email or password"}), 401
 
-# Helper function to get the current user from JWT
+# Get the user from the database - active users only
 def get_current_user():
-    user_id = get_jwt_identity()
-    return User.query.get(user_id)
+    identity = get_jwt_identity()
+    user = User.query.get(identity)
+    if user and user.is_active:
+        return user
+    return None
 
 # created the get users route including authentication
 @api.route('/users', methods=['GET'])

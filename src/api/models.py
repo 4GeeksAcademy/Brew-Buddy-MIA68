@@ -13,7 +13,7 @@ class User(db.Model):
     favorited_by = db.relationship("FavoriteUsers", back_populates="favorited_user", foreign_keys="FavoriteUsers.favorited_user_id")
     favorite_beers = db.relationship("FavoriteBeers", back_populates="owner", foreign_keys="FavoriteBeers.owner_id")
 
-    def __init__(self, email, password, is_active):
+    def __init__(self, email, password, is_active=True):
         self.email = email
         self.password = password
         self.is_active = is_active
@@ -33,8 +33,9 @@ class User(db.Model):
             # do not serialize the password, it's a security breach
         }
     
-    # def is_active(self):
-    # return self.is_active
+    # checks if used is active
+    def is_active_status(self):
+        return self.is_active
 
 class FavoriteUsers(db.Model):
     id = db.Column(db.Integer, primary_key=True)
