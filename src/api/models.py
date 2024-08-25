@@ -1,5 +1,4 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.sql import func
 
 db = SQLAlchemy()
 
@@ -7,8 +6,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(80), nullable=False)
-    is_active = db.Column(db.Boolean(), default=True, nullable=False)
-
+    is_active = db.Column(db.Boolean(), unique=False, nullable=False)
     favorite_users = db.relationship("FavoriteUsers", back_populates="owner", foreign_keys="FavoriteUsers.owner_id")
     favorited_by = db.relationship("FavoriteUsers", back_populates="favorited_user", foreign_keys="FavoriteUsers.favorited_user_id")
     favorite_beers = db.relationship("FavoriteBeers", back_populates="owner", foreign_keys="FavoriteBeers.owner_id")
@@ -17,11 +15,11 @@ class User(db.Model):
         self.email = email
         self.password = password
         self.is_active = is_active
-
+    
     # added repr to help with debugging by providing a readable string representation of the model instances
     def __repr__(self):
             return f'<User {self.email}>'
-
+    
     def serialize(self):
         favorite_users_dictionaries = [favorite.serialize() for favorite in self.favorite_users]
         favorite_beers_dictionaries = [favorite.serialize() for favorite in self.favorite_beers]
@@ -33,10 +31,6 @@ class User(db.Model):
             # do not serialize the password, it's a security breach
         }
     
-    # checks if used is active
-    def is_active_status(self):
-        return self.is_active
-
 class FavoriteUsers(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     owner_id = db.Column(db.Integer, db.ForeignKey("user.id"))
