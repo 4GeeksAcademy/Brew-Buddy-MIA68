@@ -5,6 +5,7 @@ import os
 from flask import Flask, request, jsonify, url_for, send_from_directory
 from flask_migrate import Migrate
 from flask_swagger import swagger
+from flask_jwt_extended import JWTManager
 from api.utils import APIException, generate_sitemap
 from api.models import db
 from api.routes import api
@@ -30,6 +31,12 @@ else:
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 MIGRATE = Migrate(app, db, compare_type=True)
 db.init_app(app)
+
+# Addition of JWT user authentication piece
+app.config["JWT_SECRET_KEY"] = os.environ.get("FLASK_APP_KEY")
+app.config['JWT_TOKEN_LOCATION'] = ['headers']  # Assumes the token location is the headers rather that elsewhere (e.g. cookies)
+jwt = JWTManager(app)
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = 100000
 
 # add the admin
 setup_admin(app)
