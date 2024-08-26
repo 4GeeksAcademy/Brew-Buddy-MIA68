@@ -1,3 +1,5 @@
+import { BackendURL } from "../component/backendURL";
+
 class BreweryInfo {
 	constructor(resultFromServer) {
 		this.id = resultFromServer.id;
@@ -40,6 +42,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			state: "",
 			searchedBreweryData: [],
 			modalIsOpen: false,
+			page: 1,
 		},
 		actions: {
 			fetchBreweryInfo: async () => {
@@ -121,8 +124,42 @@ const getState = ({ getStore, getActions, setStore }) => {
 				const actions = getActions();
 				setStore({ city: city, state: state })
 				actions.searchFunctionWithCity()
-			}
+			},
+			fetchBreweryInfoForAPI: async () => {
+				const store = getStore()
+				try {
+					const resp = await fetch(`https://api.openbrewerydb.org/v1/breweries?by_country=united_states&page=${store.page}&per_page=10`, {
+						method: "GET",
+						headers: {
+							"Content-type": "application/json"
+						}
+					});
+					let newPageNumber = store.page + 1
+					let data = await resp.json();
+					console.log(data);
+					const brewery = new BreweryInfo(data);
+					for (const element of data) {
+						const response = await fetch(`${BackendURL}` + "/breweries", {
+							method: "POST",
+							body: {
 
+							}
+						})
+
+
+					};
+					setStore({ page: newPageNumber })
+					console.log(store.page)
+					return brewery;
+				}
+				catch (error) {
+					console.error("Error fetching brewery info", error);
+				}
+
+			},
+			postBreweryInfoToAPI: async () => {
+
+			}
 		}
 	};
 };
