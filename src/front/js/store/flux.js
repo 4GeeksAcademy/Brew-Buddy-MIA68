@@ -1,3 +1,5 @@
+import { SignUp } from "../pages/SignUp";
+
 class BreweryInfo {
 	constructor(resultFromServer) {
 		this.id = resultFromServer.id;
@@ -42,6 +44,27 @@ const getState = ({ getStore, getActions, setStore }) => {
 			modalIsOpen: false,
 		},
 		actions: {
+			signUp: async(email, password) => {
+				try {
+					const response=await fetch(`${process.env.BACKEND_URL}/api/signup`, {
+						method: "POST",
+						headers: {
+							"Content-type": "application/json"
+						},
+						body: JSON.stringify({ email, password});
+					})
+					if (response.ok) {
+						const data=await response.json();
+						console.log("signup successful", data)
+					} else {
+						const errorData = await response.json();
+						console.error("signup failed", errorData)
+					}
+				} catch (error) {
+					console.error("error during signup", error);
+				}
+			},
+			
 			fetchBreweryInfo: async () => {
 				try {
 					const resp = await fetch("https://api.openbrewerydb.org/v1/breweries?per_page=3", {
