@@ -5,21 +5,56 @@ from flask import Flask, request, jsonify, url_for, Blueprint, session
 from api.models import db, User, Beer, FavoriteUsers, FavoriteBeers
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
+from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
+import hashlib
 
 api = Blueprint('api', __name__)
 
 # Allow CORS requests to this API
 CORS(api)
 
-# To get the current user (does not include JWTManager/user authentication piece)
+# User sign up route including authentication to hash passwords
+@api.route('/signup', methods=['POST'])
+def handle_signup():
+    body = request.get_json()
+    email = body["email"]
+    password = hashlib.sha256(body["password"].encode("utf-8")).hexdigest()
+    user = User(email = email, password = password, is_active = True)
+    db.session.add(user)
+    db.session.commit()
+    response_body = {
+        "message": "User successfully created"
+    }
+
+    return jsonify(response_body), 200
+
+# User log in route with password hashing - for active users only
+@api.route('/login', methods=['POST'])
+def handle_login():
+    body = request.get_json()
+    email = body["email"]
+    password = hashlib.sha256(body["password"].encode("utf-8")).hexdigest()
+    user = User.query.filter_by(email = email).first()
+    if user and user.password == password:
+        if user.is_active:
+            access_token = create_access_token(identity=user.id)
+            return jsonify(access_token=access_token)
+        else:
+            return jsonify({"error": "User is not active"}), 403
+    else:
+        return jsonify({"error": "Invalid email or password"}), 401
+
+# Get the user from the database - active users only
 def get_current_user():
-    user_id = session.get('user_id')  # Get the user ID from the session
-    if user_id:
-        return User.query.get(user_id)  # Query the user from the database
+    identity = get_jwt_identity()
+    user = User.query.get(identity)
+    if user and user.is_active:
+        return user
     return None
 
-# preemptively created the get user route, feel free to fix if you're working on the user stuff
+# created the get users route including authentication
 @api.route('/users', methods=['GET'])
+@jwt_required()
 def get_all_users():
     users = User.query.all()
     return jsonify([user.serialize() for user in users]), 200
@@ -30,10 +65,11 @@ def get_all_beers():
     beers = Beer.query.all()
     return jsonify([beer.serialize() for beer in beers]), 200
 
-# Access user's favorite beers list
-@api.route('favorite_beers', methods=['GET'])
+# Access user's favorite beers list (with user authentication)
+@api.route('/favorite_beers', methods=['GET'])
+@jwt_required()
 def handle_get_favorite_beers():
-    return jsonify({"message": "Not implemented"}), 405
+    #return jsonify({"message": "Not implemented"}), 405
     current_user = get_current_user()
     if not current_user:
         return jsonify({"error": "User not authenticated"}), 401
@@ -41,11 +77,11 @@ def handle_get_favorite_beers():
     favorite_beers = FavoriteBeers.query.filter_by(owner_id=current_user.id).all()
     return jsonify([favorite_beer.serialize() for favorite_beer in favorite_beers]), 200
 
-#comment (please delete)
-# Access user's favorite users list
-@api.route('favorite_users', methods=['GET'])
+# Access user's favorite users list (including authentication piece)
+@api.route('/favorite_users', methods=['GET'])
+@jwt_required()
 def handle_get_favorite_users():
-    return jsonify({"message": "Not implemented"}), 405
+    #return jsonify({"message": "Not implemented"}), 405
     current_user = get_current_user()
     if not current_user:
         return jsonify({"error": "User not authenticated"}), 401
@@ -53,10 +89,11 @@ def handle_get_favorite_users():
     favorite_users = FavoriteUsers.query.filter_by(owner_id=current_user.id).all()
     return jsonify([favorite_user.serialize() for favorite_user in favorite_users]), 200
 
-# Add a favorite beer for the current user
+# Add a favorite beer for the current user with authentication
 @api.route('favorite_beers/<int:beer_id>', methods=['POST'])
+@jwt_required()
 def add_favorite_beer(beer_id):
-    return jsonify({"message": "Not implemented"}), 405
+    #return jsonify({"message": "Not implemented"}), 405
     current_user = get_current_user()
     if not current_user:
         return jsonify({"error": "User not authenticated"}), 401
@@ -66,10 +103,11 @@ def add_favorite_beer(beer_id):
     db.session.commit()
     return jsonify({"done": True}), 201
 
-# Add a favorite user for the current user
+# Add a favorite user for the current user with authentication
 @api.route('favorite_users/<int:user_id>', methods=['POST'])
+@jwt_required()
 def add_favorite_user(user_id):
-    return jsonify({"message": "Not implemented"}), 405
+    #return jsonify({"message": "Not implemented"}), 405
     current_user = get_current_user()
     if not current_user:
         return jsonify({"error": "User not authenticated"}), 401
@@ -79,10 +117,11 @@ def add_favorite_user(user_id):
     db.session.commit()
     return jsonify({"done": True}), 201
 
-# Delete a favorite beer
+# Delete a favorite beer with user authentication
 @api.route('favorite_beers/<int:beer_id>', methods=['DELETE'])
+@jwt_required()
 def delete_favorite_beer(beer_id):
-    return jsonify({"message": "Not implemented"}), 405
+    #return jsonify({"message": "Not implemented"}), 405
     current_user = get_current_user()
     if not current_user:
         return jsonify({"error": "User not authenticated"}), 401
@@ -95,10 +134,11 @@ def delete_favorite_beer(beer_id):
     else:
         return jsonify({"error": "Favorite not found"}), 404
 
-# Delete a favorite user
+# Delete a favorite user with user authentication
 @api.route('favorite_users/<int:user_id>', methods=['DELETE'])
+@jwt_required()
 def delete_favorite_user(user_id):
-    return jsonify({"message": "Not implemented"}), 405
+    #return jsonify({"message": "Not implemented"}), 405
     current_user = get_current_user()
     if not current_user:
         return jsonify({"error": "User not authenticated"}), 401
