@@ -18,7 +18,7 @@ export const BreweryCard = (props) => {
                 <p className="card-text">With supporting text below as a natural lead-in to additional content.</p>
                 <a href="#" className="btn btn-primary">Go somewhere</a>
                 {/* J.R.: A favorites button for brewery */}
-                <a href="#" className="btn btn-info">Favorite</a>
+                <a href="#" className="btn btn-info"><i class="fa-regular fa-star"></i></a>
                 {/* J.R.: A button for contact information of brewery */}
                 <a href="#" className="btn btn-success">{props.breweryData.phone}</a>
             </div>
