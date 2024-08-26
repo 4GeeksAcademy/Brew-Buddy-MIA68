@@ -10,6 +10,7 @@ class User(db.Model):
     favorite_users = db.relationship("FavoriteUsers", back_populates="owner", foreign_keys="FavoriteUsers.owner_id")
     favorited_by = db.relationship("FavoriteUsers", back_populates="favorited_user", foreign_keys="FavoriteUsers.favorited_user_id")
     favorite_beers = db.relationship("FavoriteBeers", back_populates="owner", foreign_keys="FavoriteBeers.owner_id")
+    favorite_breweries = db.relationship("FavoriteBreweries", back_populates="owner", foreign_keys="FavoriteBreweries.owner_id")
 
     def __init__(self, email, password, is_active=True):
         self.email = email
@@ -23,11 +24,13 @@ class User(db.Model):
     def serialize(self):
         favorite_users_dictionaries = [favorite.serialize() for favorite in self.favorite_users]
         favorite_beers_dictionaries = [favorite.serialize() for favorite in self.favorite_beers]
+        favorite_breweries_dictionaries = [favorite.serialize() for favorite in self.favorite_breweries]
         return {
             "id": self.id,
             "email": self.email,
             "favorite_users": favorite_users_dictionaries,
-            "favorite_beers": favorite_beers_dictionaries
+            "favorite_beers": favorite_beers_dictionaries,
+            "favorite_breweries": favorite_breweries_dictionaries
             # do not serialize the password, it's a security breach
         }
     
@@ -67,20 +70,66 @@ class FavoriteBeers(db.Model):
             "favorited_beer_id": self.favorited_beer_id
         }
 
-# PLACEHOLDER FOR USER'S FAVORITE BREWERIES LIST
-# class FavoriteBreweries(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     owner_id = db.Column(db.Integer, db.ForeignKey("user.id"))
-#     favorited_brewery_id = db.Column(db.Integer, db.ForeignKey("brewery.id"))
+class FavoriteBreweries(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    owner_id = db.Column(db.Integer, db.ForeignKey("user.id"))
+    favorited_brewery_id = db.Column(db.Integer, db.ForeignKey("brewery.id"))
 
-#     owner = db.relationship("User", back_populates="favorite_breweries", foreign_keys=[owner_id])
-#     brewery = db.relationship("Brewery", back_populates="favorited_by_users", foreign_keys=[favorited_brewery_id])
+    owner = db.relationship("User", back_populates="favorite_breweries", foreign_keys=[owner_id])
+    brewery = db.relationship("Brewery", back_populates="favorited_by_users", foreign_keys=[favorited_brewery_id])
 
-#     def serialize(self):
-#         return {
-#             "id": self.id,
-#             "favorite_breweries": self.favorited_brewery_id
-#        }
+    # added repr to help with debugging by providing a readable string representation of the model instances
+    def __repr__(self):
+        return f'<FavoriteBreweries owner_id={self.owner_id} favorited_brewery_id={self.favorited_brewery_id}>'
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "favorited_brewery_id": self.favorited_brewery_id
+       }
+
+class Brewery(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    brewery_name = db.Column(db.String(250))
+    brewery_type = db.Column(db.String(250))
+    address = db.Column(db.String(250))
+    city = db.Column(db.String(250))
+    state_province = db.Column(db.String(250))
+    longitude = db.Column(db.String(250))
+    latitude = db.Column(db.String(250))
+    phone = db.Column(db.String(250))
+    website_url = db.Column(db.String(250))
+
+    favorited_by_users = db.relationship("FavoriteBreweries", back_populates="brewery", foreign_keys="FavoriteBreweries.favorited_brewery_id")
+
+    def __init__(self, brewery_name, brewery_type, address, city, state_province, longitude, latitude, phone, website_url):
+        self.brewery_name = brewery_name
+        self.brewery_type = brewery_type
+        self.address = address
+        self.city = city
+        self.state_province = state_province
+        self.longitude = longitude
+        self.latitude = latitude
+        self.phone = phone
+        self.website_url = website_url
+
+    # added repr to help with debugging by providing a readable string representation of the model instances
+    def __repr__(self):
+        return f'<Brewery {self.brewery_name}>'
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "brewery_name": self.brewery_name,
+            "brewery_type": self.brewery_type,
+            "address": self.address,
+            "city": self.city,
+            "state_province": self.state_province,
+            "longitude": self.longitude,
+            "latitude": self.latitude,
+            "phone": self.phone,
+            "website_url": self.website_url
+        }
 
 class Beer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
