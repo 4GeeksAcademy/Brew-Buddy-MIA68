@@ -8,6 +8,11 @@ from flask_cors import CORS
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 import hashlib
 
+from pyeasyencrypt.pyeasyencrypt import encrypt_string, decrypt_string
+from api.send_email import send_email
+import datetime
+import json, os
+
 api = Blueprint('api', __name__)
 
 # Allow CORS requests to this API
@@ -43,6 +48,55 @@ def handle_login():
             return jsonify({"error": "User is not active"}), 403
     else:
         return jsonify({"error": "Invalid email or password"}), 401
+
+@api.route("/forgot_password", methods=["POST"])
+def forgotpassword():
+    data=request.json
+    email=data.get("email")
+    if not email:
+        return jsonify({"message": "email is required"}), 400
+    user = User.query.filter_by(email=email) .first()
+    if user is None:
+        return jsonify({"message": "email does not exist"}), 400
+    #jwt_access_token 
+    token= encrypt_string(json.dumps({
+        "email": email, 
+        "exp": 15,
+        "current_time": datetime.datetime.now().isoformat()
+    }), os.getenv("FLASK_APP_KEY"))
+    email_value = f"Here is the password recovery link!\n{os.getenv('FRONTEND_URL')}/change_password/{token}"
+    send_email(email, email_value, "Subject: password recovery for BrewBuddy")
+    return jsonify({"message": "recovery password has been sent"}), 200
+
+@api.route("/change_password", methods=["PUT"])
+def changepassword():
+    data=request.get_json()
+    password=data.get("password")
+    secret=data.get("secret")
+
+    if not password:
+        return jsonify({"message": "please provide a new password"}), 400
+    
+    try: 
+        json_secret= json.loads(decrypt_string(secret, os.getenv("FLASK_APP_KEY")))
+    except Exception as e: 
+        return jsonify({"message": "invalid or expired token"}), 400
+                       
+    email = json_secret.get("email")
+    if not email:
+         return jsonify({"message": "invalid token data"}), 400
+    
+    user=User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({"message": "email does not exist"}), 400
+
+    user.password=hashlib.sha256(password.encode()).hexdigest()
+    db.session.commit()
+
+    send_email(email, "successfully changed password", "password changed notification")
+
+    return jsonify({"message" : "password successfully changed"}), 200
+
 
 # Get the user from the database - active users only
 def get_current_user():

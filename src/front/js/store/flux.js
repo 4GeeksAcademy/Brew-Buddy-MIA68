@@ -72,7 +72,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 						const data = await response.json();
 						sessionStorage.setItem("token", data.access_token);
 						setStore({ token: data.access_token })
-						console.log("login successful", data);
+						console.log("login successful");
 					} else {
 						const errorData = await response.json();
 						console.error("login failed", errorData);
