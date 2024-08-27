@@ -6,6 +6,19 @@ import "../../styles/favorites.css";
 
 export const Favorites = () => {
   const { store, actions } = useContext(Context);
+  useEffect(()=>{
+    let getData=async() => {
+      let beersSuccess=await actions.getFavoriteBeers()
+      if (beersSuccess==false) {
+        console.log("no beers were retrieved") 
+      }
+      let peopleSuccess=await actions.getFavoritePeople()
+      if (peopleSuccess==false) {
+        console.log("no people were retrieved") 
+      }
+    }
+    getData()
+  },[])
   return (
     <div className="">
     <ul
@@ -133,7 +146,18 @@ export const Favorites = () => {
         aria-labelledby="pills-contact-tab"
         tabindex="0"
       >
-        Beers
+        <h1>Beers</h1> 
+        {store.favoriteBeers.map((item,index)=>{
+          return(
+          <div class="card text-center mb-3" style={{width: "18rem"}}>
+            <div class="card-body">
+              <h5 class="card-title">Special title treatment</h5>
+              <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+              <a href="#" class="btn btn-primary">Go somewhere</a>
+            </div>
+          </div>
+          )
+        })}
       </div>
     </div>
   </div>

@@ -31,6 +31,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 			state: "",
 			searchedBreweryData: [],
 			modalIsOpen: false,
+			favoriteBeers: [],
+			favoritePeople: []
 		},
 		actions: {
 			signUp: async (email, password) => {
@@ -169,8 +171,33 @@ const getState = ({ getStore, getActions, setStore }) => {
 				const actions = getActions();
 				setStore({ city: city, state: state })
 				actions.searchFunctionWithCity()
-			}
-
+			},
+			getFavoriteBeers: async() => {
+				let response = await fetch(process.env.BACKEND_URL+"api/favorite_beers", {headers:{
+					"Content-Type": "application/json", 
+					Authorization: "Bearer "+sessionStorage.getItem("token")
+				}})
+				if (response.status !=200) {
+					console.log("error occurred while getting favorite beers", response.status)
+					return false
+				} 
+				let data = await response.json()
+				setStore({favoriteBeers:data})
+				
+			},
+			getFavoritePeople: async() => {
+				let response = await fetch(process.env.BACKEND_URL+"api/favorite_users", {headers:{
+					"Content-Type": "application/json", 
+					Authorization: "Bearer "+sessionStorage.getItem("token")
+				}})
+				if (response.status !=200) {
+					console.log("error occurred while getting favorite users", response.status)
+					return false
+				} 
+				let data = await response.json()
+				setStore({favoritePeople:data})
+				
+			},
 		}
 	};
 };
