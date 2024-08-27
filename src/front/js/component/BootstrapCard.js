@@ -17,9 +17,9 @@ export const BreweryCard = (props) => {
                 </h4>
                 <h5>{props.breweryData.city}, {props.breweryData.state}</h5>
                 <p className="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                <a href="#" className="btn btn-primary">Go somewhere</a>
+                <button className="btn btn-primary" onClick={() => actions.addToCurrentRoute(props.breweryData)}>Add to my current route</button>
                 {/* J.R.: A favorites button for brewery */}
-                <a href="#" className="btn btn-info"><i class="fa-regular fa-star"></i></a>
+                <a href="#" className="btn btn-info"><i className="fa-regular fa-star"></i></a>
                 {/* J.R.: A button for contact information of brewery */}
                 <a href="#" className="btn btn-success">{props.breweryData.phone}</a>
                 <p>

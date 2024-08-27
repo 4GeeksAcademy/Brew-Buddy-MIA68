@@ -18,12 +18,11 @@ class BreweryInfo {
 		this.street = resultFromServer.street
 	}
 }
-class Result {
-}
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
 			breweryData: [],
+			routes: [],
 			demo: [
 				{
 					title: "FIRST",
@@ -121,6 +120,16 @@ const getState = ({ getStore, getActions, setStore }) => {
 				const actions = getActions();
 				setStore({ city: city, state: state })
 				actions.searchFunctionWithCity()
+			},
+
+			addToCurrentRoute: async (breweryObject) => {
+				try {
+					const store = getStore()
+					store.routes.push(breweryObject)
+					setStore(store)
+				} catch (error) {
+					console.error("Error")
+				}
 			}
 
 		}

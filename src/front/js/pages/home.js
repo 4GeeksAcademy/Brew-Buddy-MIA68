@@ -7,7 +7,7 @@ import Modal from "../component/searchModal";
 
 
 export const Home = () => {
-	const { store, actions } = useContext(Context);;
+	const { store, actions } = useContext(Context);
 
 	const eachBrewery = store.breweryData.map((breweryData, index) => (
 		<BreweryCard key={index} breweryData={breweryData} />
