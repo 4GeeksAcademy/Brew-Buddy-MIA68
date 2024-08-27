@@ -3,3 +3,11 @@
   height: 150px;
   overflow-y: auto;
 }
+.wide-input {
+  width: 100%;
+  max-width: 490px;
+}
+
+ul {
+  list-style-type: square;
+}

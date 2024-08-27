@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Context } from "../store/appContext";
 import brewbuddyimg from "../../img/DALL·E 2024-08-18.png"
 import "../../styles/home.css";
@@ -9,11 +9,18 @@ import { Link } from "react-router-dom";
 
 
 export const Home = () => {
-	const { store, actions } = useContext(Context);;
+	const { store, actions } = useContext(Context);
 
 	const eachBrewery = store.breweryData.map((breweryData, index) => (
 		<BreweryCard key={index} breweryData={breweryData} />
 	))
+	// useEffect(() => {
+	// 	actions.fetchBreweryInfoTEST().then(journey => {
+	// 		console.log("Active Route:", journey.getActiveRoute());
+	// 		console.log("Total Travel Time:", journey.getTotalTravelTime(), "minutes");
+	// 		console.log("Total Miles:", journey.getTotalMiles(), "miles");
+	// 	});
+	// }, []);
 
 	return (
 		<div className="text-center mt-5">
@@ -25,11 +32,11 @@ export const Home = () => {
 				{eachBrewery}
 			</div>
 			<div>
-				<BreweryRouteCard/>
+				<BreweryRouteCard />
 			</div>
 
-			<button onClick={actions.fetchBreweryInfo}>Fetch Brewery Info</button>
-			<div className="mt-5"><Link to="forgot-password">Change My Password</Link></div>
+			<button onClick={actions.fetchBreweryInfoTEST}>Fetch Brewery Info</button>
+			{/* <div className="mt-5"><Link to="/forgot-password">Change My Password</Link></div> */}
 		</div>
 	);
 };
