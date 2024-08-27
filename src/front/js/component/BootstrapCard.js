@@ -6,22 +6,25 @@ import { Context } from "../store/appContext";
 export const BreweryCard = (props) => {
     const { store, actions } = useContext(Context);
     const navigate = useNavigate()
+
     return (
         <div className="card">
             <div className="card-body">
                 <h4 className="card-title">
+                    {/* J.R.: A specific image for brewery type */}
                     <a href={props.breweryData.brewery_type}>
-                        <img src="img=`/img/${store.brewery_type}.jpg`" alt="brewery-type-icon" style={{ width: '20px', height: '20px', marginRight: '8px' }} />
+                        <img src="" title="beer icons" alt="brewery-type-icon" style={{ width: '20px', height: '20px', marginRight: '8px' }} />
                     </a>
                     {props.breweryData.name}
                 </h4>
                 <h5>{props.breweryData.city}, {props.breweryData.state}</h5>
                 <p className="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                <a href="#" className="btn btn-primary">Go somewhere</a>
+                <a href={props.breweryData.address_1} className="btn btn-primary">Go somewhere</a>
                 {/* J.R.: A favorites button for brewery */}
-                <a href="#" className="btn btn-info"><i class="fa-regular fa-star"></i></a>
+                <a href="#" className="btn btn-info"><i className="fa-regular fa-star"></i></a>
                 {/* J.R.: A button for contact information of brewery */}
-                <a href="#" className="btn btn-success">{props.breweryData.phone}</a>
+                <a href={props.breweryData.phone}>{props.breweryData.phone}</a>
+                {/* J.R.: A button for website of brewery */}
                 <p>
                     <a href={props.breweryData.website_url} target="blank">
                         <button className="btn btn-secondary">Visit Our Website!</button>
