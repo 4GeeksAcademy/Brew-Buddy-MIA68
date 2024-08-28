@@ -215,19 +215,23 @@ const getState = ({ getStore, getActions, setStore }) => {
 					return false;
 				}
 			},
-			getFavoritePeople: async() => {
-				let response = await fetch(process.env.BACKEND_URL+"api/favorite_users", {headers:{
-					"Content-Type": "application/json", 
-					Authorization: "Bearer "+sessionStorage.getItem("token")
-				}})
-				if (response.status !=200) {
+			getFavoritePeople: async () => {
+				let response = await fetch(process.env.BACKEND_URL + "/api/favorite_users", {
+					headers: {
+						"Content-Type": "application/json",
+						Authorization: "Bearer " + sessionStorage.getItem("token")
+					}
+				})
+				if (response.status != 200) {
 					console.log("error occurred while getting favorite users", response.status)
 					return false
-				} 
+				}
 				let data = await response.json()
-				setStore({favoritePeople:data})
-				
+				setStore({ favoritePeople: data })
+
 			},
+			// you need have a createFavoriteBeer (POST REQUEST) function then can attach it to card button
+			// probably the same thing for people
 		}
 	};
 };
