@@ -132,9 +132,9 @@ def handle_get_point_history():
     if not current_user:
         return jsonify({"error": "User not authenticated"}), 401
     
-    transactions = PointTransaction.query.filter_by(user_id=current_user_id).order_by(PointTransaction.timestamp.desc()).all()
+    transactions = PointTransaction.query.filter_by(owner_id=current_user.id).order_by(PointTransaction.timestamp.desc()).all()
     return jsonify([{
-        'points': transation.points,
+        'points': transaction.points,
         'action': transaction.action,
         'timestamp': transaction.timestamp.isoformat()
     } for transaction in transactions])
