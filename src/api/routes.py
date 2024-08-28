@@ -65,11 +65,31 @@ def get_all_beers():
     beers = Beer.query.all()
     return jsonify([beer.serialize() for beer in beers]), 200
 
+# Post a new brewery
+@api.route('/breweries', methods=['POST'])
+def post_new_brewery():
+    body = request.get_json()
+    brewery_name = body[brewery_name]
+    brewery_type = body[brewery_type]
+    address = body[address]
+    city = body[city]
+    state_province = body[state_province]
+    longitude = body[longitude]
+    latitude = body[latitude]
+    phone = body[phone]
+    website_url = body[website_url]
+    brewery = Brewery(brewery_name = brewery_name, brewery_type= brewery_type, address= address, city= city, state_province= state_province, longitude= longitude, latitude= latitude, phone= phone, website_url= website_url)
+    db.session.add(brewery)
+    db.session.commit()
+    return "brewery added:", jsonify({brewery}), 200
+
 # Get all breweries route
 @api.route('/breweries', methods=['GET'])
 def get_all_breweries():
     breweries = Brewery.query.all()
     return jsonify([brewery.serialize() for brewery in breweries]), 200
+
+
 
 # Access user's favorite beers list (with user authentication)
 @api.route('/favorite_beers', methods=['GET'])

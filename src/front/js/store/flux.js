@@ -128,7 +128,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			fetchBreweryInfoForAPI: async () => {
 				const store = getStore()
 				try {
-					const resp = await fetch(`https://api.openbrewerydb.org/v1/breweries?by_country=united_states&page=${store.page}&per_page=10`, {
+					const resp = await fetch(`https://api.openbrewerydb.org/v1/breweries?by_country=united_states&page=${store.page}&per_page=200`, {
 						method: "GET",
 						headers: {
 							"Content-type": "application/json"
@@ -139,13 +139,22 @@ const getState = ({ getStore, getActions, setStore }) => {
 					console.log(data);
 					const brewery = new BreweryInfo(data);
 					for (const element of data) {
-						const response = await fetch(`${BackendURL}` + "/breweries", {
-							method: "POST",
-							body: {
-
-							}
-						})
-
+						if (element.brewery_type != "closed" || element.brewery_type != "planning") {
+							const response = await fetch(`${BackendURL}` + "/breweries", {
+								method: "POST",
+								body: {
+									"brewery_name": element.name,
+									"brewery_type": element.brewery_type,
+									"address": element.address_1,
+									"city": element.city,
+									"state_province": element.state_province,
+									"longitude": element.longitude,
+									"latitude": element.latitude,
+									"phone": element.phone,
+									"website_url": element.website_url
+								}
+							})
+						}
 
 					};
 					setStore({ page: newPageNumber })
