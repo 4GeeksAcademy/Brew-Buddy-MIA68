@@ -174,20 +174,20 @@ class Beer(db.Model):
     
 class PointTransaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     points = db.Column(db.Integer, nullable=False)
     action = db.Column(db.String(250), nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
-    user = db.relationship('User', backref=db.backref('point_transactions', lazy=True))
+    owner = db.relationship('User', backref=db.backref('point_transactions', lazy=True))
 
     def __repr__(self):
-        return f'<PointTransaction user_id={self.user_id} points={self.points} action={self.action}>'
+        return f'<PointTransaction owner_id={self.owner_id} points={self.points} action={self.action}>'
 
     def serialize(self):
         return {
             "id": self.id,
-            "user_id": self.user_id,
+            "owner_id": self.owner_id,
             "points": self.points,
             "action": self.action,
             "timestamp": self.timestamp.isoformat()
