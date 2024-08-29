@@ -7,16 +7,37 @@ export const Login = () => {
     const [credentials, setCredentials] = useState({ email: "", password: "" });
     const navigate = useNavigate();
 
-    function handleChange(e) {
-        setCredentials({ ...credentials, [e.target.id]: e.target.value })
+    const handleChange = (e) => {
+        setCredentials({ ...credentials, [e.target.id]: e.target.value });
     };
 
+    // const handleLogin = async (e) => {
+    //     e.preventDefault();
+    //     await actions.login(credentials.email, credentials.password);
+    //     navigate("/");
+
+    // }
+
+    // EJQ-updated handleLogin code below integrates the addition of points at login, also includes console messages to confirm whether login was successful
     const handleLogin = async (e) => {
         e.preventDefault();
-        await actions.login(credentials.email, credentials.password);
-        navigate("/");
-
-    }
+        try {
+            const result = await actions.login(credentials.email, credentials.password);
+            if (result.success) {
+                // Check if points were earned
+                if (result.points_earned > 0) {
+                    console.log(`User earned ${result.points_earned} points for logging in.`);
+                }
+                // Update the global state with the new total points
+                actions.updateUserPoints(result.total_points);
+                navigate("/");
+            } else {
+                console.error("Login failed");
+            }
+        } catch (error) {
+            console.error("Error logging in", error);
+        }
+    };
 
     return (
         <div className="container">
