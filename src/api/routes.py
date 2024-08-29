@@ -44,20 +44,20 @@ def handle_login():
     if user and user.password == password:
         if user.is_active:
             # Check if the user has already logged in today
-            last_login = PointTransaction.query.filter_by(user_id=user.id, action="Daily login").order_by(PointTransaction.timestamp.desc()).first()
+            # last_login = PointTransaction.query.filter_by(user_id=user.id, action="Daily login").order_by(PointTransaction.timestamp.desc()).first()
             
-            if not last_login or (datetime.utcnow() - last_login.timestamp) > timedelta(days=1):
-                # Award points for daily login
-                points_earned = 1
-                user.change_points(points_earned, "Daily login")
-                db.session.commit()
-            else:
-                points_earned = 0
+            # if not last_login or (datetime.utcnow() - last_login.timestamp) > timedelta(days=1):
+            #     # Award points for daily login
+            #     points_earned = 1
+            #     user.change_points(points_earned, "Daily login")
+            #     db.session.commit()
+            # else:
+            #     points_earned = 0
 
             access_token = create_access_token(identity=user.id)
             return jsonify({
                 "access_token": access_token,
-                "points_earned": points_earned,
+                # "points_earned": points_earned,
                 "total_points": user.points
             })
         else:
