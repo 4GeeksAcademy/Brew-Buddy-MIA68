@@ -179,7 +179,7 @@ class PointTransaction(db.Model):
     action = db.Column(db.String(250), nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
-    owner = db.relationship('User', backref=db.backref('point_transactions', lazy=True))
+    owner = db.relationship('User', )
 
     def __repr__(self):
         return f'<PointTransaction owner_id={self.owner_id} points={self.points} action={self.action}>'
