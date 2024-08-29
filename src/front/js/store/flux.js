@@ -1,5 +1,7 @@
 import { BackendURL } from "../component/backendURL";
 
+import { SignUp } from "../pages/SignUp";
+
 class BreweryInfo {
 	constructor(resultFromServer) {
 		this.id = resultFromServer.id;
@@ -25,26 +27,72 @@ class Result {
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
+			token: sessionStorage.getItem("token") || null,
 			breweryData: [],
-			demo: [
-				{
-					title: "FIRST",
-					background: "white",
-					initial: "white"
-				},
-				{
-					title: "SECOND",
-					background: "white",
-					initial: "white"
-				}
-			],
 			city: "",
 			state: "",
 			searchedBreweryData: [],
 			modalIsOpen: false,
-			page: 1,
+			page: 16,
 		},
 		actions: {
+			signUp: async (email, password) => {
+				try {
+					const response = await fetch(`${process.env.BACKEND_URL}/api/signup`, {
+						method: "POST",
+						headers: {
+							"Content-type": "application/json"
+						},
+						body: JSON.stringify({ email, password })
+					})
+					if (response.ok) {
+						const data = await response.json();
+						console.log("signup successful", data);
+						return { ok: true };
+					} else {
+						const errorData = await response.json();
+						console.error("signup failed", errorData)
+
+					}
+				} catch (error) {
+					console.error("error during signup", error);
+					return { ok: false, error: error.message };
+				}
+			},
+
+			login: async (email, password) => {
+				try {
+					const response = await fetch(`${process.env.BACKEND_URL}/api/login`, {
+						method: "POST",
+						headers: {
+							"Content-type": "application/json"
+						},
+						body: JSON.stringify({ email, password })
+					})
+					if (response.ok) {
+						const data = await response.json();
+						sessionStorage.setItem("token", data.access_token);
+						setStore({ token: data.access_token })
+						console.log("login successful", data);
+					} else {
+						const errorData = await response.json();
+						console.error("login failed", errorData);
+					}
+				} catch (error) {
+					console.error("error during login", error);
+				}
+			},
+
+			logout: () => {
+				try {
+					sessionStorage.removeItem("token");
+					setStore({ token: null })
+					console.log("logout successful");
+				} catch (error) {
+					console.error("error during logout", error);
+				}
+			},
+
 			fetchBreweryInfo: async () => {
 				try {
 					const resp = await fetch("https://api.openbrewerydb.org/v1/breweries?per_page=3", {
@@ -127,6 +175,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},
 			fetchBreweryInfoForAPI: async () => {
 				const store = getStore()
+				const actions = getActions()
 				try {
 					const resp = await fetch(`https://api.openbrewerydb.org/v1/breweries?by_country=united_states&page=${store.page}&per_page=200`, {
 						method: "GET",
@@ -136,27 +185,22 @@ const getState = ({ getStore, getActions, setStore }) => {
 					});
 					let newPageNumber = store.page + 1
 					let data = await resp.json();
-					console.log(data);
+					//console.log(data);
 					const brewery = new BreweryInfo(data);
-					for (const element of data) {
-						if (element.brewery_type != "closed" || element.brewery_type != "planning") {
-							const response = await fetch(`${BackendURL}` + "/breweries", {
-								method: "POST",
-								body: {
-									"brewery_name": element.name,
-									"brewery_type": element.brewery_type,
-									"address": element.address_1,
-									"city": element.city,
-									"state_province": element.state_province,
-									"longitude": element.longitude,
-									"latitude": element.latitude,
-									"phone": element.phone,
-									"website_url": element.website_url
-								}
-							})
+					const micro = "micro"
+					const nano = "nano"
+					const brewpub = "brewpub"
+					const regional = "regional"
+					const bar = "bar"
+					const notClosedBreweries = []
+					for(const element of data){
+						if(element.brewery_type === micro || element.brewery_type === nano || element.brewery_type === brewpub || element.brewery_type === regional){
+							if (element.address_1 === null || element.latitude === null){
+							continue
 						}
-
-					};
+						notClosedBreweries.push(element)} 
+					}
+					actions.postBreweryInfoToAPI(notClosedBreweries)
 					setStore({ page: newPageNumber })
 					console.log(store.page)
 					return brewery;
@@ -166,8 +210,32 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 
 			},
-			postBreweryInfoToAPI: async () => {
-
+			postBreweryInfoToAPI: async (notClosedBreweries) => {
+				try{
+					for(const breweryToBeAdded of notClosedBreweries) {
+						let newBrewery = {
+							"brewery_name": breweryToBeAdded.name,
+							"brewery_type": breweryToBeAdded.brewery_type,
+							"address": breweryToBeAdded.address_1,
+							"city": breweryToBeAdded.city,
+							"state_province": breweryToBeAdded.state_province,
+							"postal_code": breweryToBeAdded.postal_code,
+							"longitude": breweryToBeAdded.longitude,
+							"latitude": breweryToBeAdded.latitude,
+							"phone": breweryToBeAdded.phone,
+							"website_url": breweryToBeAdded.website_url
+						} 
+						await fetch("https://silver-space-robot-g4xj5p6796rq39g7g-3001.app.github.dev/api/breweries", {
+							method: "POST",
+							body: JSON.stringify(newBrewery),
+							headers: {
+								"Content-Type": "application/json"
+							}
+						})
+				}}
+				catch (error) {
+					console.error("Error fetching brewery info", error);
+				}
 			}
 		}
 	};

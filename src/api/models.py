@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 
 db = SQLAlchemy()
 
@@ -11,6 +12,7 @@ class User(db.Model):
     favorited_by = db.relationship("FavoriteUsers", back_populates="favorited_user", foreign_keys="FavoriteUsers.favorited_user_id")
     favorite_beers = db.relationship("FavoriteBeers", back_populates="owner", foreign_keys="FavoriteBeers.owner_id")
     favorite_breweries = db.relationship("FavoriteBreweries", back_populates="owner", foreign_keys="FavoriteBreweries.owner_id")
+    points = db.Column(db.Integer, default=0)
 
     def __init__(self, email, password, is_active=True):
         self.email = email
@@ -21,6 +23,16 @@ class User(db.Model):
     def __repr__(self):
             return f'<User {self.email}>'
     
+    def add_points(self, points):
+        self.points += points
+        db.session.commit()
+
+    def change_points(self, points, action):
+        self.points += points
+        transaction = PointTransaction(user_id=self.id, points=points, action=action)
+        db.session.add(transaction)
+        db.session.commit()
+    
     def serialize(self):
         favorite_users_dictionaries = [favorite.serialize() for favorite in self.favorite_users]
         favorite_beers_dictionaries = [favorite.serialize() for favorite in self.favorite_beers]
@@ -30,7 +42,8 @@ class User(db.Model):
             "email": self.email,
             "favorite_users": favorite_users_dictionaries,
             "favorite_beers": favorite_beers_dictionaries,
-            "favorite_breweries": favorite_breweries_dictionaries
+            "favorite_breweries": favorite_breweries_dictionaries,
+            "points": self.points
             # do not serialize the password, it's a security breach
         }
     
@@ -95,6 +108,7 @@ class Brewery(db.Model):
     address = db.Column(db.String(250))
     city = db.Column(db.String(250))
     state_province = db.Column(db.String(250))
+    postal_code = db.Column(db.String(250))
     longitude = db.Column(db.String(250))
     latitude = db.Column(db.String(250))
     phone = db.Column(db.String(250))
@@ -102,12 +116,13 @@ class Brewery(db.Model):
 
     favorited_by_users = db.relationship("FavoriteBreweries", back_populates="brewery", foreign_keys="FavoriteBreweries.favorited_brewery_id")
 
-    def __init__(self, brewery_name, brewery_type, address, city, state_province, longitude, latitude, phone, website_url):
+    def __init__(self, brewery_name, brewery_type, address, city, state_province, postal_code, longitude, latitude, phone, website_url):
         self.brewery_name = brewery_name
         self.brewery_type = brewery_type
         self.address = address
         self.city = city
         self.state_province = state_province
+        self.postal_code = postal_code
         self.longitude = longitude
         self.latitude = latitude
         self.phone = phone
@@ -125,6 +140,7 @@ class Brewery(db.Model):
             "address": self.address,
             "city": self.city,
             "state_province": self.state_province,
+            "postal_code": self.postal_code,
             "longitude": self.longitude,
             "latitude": self.latitude,
             "phone": self.phone,
@@ -157,4 +173,25 @@ class Beer(db.Model):
             "type": self.type,
             "flavor": self.flavor,
             "ABV": self.ABV
+        }
+    
+class PointTransaction(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    points = db.Column(db.Integer, nullable=False)
+    action = db.Column(db.String(250), nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship('User', backref=db.backref('point_transactions', lazy=True))
+
+    def __repr__(self):
+        return f'<PointTransaction user_id={self.user_id} points={self.points} action={self.action}>'
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "points": self.points,
+            "action": self.action,
+            "timestamp": self.timestamp.isoformat()
         }
