@@ -15,32 +15,76 @@ class BreweryInfo {
 		this.phone = resultFromServer.phone
 		this.website_url = resultFromServer.website_url
 		this.state = resultFromServer.state;
-		this.street = resultFromServer.street
+		this.street = resultFromServer.street;
 	}
 }
+class Address {
+	constructor(breweryInfo) {
+		this.street = breweryInfo.street || breweryInfo.address_1;
+		this.city = breweryInfo.city;
+		this.state = breweryInfo.state;
+		this.postal_code = breweryInfo.postal_code;
+		this.country = breweryInfo.country
+	}
+}
+class BreweryDestination {
+	constructor(breweryInfo) {
+		this.id = breweryInfo.id;
+		this.name = breweryInfo.name;
+		this.brewery_type = breweryInfo.brewery_type;
+		this.phone = breweryInfo.phone
+		this.website_url = breweryInfo.website_url;
+		this.address = new Address(breweryInfo); //create an address instance using BreweryInfo
+	}
+}
+class Route {
+	constructor(breweryDestination, travelTime, miles) {
+		this.breweryDestination = breweryDestination; // this is an instance of the brewerydestination class
+		this.travelTime = travelTime; //shown in minutes ideally
+		this.miles = miles //shown in miles ideally.. Km?
+	}
+}
+class Journey {
+	constructor() {
+		this.routes = []; // list of route objects
+		this.activeRouteIndex = -1;
+	}
+	addRoute(route) {
+		this.routes.push(route);
+	}
+	setActiveRoute(index) {
+		if (index >= 0 && index < this.routes.length) {
+			this.activeRouteIndex = index;
+		} else {
+			throw new error("Invalid route index.");
+		}
+	}
+	getActiveRoute() {
+		if (this.activeRouteIndex !== -1) {
+			return this.routes[this.activeRouteIndex];
+		}
+		return null;
+	}
+	getTotalTravelTime() {
+		return this.routes.reduce((total, route) => total + route.travelTime, 0)
+	}
+	getTotalMiles() {
+		return this.routes.reduce((total, route) => total + route.miles)
+	}
+}
+
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
 			breweryData: [],
-			routes: [],
-			demo: [
-				{
-					title: "FIRST",
-					background: "white",
-					initial: "white"
-				},
-				{
-					title: "SECOND",
-					background: "white",
-					initial: "white"
-				}
-			],
+			journey: [],
 			city: "",
 			state: "",
 			searchedBreweryData: [],
 			modalIsOpen: false,
 		},
 		actions: {
+			//starter function used to get us going.. it fetches 3 breweries at the moment
 			fetchBreweryInfo: async () => {
 				try {
 					const resp = await fetch("https://api.openbrewerydb.org/v1/breweries?per_page=3", {
@@ -54,6 +98,32 @@ const getState = ({ getStore, getActions, setStore }) => {
 					const brewery = new BreweryInfo(data);
 					setStore({ breweryData: data })
 					return brewery;
+				} catch (error) {
+					console.error("Error fetching brewery info", error);
+				}
+			},
+			fetchBreweryInfoTEST: async () => {
+				try {
+					const resp = await fetch("https://api.openbrewerydb.org/v1/breweries?per_page=3", {
+						method: "GET",
+						headers: {
+							"Content-type": "application/json"
+						}
+					});
+					let data = await resp.json();
+					console.log(data);
+					const breweryInfos = data.map(brewery => new BreweryInfo(brewery));
+					// Create routes based on the brewery information (for example purposes, using dummy travel times and distances)
+					const routes = breweryInfos.map(info => new Route(new BreweryDestination(info), Math.floor(Math.random() * 60), Math.floor(Math.random() * 20)));
+					const journey = new Journey();
+					routes.forEach(route => journey.addRoute(route));
+					journey.setActiveRoute(0);
+					setStore({
+						breweryData: breweryInfos,
+						routes: routes,
+						journey: journey
+					});
+					return journey;
 				} catch (error) {
 					console.error("Error fetching brewery info", error);
 				}
@@ -121,7 +191,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				setStore({ city: city, state: state })
 				actions.searchFunctionWithCity()
 			},
-
+			//function used to add individual objects into the routes array in the store
 			addToCurrentRoute: async (breweryObject) => {
 				try {
 					const store = getStore()
