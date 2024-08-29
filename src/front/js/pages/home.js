@@ -3,6 +3,7 @@ import { Context } from "../store/appContext";
 import brewbuddyimg from "../../img/DALL·E 2024-08-18.png"
 import "../../styles/home.css";
 import { BreweryCard } from "../component/BootstrapCard";
+import { BreweryRouteCard } from "../component/BootstrapCardRoute";
 import Modal from "../component/searchModal";
 
 
@@ -28,6 +29,9 @@ export const Home = () => {
 				<img src={brewbuddyimg} />
 				< Modal />
 				{eachBrewery}
+			</div>
+			<div>
+				<BreweryRouteCard/>
 			</div>
 
 			<button onClick={actions.fetchBreweryInfoTEST}>Fetch Brewery Info</button>
