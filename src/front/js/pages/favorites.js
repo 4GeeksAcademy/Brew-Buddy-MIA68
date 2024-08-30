@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 
 import { Context } from "../store/appContext";
 import "../../styles/favorites.css";
+import {FavoriteBeers} from "../component/FavoriteBeers"
 
 export const Favorites = () => {
   const { store, actions } = useContext(Context);
@@ -156,19 +157,23 @@ export const Favorites = () => {
           tabindex="0"
         >
           <h1>Beers</h1>
-          {store.favoriteBeers.map((item, index) => {
+          <FavoriteBeers/>
+          <div>
+          {/* {store.favoriteBeers?.map((item, index) => {
             return (
-              <div class="card text-center mb-3" style={{ width: "18rem" }}>
+              <div class="card text-center mb-3 mx-auto" style={{ width: "18rem" }}>
                 <div class="card-body">
                   <h5 class="card-title">{item.beer_name}</h5>
                   <p class="card-text">{item.flavor}</p>
                   <p class="card-text">{item.type}</p>
+                  <p class="card-text">{item.ABV}</p>
                   <a href="#" class="btn btn-primary">Go somewhere</a>
-                  {/* <a onClick={() => actions.handleFavoriteBeer(item.id)} href="#" class="btn btn-primary">Add To Favorites</a> */}
+                  <a onClick={() => actions.handleFavoriteBeer(item.id)} href="#" class="btn btn-primary">Add To Favorites</a>
                 </div>
               </div>
             )
-          })}
+          })}  */}
+          </div>
         </div>
       </div>
     </div>
