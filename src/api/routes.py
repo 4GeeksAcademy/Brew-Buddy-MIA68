@@ -39,7 +39,7 @@ def handle_login():
     if user and user.password == password:
         if user.is_active:
             # Check if the user has already logged in today
-            last_login = PointTransaction.query.filter_by(user_id=user.id, action="Daily login").order_by(PointTransaction.timestamp.desc()).first()
+            last_login = PointTransaction.query.filter_by(owner_id=user.id, action="Daily login").order_by(PointTransaction.timestamp.desc()).first()
             
             if not last_login or (datetime.utcnow() - last_login.timestamp) > timedelta(days=1):
                 # Award points for daily login
@@ -140,7 +140,7 @@ def handle_get_point_history():
     } for transaction in transactions])
 
 # Add a favorite beer for the current user with authentication
-@api.route('favorite_beers/<int:beer_id>', methods=['POST'])
+@api.route('/favorite_beers/<int:beer_id>', methods=['POST'])
 @jwt_required()
 def add_favorite_beer(beer_id):
     #return jsonify({"message": "Not implemented"}), 405
@@ -154,7 +154,7 @@ def add_favorite_beer(beer_id):
     return jsonify({"done": True}), 201
 
 # Add a favorite brewery for the current user with authentication
-@api.route('favorite_breweries/<int:brewery_id>', methods=['POST'])
+@api.route('/favorite_breweries/<int:brewery_id>', methods=['POST'])
 @jwt_required()
 def add_favorite_brewery(brewery_id):
     #return jsonify({"message": "Not implemented"}), 405
@@ -183,7 +183,7 @@ def add_favorite_brewery(brewery_id):
     }), 201
 
 # Add a favorite user for the current user with authentication
-@api.route('favorite_users/<int:user_id>', methods=['POST'])
+@api.route('/favorite_users/<int:user_id>', methods=['POST'])
 @jwt_required()
 def add_favorite_user(user_id):
     #return jsonify({"message": "Not implemented"}), 405
@@ -215,7 +215,7 @@ def add_favorite_user(user_id):
     }), 201
 
 # Delete a favorite beer with user authentication
-@api.route('favorite_beers/<int:beer_id>', methods=['DELETE'])
+@api.route('/favorite_beers/<int:beer_id>', methods=['DELETE'])
 @jwt_required()
 def delete_favorite_beer(beer_id):
     #return jsonify({"message": "Not implemented"}), 405
@@ -232,7 +232,7 @@ def delete_favorite_beer(beer_id):
         return jsonify({"error": "Favorite not found"}), 404
 
 # Delete a favorite brewery with user authentication
-@api.route('favorite_breweries/<int:brewery_id>', methods=['DELETE'])
+@api.route('/favorite_breweries/<int:brewery_id>', methods=['DELETE'])
 @jwt_required()
 def delete_favorite_brewery(brewery_id):
     #return jsonify({"message": "Not implemented"}), 405
@@ -249,7 +249,7 @@ def delete_favorite_brewery(brewery_id):
         return jsonify({"error": "Favorite not found"}), 404
 
 # Delete a favorite user with user authentication
-@api.route('favorite_users/<int:user_id>', methods=['DELETE'])
+@api.route('/favorite_users/<int:user_id>', methods=['DELETE'])
 @jwt_required()
 def delete_favorite_user(user_id):
     #return jsonify({"message": "Not implemented"}), 405

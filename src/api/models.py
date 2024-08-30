@@ -29,7 +29,7 @@ class User(db.Model):
 
     def change_points(self, points, action):
         self.points += points
-        transaction = PointTransaction(user_id=self.id, points=points, action=action)
+        transaction = PointTransaction(owner_id=self.id, points=points, action=action)
         db.session.add(transaction)
         db.session.commit()
     
