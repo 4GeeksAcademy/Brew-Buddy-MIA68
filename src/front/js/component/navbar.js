@@ -4,8 +4,6 @@ import { Link, useNavigate } from "react-router-dom";
 import BBLogo from "../../img/BB-Logo.jpg"
 import "../../styles/navbar.css"
 
-
-
 export const Navbar = () => {
 	const { store, actions } = useContext(Context);
 	const navigate = useNavigate();
@@ -13,7 +11,6 @@ export const Navbar = () => {
 	const handleLogout = () => {
 		actions.logout();
 		navigate("/");
-
 	}
 
 	return (
@@ -26,7 +23,8 @@ export const Navbar = () => {
 				<div className="ml-auto navbarButtons">
 					{store.token ? (
 						<>
-							<button className="btn btn-dark me-3">Profile</button>
+							<span className="me-3">Hello {store.userEmail}!</span>
+							<Link to="/UserProfile"><button className="btn btn-dark me-3">Profile</button></Link>
 							<button onClick={handleLogout} className="btn btn-dark">Log Out</button>
 						</>
 					) : (

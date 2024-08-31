@@ -75,6 +75,21 @@ def get_all_users():
     users = User.query.all()
     return jsonify([user.serialize() for user in users]), 200
 
+# Get user route to grab the info on the current user including authentication
+@api.route('/user', methods=['GET'])
+@jwt_required()
+def get_user_info():
+    current_user = get_current_user()
+    if not current_user:
+        return jsonify({"error": "User not authenticated"}), 401
+    
+    return jsonify({
+        "id": current_user.id,
+        "email": current_user.email,
+        "points": current_user.points,
+        "is_active": current_user.is_active
+    }), 200
+
 # Get all beers route
 @api.route('/beers', methods=['GET'])
 def get_all_beers():
