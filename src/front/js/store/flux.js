@@ -41,7 +41,7 @@ class BreweryDestination {
 }
 class Route {
 	constructor(breweryDestination, travelTime, miles) {
-		this.breweryDestination = breweryDestination; // this is an instance of the brewerydestination class
+		this.breweryDestination = breweryDestination; // this is an instance of the brewery destination class
 		this.travelTime = travelTime; //shown in minutes ideally
 		this.miles = miles //shown in miles ideally.. Km?
 	}
@@ -252,16 +252,37 @@ const getState = ({ getStore, getActions, setStore }) => {
 				actions.searchFunctionWithCity()
 			},
 			//function used to add individual objects into the routes array in the store
-			addToCurrentRoute: async (breweryObject) => {
+			addToCurrentJourney: async (breweryObject) => {
 				try {
-					const store = getStore()
-					store.routes.push(breweryObject)
-					setStore(store)
-				} catch (error) {
-					console.error("Error")
-				}
-			}
 
+					const store = getStore();
+					// Create a BreweryDestination from the breweryObject
+					const breweryDestination = new BreweryDestination(breweryObject);
+					// Create a new Route with the BreweryDestination
+					const newRoute = new Route(breweryDestination, 30, 10); // Replace 30 and 10 with actual travel time and miles
+					// Initialize a new journey if necessary
+					let currentJourney;
+					if (store.journey.length === 0) {
+						currentJourney = new Journey();
+						setStore({ ...store, journey: [currentJourney] });
+					} else {
+						// Retrieve the existing journey
+						currentJourney = store.journey[0];
+						// If the existing journey is not an instance of Journey, reinitialize it
+						if (!(currentJourney instanceof Journey)) {
+							console.warn("Reinitializing current journey");
+							currentJourney = new Journey();
+							setStore({ ...store, journey: [currentJourney] });
+						}
+					}
+					// Add the new route to the journey
+					currentJourney.addRoute(newRoute);
+					setStore({ ...store, journey: [currentJourney] });
+					console.log(store.journey[0].routes[0].travelTime);
+				} catch (error) {
+					console.error("Error adding to current journey", error);
+				}
+			},
 		}
 	};
 };

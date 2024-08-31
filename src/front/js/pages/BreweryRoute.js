@@ -2,7 +2,7 @@ import React, { useContext, useState } from "react";
 import { Context } from "../store/appContext";
 import brewbuddyimg from "../../img/DALL·E 2024-08-18.png"
 import "../../styles/home.css";
-import { BreweryCard } from "../component/BootstrapCard";
+import { BreweryCard, JourneyCard } from "../component/BootstrapCard";
 import "../../styles/BreweryRoute.css"
 
 // let map;
@@ -24,17 +24,26 @@ export const BreweryRoutes = () => {
     // const breweryRoute = store.routes.map((brewery, index) => (
     //     <BreweryCard key={index} breweryData={brewery} />
     // ))
-    const breweryRoute = store.routes.map((route, index) => (
-        <BreweryCard key={index} breweryData={route.breweryDestination} />
+    // const breweryRoute = store.routes.map((route, index) => (
+    //     <BreweryCard key={index} breweryData={route.breweryDestination} />
+    // ));
+    const journeys = store.journey.map((journey, journeyIndex) => (
+        <div key={journeyIndex}>
+            <h2>Current Journey</h2>
+            {journey.routes.map((route, routeIndex) => (
+                <JourneyCard key={routeIndex} breweryData={route.breweryDestination} />
+            ))}
+        </div>
     ));
-
-
     return (
         <div className="text-center mt-5">
             <h1>Hello Brew Buddy!!</h1>
             <div>
                 <img src={brewbuddyimg} />
-                {breweryRoute}
+                {/* {breweryRoute} */}
+            </div>
+            <div>
+                {journeys}
             </div>
             <button onClick={actions.fetchBreweryInfo}>Fetch Brewery Info</button>
             {/* <div id="map">

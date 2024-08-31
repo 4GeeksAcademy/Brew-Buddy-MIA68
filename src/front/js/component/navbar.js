@@ -39,7 +39,7 @@ export const Navbar = () => {
 
 			<ul className="nav nav-tabs mt-2 ps-3">
 				<li className="nav-item">
-					<Link to="/home">
+					<Link to="/">
 						<button className="nav-link">Home</button>
 
 					</Link>

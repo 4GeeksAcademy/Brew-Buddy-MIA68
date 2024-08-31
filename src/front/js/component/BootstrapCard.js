@@ -19,7 +19,7 @@ export const BreweryCard = (props) => {
                 </h4>
                 <h5>{props.breweryData.city}, {props.breweryData.state}</h5>
                 <p className="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                <button className="btn btn-primary" onClick={() => actions.addToCurrentRoute(props.breweryData)}>Add to my current route</button>
+                <button className="btn btn-primary" onClick={() => actions.addToCurrentJourney(props.breweryData)}>Add to my current route</button>
                 {/* J.R.: A favorites button for brewery */}
                 <a href="#" className="btn btn-info"><i className="fa-regular fa-star"></i></a>
                 {/* J.R.: A button for contact information of brewery */}
@@ -30,6 +30,21 @@ export const BreweryCard = (props) => {
                         <button className="btn btn-secondary">Visit Our Website!</button>
                     </a>
                 </p>
+            </div>
+        </div>
+    )
+}
+export const JourneyCard = (props) => {
+    const { store, actions } = useContext(Context);
+    const navigate = useNavigate()
+    return (
+        <div className="card">
+            <h5 className="card-header">{props.breweryData.name}</h5>
+            <div className="card-body">
+                <h5 className="card-title">Special title treatment</h5>
+                <p className="card-text">Travel Time: {store.journey[0].routes[0].travelTime} Minutes</p>
+                <p className="card-text">Distance: {store.journey[0].routes[0].miles} Miles</p>
+                <a href="#" className="btn btn-primary">Go somewhere</a>
             </div>
         </div>
     )
