@@ -72,7 +72,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 						sessionStorage.setItem("token", data.access_token);
 						setStore({ 
 							token: data.access_token,
-							userPoints: data.total_points
+							userPoints: data.total_points,
+							userEmail: email
 						});
 						
 						console.log("Login successful", data);
@@ -95,7 +96,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			logout: () => {
 				try {
 					sessionStorage.removeItem("token");
-					setStore({ token: null })
+					setStore({ token: null, userEmail: null })
 					console.log("logout successful");
 				} catch (error) {
 					console.error("error during logout", error);

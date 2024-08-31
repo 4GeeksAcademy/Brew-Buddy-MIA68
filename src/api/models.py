@@ -12,7 +12,7 @@ class User(db.Model):
     favorited_by = db.relationship("FavoriteUsers", back_populates="favorited_user", foreign_keys="FavoriteUsers.favorited_user_id")
     favorite_beers = db.relationship("FavoriteBeers", back_populates="owner", foreign_keys="FavoriteBeers.owner_id")
     favorite_breweries = db.relationship("FavoriteBreweries", back_populates="owner", foreign_keys="FavoriteBreweries.owner_id")
-    points = db.Column(db.Integer, default=0)
+    point_transactions = db.relationship("PointTransaction", back_populates="owner", foreign_keys="PointTransaction.owner_id")
 
     def __init__(self, email, password, is_active=True):
         self.email = email
@@ -22,6 +22,11 @@ class User(db.Model):
     # added repr to help with debugging by providing a readable string representation of the model instances
     def __repr__(self):
             return f'<User {self.email}>'
+    
+    def get_points(self):
+        total = 0
+        # loop through self.point_transactions and on each iteration add the value of the points property to an external (to the loop) variable 'sum' or 'total
+        # loop on each iteration and add to this variable
     
     def add_points(self, points):
         self.points += points
@@ -43,7 +48,7 @@ class User(db.Model):
             "favorite_users": favorite_users_dictionaries,
             "favorite_beers": favorite_beers_dictionaries,
             "favorite_breweries": favorite_breweries_dictionaries,
-            "points": self.points
+            "points": self.get_points()
             # do not serialize the password, it's a security breach
         }
     
