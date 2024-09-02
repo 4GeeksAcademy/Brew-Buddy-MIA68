@@ -52,6 +52,7 @@ def handle_login():
             access_token = create_access_token(identity=user.id)
             return jsonify({
                 "access_token": access_token,
+                "email": user.email,
                 "points_earned": points_earned,
                 "total_points": user.points
             })

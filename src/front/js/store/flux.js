@@ -26,6 +26,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
 			token: sessionStorage.getItem("token") || null,
+			userEmail: sessionStorage.getItem("userEmail") || null,
 			breweryData: [],
 			city: "",
 			state: "",
@@ -70,6 +71,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					if (response.ok) {
 						const data = await response.json();
 						sessionStorage.setItem("token", data.access_token);
+						sessionStorage.setItem("userEmail", data.email);
 						setStore({ 
 							token: data.access_token,
 							userPoints: data.total_points,
