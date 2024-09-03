@@ -12,7 +12,7 @@ class User(db.Model):
     favorited_by = db.relationship("FavoriteUsers", back_populates="favorited_user", foreign_keys="FavoriteUsers.favorited_user_id")
     favorite_beers = db.relationship("FavoriteBeers", back_populates="owner", foreign_keys="FavoriteBeers.owner_id")
     favorite_breweries = db.relationship("FavoriteBreweries", back_populates="owner", foreign_keys="FavoriteBreweries.owner_id")
-    points = db.Column(db.Integer, default=0)
+    point_transactions = db.relationship("PointTransaction", back_populates="owner")
 
     def __init__(self, email, password, is_active=True):
         self.email = email
@@ -23,13 +23,15 @@ class User(db.Model):
     def __repr__(self):
             return f'<User {self.email}>'
     
-    def add_points(self, points):
-        self.points += points
-        db.session.commit()
-
+    @property
+    def points(self):
+        total = 0
+        for transaction in self.point_transactions:
+            total += transaction.points
+        return total
+    
     def change_points(self, points, action):
-        self.points += points
-        transaction = PointTransaction(user_id=self.id, points=points, action=action)
+        transaction = PointTransaction(owner_id=self.id, points=points, action=action)
         db.session.add(transaction)
         db.session.commit()
     
@@ -179,7 +181,7 @@ class PointTransaction(db.Model):
     action = db.Column(db.String(250), nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
-    owner = db.relationship('User', backref=db.backref('point_transactions', lazy=True))
+    owner = db.relationship('User', back_populates='point_transactions')
 
     def __repr__(self):
         return f'<PointTransaction owner_id={self.owner_id} points={self.points} action={self.action}>'

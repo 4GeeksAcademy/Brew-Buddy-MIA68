@@ -39,7 +39,7 @@ def handle_login():
     if user and user.password == password:
         if user.is_active:
             # Check if the user has already logged in today
-            last_login = PointTransaction.query.filter_by(user_id=user.id, action="Daily login").order_by(PointTransaction.timestamp.desc()).first()
+            last_login = PointTransaction.query.filter_by(owner_id=user.id, action="Daily login").order_by(PointTransaction.timestamp.desc()).first()
             
             if not last_login or (datetime.utcnow() - last_login.timestamp) > timedelta(days=1):
                 # Award points for daily login
@@ -52,6 +52,7 @@ def handle_login():
             access_token = create_access_token(identity=user.id)
             return jsonify({
                 "access_token": access_token,
+                "email": user.email,
                 "points_earned": points_earned,
                 "total_points": user.points
             })
@@ -74,6 +75,24 @@ def get_current_user():
 def get_all_users():
     users = User.query.all()
     return jsonify([user.serialize() for user in users]), 200
+
+# Get user route to grab the info on the current user including authentication
+@api.route('/user', methods=['GET'])
+@jwt_required()
+def get_user_info():
+    current_user = get_current_user()
+    if not current_user:
+        return jsonify({"error": "User not authenticated"}), 401
+    
+    user_data = current_user.serialize()
+    return jsonify(user_data), 200
+    
+    # return jsonify({
+    #     "id": current_user.id,
+    #     "email": current_user.email,
+    #     "points": current_user.points,
+    #     "is_active": current_user.is_active
+    # }), 200
 
 # Get all beers route
 @api.route('/beers', methods=['GET'])
@@ -140,7 +159,7 @@ def handle_get_point_history():
     } for transaction in transactions])
 
 # Add a favorite beer for the current user with authentication
-@api.route('favorite_beers/<int:beer_id>', methods=['POST'])
+@api.route('/favorite_beers/<int:beer_id>', methods=['POST'])
 @jwt_required()
 def add_favorite_beer(beer_id):
     #return jsonify({"message": "Not implemented"}), 405
@@ -154,7 +173,7 @@ def add_favorite_beer(beer_id):
     return jsonify({"done": True}), 201
 
 # Add a favorite brewery for the current user with authentication
-@api.route('favorite_breweries/<int:brewery_id>', methods=['POST'])
+@api.route('/favorite_breweries/<int:brewery_id>', methods=['POST'])
 @jwt_required()
 def add_favorite_brewery(brewery_id):
     #return jsonify({"message": "Not implemented"}), 405
@@ -183,7 +202,7 @@ def add_favorite_brewery(brewery_id):
     }), 201
 
 # Add a favorite user for the current user with authentication
-@api.route('favorite_users/<int:user_id>', methods=['POST'])
+@api.route('/favorite_users/<int:user_id>', methods=['POST'])
 @jwt_required()
 def add_favorite_user(user_id):
     #return jsonify({"message": "Not implemented"}), 405
@@ -215,7 +234,7 @@ def add_favorite_user(user_id):
     }), 201
 
 # Delete a favorite beer with user authentication
-@api.route('favorite_beers/<int:beer_id>', methods=['DELETE'])
+@api.route('/favorite_beers/<int:beer_id>', methods=['DELETE'])
 @jwt_required()
 def delete_favorite_beer(beer_id):
     #return jsonify({"message": "Not implemented"}), 405
@@ -232,7 +251,7 @@ def delete_favorite_beer(beer_id):
         return jsonify({"error": "Favorite not found"}), 404
 
 # Delete a favorite brewery with user authentication
-@api.route('favorite_breweries/<int:brewery_id>', methods=['DELETE'])
+@api.route('/favorite_breweries/<int:brewery_id>', methods=['DELETE'])
 @jwt_required()
 def delete_favorite_brewery(brewery_id):
     #return jsonify({"message": "Not implemented"}), 405
@@ -249,7 +268,7 @@ def delete_favorite_brewery(brewery_id):
         return jsonify({"error": "Favorite not found"}), 404
 
 # Delete a favorite user with user authentication
-@api.route('favorite_users/<int:user_id>', methods=['DELETE'])
+@api.route('/favorite_users/<int:user_id>', methods=['DELETE'])
 @jwt_required()
 def delete_favorite_user(user_id):
     #return jsonify({"message": "Not implemented"}), 405

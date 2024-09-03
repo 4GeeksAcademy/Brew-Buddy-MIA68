@@ -26,11 +26,13 @@ const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
 			token: sessionStorage.getItem("token") || null,
+			userEmail: sessionStorage.getItem("userEmail") || null,
 			breweryData: [],
 			city: "",
 			state: "",
 			searchedBreweryData: [],
 			modalIsOpen: false,
+			userPoints: 0,
 		},
 		actions: {
 			signUp: async (email, password) => {
@@ -65,25 +67,38 @@ const getState = ({ getStore, getActions, setStore }) => {
 							"Content-type": "application/json"
 						},
 						body: JSON.stringify({ email, password })
-					})
+					});
 					if (response.ok) {
 						const data = await response.json();
 						sessionStorage.setItem("token", data.access_token);
-						setStore({ token: data.access_token })
-						console.log("login successful", data);
+						sessionStorage.setItem("userEmail", data.email);
+						setStore({ 
+							token: data.access_token,
+							userPoints: data.total_points,
+							userEmail: email
+						});
+						
+						console.log("Login successful", data);
+						return { 
+							success: true, 
+							points_earned: data.points_earned, 
+							total_points: data.total_points 
+						};
 					} else {
 						const errorData = await response.json();
-						console.error("login failed", errorData);
+						console.error("Login failed", errorData);
+						return { success: false };
 					}
 				} catch (error) {
-					console.error("error during login", error);
+					console.error("Error during login", error);
+					return { success: false };
 				}
 			},
 
 			logout: () => {
 				try {
 					sessionStorage.removeItem("token");
-					setStore({ token: null })
+					setStore({ token: null, userEmail: null })
 					console.log("logout successful");
 				} catch (error) {
 					console.error("error during logout", error);
@@ -169,7 +184,25 @@ const getState = ({ getStore, getActions, setStore }) => {
 				const actions = getActions();
 				setStore({ city: city, state: state })
 				actions.searchFunctionWithCity()
-			}
+			},
+
+			fetchUserPoints: async () => {
+				try {
+				  const resp = await fetch("/api/user/points", {
+					headers: { 'Authorization': `Bearer ${token}` },
+				  });
+				  const data = await resp.json();
+				  setStore({ userPoints: data.points });
+				} catch (error) {
+				  console.error("Error fetching user points", error);
+				}
+			  },
+			  setUserPoints: (points) => {
+                setStore({ userPoints: points });
+            },
+			  updateUserPoints: (newPoints) => {
+				setStore({ userPoints: newPoints });
+			  }
 
 		}
 	};
