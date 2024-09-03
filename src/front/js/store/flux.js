@@ -49,10 +49,17 @@ class Route {
 class Journey {
 	constructor() {
 		this.routes = []; // list of route objects
+		this.breweryReviews = [];
 		this.activeRouteIndex = -1;
 	}
 	addRoute(route) {
 		this.routes.push(route);
+	}
+	addBreweryReview(breweryReview) {
+		this.breweryReviews.push(breweryReview);
+	}
+	getBreweryReview(breweryId) {
+		return this.breweryReviews.find(review => review.brewery.id === breweryId);
 	}
 	setActiveRoute(index) {
 		if (index >= 0 && index < this.routes.length) {
@@ -75,6 +82,30 @@ class Journey {
 	}
 }
 
+class BeerReview {
+	constructor(beerName, rating, notes = "", isFavorite = false) {
+		this.beerName = beerName;
+		this.rating = rating;
+		this.notes = notes;
+		this.isFavorite = isFavorite;
+		this.dateTried = new Date();
+	}
+}
+class BreweryReview {
+	constructor(brewery, overallRating, reviewText = "", isFavoriteBrewery = false) {
+		this.brewery = brewery;
+		this.overallRating = overallRating;
+		this.reviewText = reviewText;
+		this.beerReviews = [];
+		this.isFavoriteBrewery = isFavoriteBrewery;
+		this.visitDate = new Date();
+	}
+
+	// Method to add a beer review
+	addBeerReview(beerReview) {
+		this.beerReviews.push(beerReview);
+	}
+}
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
