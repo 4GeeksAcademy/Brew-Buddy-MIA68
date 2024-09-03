@@ -17,10 +17,94 @@ class BreweryInfo {
 		this.phone = resultFromServer.phone
 		this.website_url = resultFromServer.website_url
 		this.state = resultFromServer.state;
-		this.street = resultFromServer.street
+		this.street = resultFromServer.street;
 	}
 }
-class Result {
+class Address {
+	constructor(breweryInfo) {
+		this.street = breweryInfo.street || breweryInfo.address_1;
+		this.city = breweryInfo.city;
+		this.state = breweryInfo.state;
+		this.postal_code = breweryInfo.postal_code;
+		this.country = breweryInfo.country
+	}
+}
+class BreweryDestination {
+	constructor(breweryInfo) {
+		this.id = breweryInfo.id;
+		this.name = breweryInfo.name;
+		this.brewery_type = breweryInfo.brewery_type;
+		this.phone = breweryInfo.phone
+		this.website_url = breweryInfo.website_url;
+		this.address = new Address(breweryInfo); //create an address instance using BreweryInfo
+	}
+}
+class Route {
+	constructor(breweryDestination, travelTime, miles) {
+		this.breweryDestination = breweryDestination; // this is an instance of the brewery destination class
+		this.travelTime = travelTime; //shown in minutes ideally
+		this.miles = miles //shown in miles ideally.. Km?
+	}
+}
+class Journey {
+	constructor() {
+		this.routes = []; // list of route objects
+		this.breweryReviews = [];
+		this.activeRouteIndex = -1;
+	}
+	addRoute(route) {
+		this.routes.push(route);
+	}
+	addBreweryReview(breweryReview) {
+		this.breweryReviews.push(breweryReview);
+	}
+	getBreweryReview(breweryId) {
+		return this.breweryReviews.find(review => review.brewery.id === breweryId);
+	}
+	setActiveRoute(index) {
+		if (index >= 0 && index < this.routes.length) {
+			this.activeRouteIndex = index;
+		} else {
+			throw new error("Invalid route index.");
+		}
+	}
+	getActiveRoute() {
+		if (this.activeRouteIndex !== -1) {
+			return this.routes[this.activeRouteIndex];
+		}
+		return null;
+	}
+	getTotalTravelTime() {
+		return this.routes.reduce((total, route) => total + route.travelTime, 0)
+	}
+	getTotalMiles() {
+		return this.routes.reduce((total, route) => total + route.miles)
+	}
+}
+
+class BeerReview {
+	constructor(beerName, rating, notes = "", isFavorite = false) {
+		this.beerName = beerName;
+		this.rating = rating;
+		this.notes = notes;
+		this.isFavorite = isFavorite;
+		this.dateTried = new Date();
+	}
+}
+class BreweryReview {
+	constructor(brewery, overallRating, reviewText = "", isFavoriteBrewery = false) {
+		this.brewery = brewery;
+		this.overallRating = overallRating;
+		this.reviewText = reviewText;
+		this.beerReviews = [];
+		this.isFavoriteBrewery = isFavoriteBrewery;
+		this.visitDate = new Date();
+	}
+
+	// Method to add a beer review
+	addBeerReview(beerReview) {
+		this.beerReviews.push(beerReview);
+	}
 }
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
@@ -28,6 +112,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			token: sessionStorage.getItem("token") || null,
 			userEmail: sessionStorage.getItem("userEmail") || null,
 			breweryData: [],
+			journey: [],
 			city: "",
 			state: "",
 			searchedBreweryData: [],
@@ -72,17 +157,17 @@ const getState = ({ getStore, getActions, setStore }) => {
 						const data = await response.json();
 						sessionStorage.setItem("token", data.access_token);
 						sessionStorage.setItem("userEmail", data.email);
-						setStore({ 
+						setStore({
 							token: data.access_token,
 							userPoints: data.total_points,
 							userEmail: email
 						});
-						
+
 						console.log("Login successful", data);
-						return { 
-							success: true, 
-							points_earned: data.points_earned, 
-							total_points: data.total_points 
+						return {
+							success: true,
+							points_earned: data.points_earned,
+							total_points: data.total_points
 						};
 					} else {
 						const errorData = await response.json();
@@ -105,6 +190,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 
+			//starter function used to get us going.. it fetches 3 breweries at the moment
 			fetchBreweryInfo: async () => {
 				try {
 					const resp = await fetch("https://api.openbrewerydb.org/v1/breweries?per_page=3", {
@@ -118,6 +204,32 @@ const getState = ({ getStore, getActions, setStore }) => {
 					const brewery = new BreweryInfo(data);
 					setStore({ breweryData: data })
 					return brewery;
+				} catch (error) {
+					console.error("Error fetching brewery info", error);
+				}
+			},
+			fetchBreweryInfoTEST: async () => {
+				try {
+					const resp = await fetch("https://api.openbrewerydb.org/v1/breweries?per_page=3", {
+						method: "GET",
+						headers: {
+							"Content-type": "application/json"
+						}
+					});
+					let data = await resp.json();
+					console.log(data);
+					const breweryInfos = data.map(brewery => new BreweryInfo(brewery));
+					// Create routes based on the brewery information (for example purposes, using dummy travel times and distances)
+					const routes = breweryInfos.map(info => new Route(new BreweryDestination(info), Math.floor(Math.random() * 60), Math.floor(Math.random() * 20)));
+					const journey = new Journey();
+					routes.forEach(route => journey.addRoute(route));
+					journey.setActiveRoute(0);
+					setStore({
+						breweryData: breweryInfos,
+						routes: routes,
+						journey: journey
+					});
+					return journey;
 				} catch (error) {
 					console.error("Error fetching brewery info", error);
 				}
@@ -188,24 +300,57 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 			fetchUserPoints: async () => {
 				try {
-				  const resp = await fetch("/api/user/points", {
-					headers: { 'Authorization': `Bearer ${token}` },
-				  });
-				  const data = await resp.json();
-				  setStore({ userPoints: data.points });
+					const resp = await fetch("/api/user/points", {
+						headers: { 'Authorization': `Bearer ${token}` },
+					});
+					const data = await resp.json();
+					setStore({ userPoints: data.points });
 				} catch (error) {
-				  console.error("Error fetching user points", error);
+					console.error("Error fetching user points", error);
 				}
-			  },
-			  setUserPoints: (points) => {
-                setStore({ userPoints: points });
-            },
-			  updateUserPoints: (newPoints) => {
+			},
+			setUserPoints: (points) => {
+				setStore({ userPoints: points });
+			},
+			updateUserPoints: (newPoints) => {
 				setStore({ userPoints: newPoints });
-			  }
+			}
 
-		}
-	};
+		},
+		//function used to add individual objects into the routes array in the store
+		addToCurrentJourney: async (breweryObject) => {
+			try {
+
+				const store = getStore();
+				// Create a BreweryDestination from the breweryObject
+				const breweryDestination = new BreweryDestination(breweryObject);
+				// Create a new Route with the BreweryDestination
+				const newRoute = new Route(breweryDestination, 30, 10); // Replace 30 and 10 with actual travel time and miles
+				// Initialize a new journey if necessary
+				let currentJourney;
+				if (store.journey.length === 0) {
+					currentJourney = new Journey();
+					setStore({ ...store, journey: [currentJourney] });
+				} else {
+					// Retrieve the existing journey
+					currentJourney = store.journey[0];
+					// If the existing journey is not an instance of Journey, reinitialize it
+					if (!(currentJourney instanceof Journey)) {
+						console.warn("Reinitializing current journey");
+						currentJourney = new Journey();
+						setStore({ ...store, journey: [currentJourney] });
+					}
+				}
+				// Add the new route to the journey
+				currentJourney.addRoute(newRoute);
+				setStore({ ...store, journey: [currentJourney] });
+				console.log(store.journey[0].routes[0].travelTime);
+			} catch (error) {
+				console.error("Error adding to current journey", error);
+			}
+		},
+	}
 };
+
 
 export default getState;

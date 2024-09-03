@@ -37,7 +37,7 @@ export const Navbar = () => {
 
 			<ul className="nav nav-tabs mt-2 ps-3">
 				<li className="nav-item">
-					<Link to="/home">
+					<Link to="/">
 						<button className="nav-link">Home</button>
 
 					</Link>
@@ -50,6 +50,11 @@ export const Navbar = () => {
 				</li>
 				<li className="nav-item">
 					<a className="nav-link" href="#">Brews Near Me</a>
+				</li>
+				<li className="nav-item">
+					<Link to="/routes" className="nav-link">
+						Current Route
+					</Link>
 				</li>
 
 			</ul>
