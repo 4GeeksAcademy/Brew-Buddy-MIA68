@@ -5,6 +5,7 @@ import "../../styles/home.css";
 import { BreweryCard, JourneyCard } from "../component/BootstrapCard";
 import { ReviewForm } from '../component/ReviewForm';
 import "../../styles/BreweryRoute.css"
+import { BreweryRouteCard } from "../component/BootstrapCardRoute";
 
 // let map;
 // function myMap() {
@@ -36,6 +37,10 @@ export const BreweryRoutes = () => {
             ))}
         </div>
     ));
+
+    const eachBrewery = store.breweryData.map((breweryData, index) => (
+		<BreweryRouteCard key={index} breweryData={breweryData} />
+	));
     return (
         <div className="text-center mt-5">
             <h1>Hello Brew Buddy!!</h1>
@@ -45,6 +50,9 @@ export const BreweryRoutes = () => {
             </div>
             <div>
                 {journeys}
+            </div>
+            <div>
+                <BreweryRouteCard />
             </div>
             <button onClick={actions.fetchBreweryInfo}>Fetch Brewery Info</button>
             {/* <div id="map">

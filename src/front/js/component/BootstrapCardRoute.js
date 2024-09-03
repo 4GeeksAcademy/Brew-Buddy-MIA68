@@ -20,8 +20,8 @@ export const BreweryRouteCard = (props) => {
                             <ul className="vertical-menu w-100">
                                 <li className="border border-solid">
                                     <div>
-                                        Name
-                                        </div>
+                                        {props.breweryData.name}
+                                    </div>
                                     <div>
                                         Address
                                     </div>
@@ -32,7 +32,7 @@ export const BreweryRouteCard = (props) => {
                                 <li className="border border-solid">
                                     <div>
                                         Name
-                                        </div>
+                                    </div>
                                     <div>
                                         Address
                                     </div>
@@ -43,7 +43,7 @@ export const BreweryRouteCard = (props) => {
                                 <li className="border border-solid">
                                     <div>
                                         Name
-                                        </div>
+                                    </div>
                                     <div>
                                         Address
                                     </div>
