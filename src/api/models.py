@@ -12,7 +12,7 @@ class User(db.Model):
     favorited_by = db.relationship("FavoriteUsers", back_populates="favorited_user", foreign_keys="FavoriteUsers.favorited_user_id")
     favorite_beers = db.relationship("FavoriteBeers", back_populates="owner", foreign_keys="FavoriteBeers.owner_id")
     favorite_breweries = db.relationship("FavoriteBreweries", back_populates="owner", foreign_keys="FavoriteBreweries.owner_id")
-    point_transactions = db.relationship("PointTransaction", back_populates="owner", foreign_keys="PointTransaction.owner_id")
+    point_transactions = db.relationship("PointTransaction", back_populates="owner")
 
     def __init__(self, email, password, is_active=True):
         self.email = email
@@ -23,17 +23,14 @@ class User(db.Model):
     def __repr__(self):
             return f'<User {self.email}>'
     
-    def get_points(self):
+    @property
+    def points(self):
         total = 0
-        # loop through self.point_transactions and on each iteration add the value of the points property to an external (to the loop) variable 'sum' or 'total
-        # loop on each iteration and add to this variable
+        for transaction in self.point_transactions:
+            total += transaction.points
+        return total
     
-    def add_points(self, points):
-        self.points += points
-        db.session.commit()
-
     def change_points(self, points, action):
-        self.points += points
         transaction = PointTransaction(owner_id=self.id, points=points, action=action)
         db.session.add(transaction)
         db.session.commit()
@@ -48,7 +45,7 @@ class User(db.Model):
             "favorite_users": favorite_users_dictionaries,
             "favorite_beers": favorite_beers_dictionaries,
             "favorite_breweries": favorite_breweries_dictionaries,
-            "points": self.get_points()
+            "points": self.points
             # do not serialize the password, it's a security breach
         }
     
@@ -184,7 +181,7 @@ class PointTransaction(db.Model):
     action = db.Column(db.String(250), nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
-    owner = db.relationship('User', backref=db.backref('point_transactions', lazy=True))
+    owner = db.relationship('User', back_populates='point_transactions')
 
     def __repr__(self):
         return f'<PointTransaction owner_id={self.owner_id} points={self.points} action={self.action}>'

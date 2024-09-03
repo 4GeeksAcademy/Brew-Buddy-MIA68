@@ -52,6 +52,7 @@ def handle_login():
             access_token = create_access_token(identity=user.id)
             return jsonify({
                 "access_token": access_token,
+                "email": user.email,
                 "points_earned": points_earned,
                 "total_points": user.points
             })
@@ -83,12 +84,15 @@ def get_user_info():
     if not current_user:
         return jsonify({"error": "User not authenticated"}), 401
     
-    return jsonify({
-        "id": current_user.id,
-        "email": current_user.email,
-        "points": current_user.points,
-        "is_active": current_user.is_active
-    }), 200
+    user_data = current_user.serialize()
+    return jsonify(user_data), 200
+    
+    # return jsonify({
+    #     "id": current_user.id,
+    #     "email": current_user.email,
+    #     "points": current_user.points,
+    #     "is_active": current_user.is_active
+    # }), 200
 
 # Get all beers route
 @api.route('/beers', methods=['GET'])
