@@ -70,7 +70,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 					})
 					if (response.ok) {
 						const data = await response.json();
-						console.log(data.access_token)
 						sessionStorage.setItem("token", data.access_token);
 						setStore({ token: data.access_token })
 						console.log("login successful");
