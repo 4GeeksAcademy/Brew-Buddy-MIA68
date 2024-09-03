@@ -110,12 +110,14 @@ const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
 			token: sessionStorage.getItem("token") || null,
+			userEmail: sessionStorage.getItem("userEmail") || null,
 			breweryData: [],
 			journey: [],
 			city: "",
 			state: "",
 			searchedBreweryData: [],
 			modalIsOpen: false,
+			userPoints: 0,
 		},
 		actions: {
 			signUp: async (email, password) => {
@@ -150,25 +152,38 @@ const getState = ({ getStore, getActions, setStore }) => {
 							"Content-type": "application/json"
 						},
 						body: JSON.stringify({ email, password })
-					})
+					});
 					if (response.ok) {
 						const data = await response.json();
 						sessionStorage.setItem("token", data.access_token);
-						setStore({ token: data.access_token })
-						console.log("login successful", data);
+						sessionStorage.setItem("userEmail", data.email);
+						setStore({
+							token: data.access_token,
+							userPoints: data.total_points,
+							userEmail: email
+						});
+
+						console.log("Login successful", data);
+						return {
+							success: true,
+							points_earned: data.points_earned,
+							total_points: data.total_points
+						};
 					} else {
 						const errorData = await response.json();
-						console.error("login failed", errorData);
+						console.error("Login failed", errorData);
+						return { success: false };
 					}
 				} catch (error) {
-					console.error("error during login", error);
+					console.error("Error during login", error);
+					return { success: false };
 				}
 			},
 
 			logout: () => {
 				try {
 					sessionStorage.removeItem("token");
-					setStore({ token: null })
+					setStore({ token: null, userEmail: null })
 					console.log("logout successful");
 				} catch (error) {
 					console.error("error during logout", error);
@@ -282,40 +297,60 @@ const getState = ({ getStore, getActions, setStore }) => {
 				setStore({ city: city, state: state })
 				actions.searchFunctionWithCity()
 			},
-			//function used to add individual objects into the routes array in the store
-			addToCurrentJourney: async (breweryObject) => {
-				try {
 
-					const store = getStore();
-					// Create a BreweryDestination from the breweryObject
-					const breweryDestination = new BreweryDestination(breweryObject);
-					// Create a new Route with the BreweryDestination
-					const newRoute = new Route(breweryDestination, 30, 10); // Replace 30 and 10 with actual travel time and miles
-					// Initialize a new journey if necessary
-					let currentJourney;
-					if (store.journey.length === 0) {
-						currentJourney = new Journey();
-						setStore({ ...store, journey: [currentJourney] });
-					} else {
-						// Retrieve the existing journey
-						currentJourney = store.journey[0];
-						// If the existing journey is not an instance of Journey, reinitialize it
-						if (!(currentJourney instanceof Journey)) {
-							console.warn("Reinitializing current journey");
-							currentJourney = new Journey();
-							setStore({ ...store, journey: [currentJourney] });
-						}
-					}
-					// Add the new route to the journey
-					currentJourney.addRoute(newRoute);
-					setStore({ ...store, journey: [currentJourney] });
-					console.log(store.journey[0].routes[0].travelTime);
+			fetchUserPoints: async () => {
+				try {
+					const resp = await fetch("/api/user/points", {
+						headers: { 'Authorization': `Bearer ${token}` },
+					});
+					const data = await resp.json();
+					setStore({ userPoints: data.points });
 				} catch (error) {
-					console.error("Error adding to current journey", error);
+					console.error("Error fetching user points", error);
 				}
 			},
-		}
-	};
+			setUserPoints: (points) => {
+				setStore({ userPoints: points });
+			},
+			updateUserPoints: (newPoints) => {
+				setStore({ userPoints: newPoints });
+			}
+
+		},
+		//function used to add individual objects into the routes array in the store
+		addToCurrentJourney: async (breweryObject) => {
+			try {
+
+				const store = getStore();
+				// Create a BreweryDestination from the breweryObject
+				const breweryDestination = new BreweryDestination(breweryObject);
+				// Create a new Route with the BreweryDestination
+				const newRoute = new Route(breweryDestination, 30, 10); // Replace 30 and 10 with actual travel time and miles
+				// Initialize a new journey if necessary
+				let currentJourney;
+				if (store.journey.length === 0) {
+					currentJourney = new Journey();
+					setStore({ ...store, journey: [currentJourney] });
+				} else {
+					// Retrieve the existing journey
+					currentJourney = store.journey[0];
+					// If the existing journey is not an instance of Journey, reinitialize it
+					if (!(currentJourney instanceof Journey)) {
+						console.warn("Reinitializing current journey");
+						currentJourney = new Journey();
+						setStore({ ...store, journey: [currentJourney] });
+					}
+				}
+				// Add the new route to the journey
+				currentJourney.addRoute(newRoute);
+				setStore({ ...store, journey: [currentJourney] });
+				console.log(store.journey[0].routes[0].travelTime);
+			} catch (error) {
+				console.error("Error adding to current journey", error);
+			}
+		},
+	}
 };
+
 
 export default getState;

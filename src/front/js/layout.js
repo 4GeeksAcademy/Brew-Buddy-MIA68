@@ -8,6 +8,7 @@ import injectContext from "./store/appContext";
 import { SignUp } from "./pages/SignUp";
 import { Login } from "./pages/Login";
 import { Favorites } from "./pages/favorites";
+import { UserProfile } from "./pages/UserProfile";
 
 import { Navbar } from "./component/navbar";
 import { BreweryRoutes } from "./pages/BreweryRoute";
@@ -33,6 +34,7 @@ const Layout = () => {
                         <Route element={<h1>Not found!</h1>} />
                         <Route element={<Favorites />} path="/favorites" />
                         <Route element={<SignUp />} path="/sign-up" />
+                        <Route element={<UserProfile />} path="/UserProfile" />
                     </Routes>
                     {/* <Footer /> */}
                 </ScrollToTop>

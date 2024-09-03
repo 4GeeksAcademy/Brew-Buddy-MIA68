@@ -52,6 +52,7 @@ def handle_login():
             access_token = create_access_token(identity=user.id)
             return jsonify({
                 "access_token": access_token,
+                "email": user.email,
                 "points_earned": points_earned,
                 "total_points": user.points
             })
@@ -74,6 +75,24 @@ def get_current_user():
 def get_all_users():
     users = User.query.all()
     return jsonify([user.serialize() for user in users]), 200
+
+# Get user route to grab the info on the current user including authentication
+@api.route('/user', methods=['GET'])
+@jwt_required()
+def get_user_info():
+    current_user = get_current_user()
+    if not current_user:
+        return jsonify({"error": "User not authenticated"}), 401
+    
+    user_data = current_user.serialize()
+    return jsonify(user_data), 200
+    
+    # return jsonify({
+    #     "id": current_user.id,
+    #     "email": current_user.email,
+    #     "points": current_user.points,
+    #     "is_active": current_user.is_active
+    # }), 200
 
 # Get all beers route
 @api.route('/beers', methods=['GET'])
