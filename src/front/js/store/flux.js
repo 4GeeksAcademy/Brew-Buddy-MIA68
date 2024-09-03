@@ -25,7 +25,7 @@ class Result {
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
-			token: sessionStorage.getItem("token") || null,
+			token: sessionStorage.getItem("token") || "",
 			breweryData: [],
 			city: "",
 			state: "",
@@ -70,7 +70,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 					})
 					if (response.ok) {
 						const data = await response.json();
-						console.log(data.access_token)
 						sessionStorage.setItem("token", data.access_token);
 						setStore({ token: data.access_token })
 						console.log("login successful");
@@ -92,7 +91,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					console.error("error during logout", error);
 				}
 			},
-
+			
 			fetchBreweryInfo: async () => {
 				try {
 					const resp = await fetch("https://api.openbrewerydb.org/v1/breweries?per_page=3", {

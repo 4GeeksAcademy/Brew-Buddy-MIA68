@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { Context } from "../store/appContext";
 import "../../styles/favorites.css";
 import {FavoriteBeers} from "../component/FavoriteBeers"
+import craft from "../../img/craft.jpg"
 
 export const Favorites = () => {
   const { store, actions } = useContext(Context);
@@ -94,9 +95,9 @@ export const Favorites = () => {
               width: "300px",
               height: "200px",
               backgroundImage:
-                "url(https://www.toptal.com/developers/img-resize/view/6e3352f7dfa5cd6c3a997dd44040f485.jpg)",
+                `url(${craft})`,
               backgroundSize: "cover",
-              backgroundPosition: "center",
+              backgroundPosition: "right 9px center",
             }}
           >
             <h1 className="text-white favorites-text-shadowing">Beers</h1>

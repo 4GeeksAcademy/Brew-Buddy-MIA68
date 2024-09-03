@@ -29,10 +29,14 @@ export const Login = () => {
                 <div className="form-group mt-3">
                     <label>Password</label>
                     <input type="text" placeholder="type password here" className="form-control" id="password" value={credentials.password} onChange={handleChange} required />
+                    <div className="mt-1 mb-4">
+                        <Link to="/forgot-password" className="mt-3">Click here to reset your password</Link>
+                    </div>
+                    <button type="submit" className="btn btn-dark">Submit</button>
                 </div>
-                <button type="submit" className="btn btn-dark mt-3">Submit</button>
             </form>
             <div className="mt-4 text-center">
+                <br></br>
                 <Link to="/sign-up">Click here to sign up</Link>
             </div>
 
