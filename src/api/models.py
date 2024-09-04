@@ -12,6 +12,7 @@ class User(db.Model):
     favorited_by = db.relationship("FavoriteUsers", back_populates="favorited_user", foreign_keys="FavoriteUsers.favorited_user_id")
     favorite_beers = db.relationship("FavoriteBeers", back_populates="owner", foreign_keys="FavoriteBeers.owner_id")
     favorite_breweries = db.relationship("FavoriteBreweries", back_populates="owner", foreign_keys="FavoriteBreweries.owner_id")
+    points = db.Column(db.Integer, default=0)
     point_transactions = db.relationship("PointTransaction", back_populates="owner")
 
     def __init__(self, email, password, is_active=True):
@@ -110,6 +111,7 @@ class Brewery(db.Model):
     address = db.Column(db.String(250))
     city = db.Column(db.String(250))
     state_province = db.Column(db.String(250))
+    postal_code = db.Column(db.String(250))
     longitude = db.Column(db.String(250))
     latitude = db.Column(db.String(250))
     phone = db.Column(db.String(250))
@@ -117,12 +119,13 @@ class Brewery(db.Model):
 
     favorited_by_users = db.relationship("FavoriteBreweries", back_populates="brewery", foreign_keys="FavoriteBreweries.favorited_brewery_id")
 
-    def __init__(self, brewery_name, brewery_type, address, city, state_province, longitude, latitude, phone, website_url):
+    def __init__(self, brewery_name, brewery_type, address, city, state_province, postal_code, longitude, latitude, phone, website_url):
         self.brewery_name = brewery_name
         self.brewery_type = brewery_type
         self.address = address
         self.city = city
         self.state_province = state_province
+        self.postal_code = postal_code
         self.longitude = longitude
         self.latitude = latitude
         self.phone = phone
@@ -140,6 +143,7 @@ class Brewery(db.Model):
             "address": self.address,
             "city": self.city,
             "state_province": self.state_province,
+            "postal_code": self.postal_code,
             "longitude": self.longitude,
             "latitude": self.latitude,
             "phone": self.phone,
@@ -152,18 +156,20 @@ class Beer(db.Model):
     type = db.Column(db.String(250))
     flavor = db.Column(db.String(250))
     ABV = db.Column(db.String(250))
+    brewery_Id = db.Column(db.String(250))
 
     favorited_by_users = db.relationship("FavoriteBeers", back_populates="beer", foreign_keys="FavoriteBeers.favorited_beer_id")
 
-    def __init__(self, beer_name, type, flavor, ABV):
+    def __init__(self, beer_name, type, flavor, ABV, brewery_Id):
         self.beer_name = beer_name
         self.type = type
         self.flavor = flavor
         self.ABV = ABV
+        self.brewery_Id = brewery_Id
 
     # added repr to help with debugging by providing a readable string representation of the model instances
-    def __repr__(self):
-        return f'<Beer {self.beer_name}>'
+    #def __repr__(self):
+     #   return f'<Beer {self.beer_name}>'
 
     def serialize(self):
         return {
@@ -171,16 +177,22 @@ class Beer(db.Model):
             "beer_name": self.beer_name,
             "type": self.type,
             "flavor": self.flavor,
-            "ABV": self.ABV
+            "ABV": self.ABV,
+            "brewery_Id": self.brewery_Id
         }
     
 class PointTransaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     points = db.Column(db.Integer, nullable=False)
     action = db.Column(db.String(250), nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
+    user = db.relationship('User', backref=db.backref('point_transactions', lazy=True))
+
+    def __repr__(self):
+        return f'<PointTransaction user_id={self.user_id} points={self.points} action={self.action}>'
     owner = db.relationship('User', back_populates='point_transactions')
 
     def __repr__(self):
@@ -189,6 +201,7 @@ class PointTransaction(db.Model):
     def serialize(self):
         return {
             "id": self.id,
+            "user_id": self.user_id,
             "owner_id": self.owner_id,
             "points": self.points,
             "action": self.action,

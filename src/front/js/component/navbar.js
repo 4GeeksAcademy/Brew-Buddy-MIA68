@@ -4,6 +4,8 @@ import { Link, useNavigate } from "react-router-dom";
 import BBLogo from "../../img/BB-Logo.jpg"
 import "../../styles/navbar.css"
 
+
+
 export const Navbar = () => {
 	const { store, actions } = useContext(Context);
 	const navigate = useNavigate();
