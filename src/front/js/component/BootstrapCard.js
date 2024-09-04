@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
+import { Link } from "react-router-dom";
 
 export const BreweryCard = (props) => {
     const { store, actions } = useContext(Context);
@@ -29,6 +30,9 @@ export const BreweryCard = (props) => {
                     <a href={props.breweryData.website_url} target="blank">
                         <button className="btn btn-secondary">Visit Our Website!</button>
                     </a>
+                    <Link to={"/brewery/" + props.breweryData.id} target="blank">
+                        <button className="btn btn-secondary">See Brews</button>
+                    </Link>
                 </p>
             </div>
         </div>

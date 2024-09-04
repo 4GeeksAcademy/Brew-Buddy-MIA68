@@ -8,6 +8,7 @@ from flask_cors import CORS
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 import hashlib
 from datetime import datetime, timedelta
+from sqlalchemy import select
 
 api = Blueprint('api', __name__)
 
@@ -79,6 +80,13 @@ def get_all_users():
 @api.route('/beers', methods=['GET'])
 def get_all_beers():
     beers = Beer.query.all()
+    return jsonify([beer.serialize() for beer in beers]), 200
+
+# Get all brewery beers route
+@api.route('/brewery/beers/<string:uid>', methods=['GET'])
+def get_brewery_beers(uid):
+    brewery_id = uid
+    beers = Beer.query.filter(Beer.brewery_Id == brewery_id )
     return jsonify([beer.serialize() for beer in beers]), 200
 
 # Post a new brewery
