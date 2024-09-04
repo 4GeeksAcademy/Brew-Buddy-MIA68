@@ -17,7 +17,7 @@ class BreweryInfo {
 		this.phone = resultFromServer.phone
 		this.website_url = resultFromServer.website_url
 		this.state = resultFromServer.state;
-		this.street = resultFromServer.street
+		this.street = resultFromServer.street;
 	}
 }
 class Address {
@@ -110,9 +110,9 @@ const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
 			token: sessionStorage.getItem("token") || null,
+			userEmail: sessionStorage.getItem("userEmail") || null,
 			breweryData: [],
 			journey: [],
-			beerData: [],
 			city: "",
 			state: "",
 			searchedBreweryData: [],
@@ -190,6 +190,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 
+			//starter function used to get us going.. it fetches 3 breweries at the moment
 			fetchBreweryInfo: async () => {
 				try {
 					const resp = await fetch("https://api.openbrewerydb.org/v1/breweries?per_page=3", {
@@ -296,6 +297,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				setStore({ city: city, state: state })
 				actions.searchFunctionWithCity()
 			},
+
 			fetchUserPoints: async () => {
 				try {
 					const resp = await fetch("/api/user/points", {
@@ -313,6 +315,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			updateUserPoints: (newPoints) => {
 				setStore({ userPoints: newPoints });
 			},
+			//function used to add individual objects into the routes array in the store
 			addToCurrentJourney: async (breweryObject) => {
 				try {
 
@@ -344,47 +347,11 @@ const getState = ({ getStore, getActions, setStore }) => {
 					console.error("Error adding to current journey", error);
 				}
 			},
-			createBreweryList: (data) => {
-				const store = getStore();
-				const brewery = new BreweryInfo(data);
-				const breweries = [];
-				const micro = "micro";
-				const nano = "nano";
-				const brewpub = "brewpub";
-				const regional = "regional";
-					for(const element of data){
-						if(element.brewery_type === micro || element.brewery_type === nano || element.brewery_type === brewpub || element.brewery_type === regional){
-							if (element.address_1 === null || element.latitude === null){
-								continue
-							}
-							breweries.push(element)
-						}
-								
-					}
-							setStore({ breweryData: breweries })
-							console.log(store.breweryData)
-							return brewery
-			},
-			getBreweryBeers: async (id) => {
-				const store = getStore();
-				try {
-					const response = await fetch(`${process.env.BACKEND_URL}brewery/beers/`+ id, {
-						method: "GET",
-						headers: {
-							"Content-type": "application/json"
-						}
-					})
-				const data = await response.json()
-				
-				setStore({beerData: data})
-				console.log(store.beerData)
-				}
-				catch (error) {
-					console.error("Error fetching brewery info", error);
-				}
-			}
-		}
-	};
+
+		},
+
+	}
 };
+
 
 export default getState;

@@ -13,7 +13,6 @@ export const Navbar = () => {
 	const handleLogout = () => {
 		actions.logout();
 		navigate("/");
-
 	}
 
 	return (
@@ -26,7 +25,8 @@ export const Navbar = () => {
 				<div className="ml-auto navbarButtons">
 					{store.token ? (
 						<>
-							<button className="btn btn-dark me-3">Profile</button>
+							<span className="me-3">Hello {store.userEmail}!</span>
+							<Link to="/UserProfile"><button className="btn btn-dark me-3">Profile</button></Link>
 							<button onClick={handleLogout} className="btn btn-dark">Log Out</button>
 						</>
 					) : (
@@ -52,6 +52,11 @@ export const Navbar = () => {
 				</li>
 				<li className="nav-item">
 					<a className="nav-link" href="#">Brews Near Me</a>
+				</li>
+				<li className="nav-item">
+					<Link to="/routes" className="nav-link">
+						Current Route
+					</Link>
 				</li>
 
 			</ul>
