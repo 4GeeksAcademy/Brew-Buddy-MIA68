@@ -109,6 +109,27 @@ const getState = ({ getStore, getActions, setStore }) => {
 					console.error("Error fetching brewery info", error);
 				}
 			},
+			addFavoriteBrewery: async (brewery) => {
+			try {
+				const resp = await fetch(process.env.BACKEND_URL+"/api/favorite_breweries/" +brewery.id, {
+					method: "POST",
+					headers: {
+						Authorization: "Bearer " + sessionStorage.getItem("token")
+					}
+				})
+				if (response.ok) {
+					const data = await response.json();
+					console.log("brewery added favorites");
+				} else {
+					const errorData = await response.json();
+					console.error("failed to add", errorData);
+				}
+			} catch (error) {
+				console.error("error adding brewery", error);
+			}
+				
+		
+			},
 			searchFunctionWithCity: async () => {
 				try {
 					const store = getStore();
