@@ -28,6 +28,7 @@ export const Home = () => {
 			<button onClick={actions.toggleSearch}>Search</button>
 			<div>
 				<img src={brewbuddyimg} />
+
 				< Modal />
 				{eachBrewery}
 			</div>

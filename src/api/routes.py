@@ -8,6 +8,7 @@ from flask_cors import CORS
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 import hashlib
 from datetime import datetime, timedelta
+from sqlalchemy import select
 
 from pyeasyencrypt.pyeasyencrypt import encrypt_string, decrypt_string
 from api.send_email import send_email
@@ -182,11 +183,39 @@ def get_all_beers():
     beers = Beer.query.all()
     return jsonify([beer.serialize() for beer in beers]), 200
 
+# Get all brewery beers route
+@api.route('/brewery/beers/<string:uid>', methods=['GET'])
+def get_brewery_beers(uid):
+    brewery_id = uid
+    beers = Beer.query.filter(Beer.brewery_Id == brewery_id )
+    return jsonify([beer.serialize() for beer in beers]), 200
+
+# Post a new brewery
+@api.route('/breweries', methods=['POST'])
+def post_new_brewery():
+    body = request.get_json()
+    new_brewery_name = body["brewery_name"]
+    new_brewery_type = body["brewery_type"]
+    new_address = body["address"]
+    new_city = body["city"]
+    new_state_province = body["state_province"]
+    new_postal_code = body["postal_code"]
+    new_longitude = body["longitude"]
+    new_latitude = body["latitude"]
+    new_phone = body["phone"]
+    new_website_url = body["website_url"]
+    brewery = Brewery(brewery_name = new_brewery_name, brewery_type= new_brewery_type, address= new_address, city= new_city, state_province= new_state_province, postal_code= new_postal_code, longitude= new_longitude, latitude= new_latitude, phone= new_phone, website_url= new_website_url)
+    db.session.add(brewery)
+    db.session.commit()
+    return "msg: brewery added:", 200
+
 # Get all breweries route
 @api.route('/breweries', methods=['GET'])
 def get_all_breweries():
     breweries = Brewery.query.all()
     return jsonify([brewery.serialize() for brewery in breweries]), 200
+
+
 
 # Access user's favorite beers list (with user authentication)
 @api.route('/favorite_beers', methods=['GET'])
