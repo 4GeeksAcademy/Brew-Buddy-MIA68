@@ -238,7 +238,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 			searchFunctionWithCity: async () => {
 				try {
 					const store = getStore();
-					const breweries = [];
+					const actions = getActions();
+					const breweries = []
 					const response = await fetch(`https://api.openbrewerydb.org/v1/breweries?by_city=${store.city}`, {
 						method: "GET",
 						headers: {
@@ -253,30 +254,22 @@ const getState = ({ getStore, getActions, setStore }) => {
 							breweries.push(element)
 						}
 					});
-					setStore({ breweryData: breweries })
-					console.log(store.breweryData)
-					return brewery
+					actions.createBreweryList(breweries)
 				} catch (error) {
 					console.error("Error fetching brewery info", error);
 				}
 			},
 			searchFunctionWithLocation: async () => {
 				const store = getStore();
-				const breweries = [];
+				const actions = getActions();
 				if ("geolocation" in navigator) {
 					try {
 						navigator.geolocation.getCurrentPosition(async (position) => {
 							const longitude = position.coords.longitude;
 							const latitude = position.coords.latitude;
-							const response = await fetch(`https://api.openbrewerydb.org/v1/breweries?by_dist=${latitude},${longitude}&per_page=10`)
+							const response = await fetch(`https://api.openbrewerydb.org/v1/breweries?by_dist=${latitude},${longitude}&per_page=20`)
 							let data = await response.json();
-							const brewery = new BreweryInfo(data);
-							data.forEach(element => {
-								breweries.push(element)
-							})
-							setStore({ breweryData: breweries })
-							console.log(store.breweryData)
-							return brewery
+							actions.createBreweryList(data)
 						})
 					} catch (error) {
 						console.error("Error fetching brewery info", error)
@@ -298,7 +291,27 @@ const getState = ({ getStore, getActions, setStore }) => {
 				setStore({ city: city, state: state })
 				actions.searchFunctionWithCity()
 			},
+			createBreweryList: (data) => {
+				const store = getStore();
+				const brewery = new BreweryInfo(data);
+				const breweries = [];
+				const micro = "micro";
+				const nano = "nano";
+				const brewpub = "brewpub";
+				const regional = "regional";
+				for (const element of data) {
+					if (element.brewery_type === micro || element.brewery_type === nano || element.brewery_type === brewpub || element.brewery_type === regional) {
+						if (element.address_1 === null || element.latitude === null) {
+							continue
+						}
+						breweries.push(element)
+					}
 
+				}
+				setStore({ breweryData: breweries })
+				console.log(store.breweryData)
+				return brewery
+			},
 			fetchUserPoints: async () => {
 				try {
 					const resp = await fetch("/api/user/points", {
@@ -350,14 +363,19 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},
 			getBreweryBeers: async (uid) => {
 				const store = getStore();
-				const response = await fetch(`${process.env.BACKEND_URL}/brewery/beers/` + uid, {
-					method: "GET",
-					headers: {
-						"Content-type": "application/json"
-					}
-				})
-				const data = await response.json();
-				setStore({ beerData: data });
+				try {
+					const response = await fetch(`${process.env.BACKEND_URL}/brewery/beers/` + uid, {
+						method: "GET",
+						headers: {
+							"Content-type": "application/json"
+						}
+					})
+					const data = await response.json();
+					setStore({ beerData: data });
+				}
+				catch (error) {
+					console.error("Error fetching beer info", error);
+				}
 			}
 
 		},
