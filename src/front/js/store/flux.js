@@ -112,6 +112,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			token: sessionStorage.getItem("token") || null,
 			userEmail: sessionStorage.getItem("userEmail") || null,
 			breweryData: [],
+			beerData: [],
 			journey: [],
 			city: "",
 			state: "",
@@ -347,6 +348,17 @@ const getState = ({ getStore, getActions, setStore }) => {
 					console.error("Error adding to current journey", error);
 				}
 			},
+			getBreweryBeers: async (uid) => {
+				const store = getStore();
+				const response = await fetch(`${process.env.BACKEND_URL}/brewery/beers/` + uid, {
+					method: "GET",
+					headers: {
+						"Content-type": "application/json"
+					}
+				})
+				const data = await response.json();
+				setStore({ beerData: data });
+			}
 
 		},
 

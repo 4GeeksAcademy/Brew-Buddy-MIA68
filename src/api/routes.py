@@ -100,6 +100,13 @@ def get_all_beers():
     beers = Beer.query.all()
     return jsonify([beer.serialize() for beer in beers]), 200
 
+# Get all brewery beers route
+@api.route('/brewery/beers/<string:uid>', methods=['GET'])
+def get_brewery_beers(uid):
+    brewery_id = uid
+    beers = Beer.query.filter(Beer.brewery_Id == brewery_id )
+    return jsonify([beer.serialize() for beer in beers]), 200
+
 # Get all breweries route
 @api.route('/breweries', methods=['GET'])
 def get_all_breweries():

@@ -29,6 +29,9 @@ export const BreweryCard = (props) => {
                     <a href={props.breweryData.website_url} target="blank">
                         <button className="btn btn-secondary">Visit Our Website!</button>
                     </a>
+                    <a href={"/brewery/" + props.breweryData.id} target="blank">
+                        <button className="btn btn-secondary">See Brews</button>
+                    </a>
                 </p>
             </div>
         </div>
