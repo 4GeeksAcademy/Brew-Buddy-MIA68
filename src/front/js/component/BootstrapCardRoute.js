@@ -23,32 +23,10 @@ export const BreweryRouteCard = (props) => {
                                         {props.breweryData.name}
                                     </div>
                                     <div>
-                                        Address
+                                        {store.journey[0].routes[0].travelTime}
                                     </div>
                                     <div>
-                                        Number
-                                    </div>
-                                </li>
-                                <li className="border border-solid">
-                                    <div>
-                                        Name
-                                    </div>
-                                    <div>
-                                        Address
-                                    </div>
-                                    <div>
-                                        Number
-                                    </div>
-                                </li>
-                                <li className="border border-solid">
-                                    <div>
-                                        Name
-                                    </div>
-                                    <div>
-                                        Address
-                                    </div>
-                                    <div>
-                                        Number
+                                        {store.journey[0].routes[0].miles}
                                     </div>
                                 </li>
                             </ul>
