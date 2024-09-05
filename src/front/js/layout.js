@@ -10,6 +10,7 @@ import { Login } from "./pages/Login";
 import { Favorites } from "./pages/favorites";
 import { ForgotPassword } from "./pages/ForgotPassword";
 import { ResetPassword } from "./pages/ResetPassword";
+import { UserProfile } from "./pages/UserProfile";
 
 import { Navbar } from "./component/navbar";
 // import { Footer } from "./component/footer";
@@ -35,6 +36,7 @@ const Layout = () => {
                         <Route element={<ForgotPassword />} path="/forgot-password" />
                         <Route element={<ResetPassword />} path="/reset_password/:token" />
                         <Route element={<SignUp />} path="/sign-up" />
+                        <Route element={<UserProfile />} path="/UserProfile" />
                     </Routes>
                     {/* <Footer /> */}
                 </ScrollToTop>
