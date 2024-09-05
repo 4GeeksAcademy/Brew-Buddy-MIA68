@@ -109,14 +109,16 @@ class BreweryReview {
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
-			token: sessionStorage.getItem("token") || null,
-			userEmail: sessionStorage.getItem("userEmail") || null,
+			token: sessionStorage.getItem("token") || "",
+			userEmail: sessionStorage.getItem("userEmail") || "",
 			breweryData: [],
 			journey: [],
 			city: "",
 			state: "",
 			searchedBreweryData: [],
 			modalIsOpen: false,
+			favoriteBeers: [],
+			favoritePeople: [],
 			userPoints: 0,
 		},
 		actions: {
@@ -345,6 +347,61 @@ const getState = ({ getStore, getActions, setStore }) => {
 					console.log(store.journey[0].routes[0].travelTime);
 				} catch (error) {
 					console.error("Error adding to current journey", error);
+				}
+			},
+			getFavoriteBeers: async () => {
+				try {
+					const response = await fetch(`${process.env.BACKEND_URL}/api/favorite_beers`, {
+						headers: {
+							"Content-Type": "application/json",
+							Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+						},
+					});
+			
+					if (response.ok) {
+						const data = await response.json();
+						setStore({ favoriteBeers: data });
+					} else {
+						console.error("Failed to fetch favorite beers", response.status);
+					}
+				} catch (error) {
+					console.error("Error fetching favorite beers", error);
+				}
+			},
+			getFavoritePeople: async() => {
+				let response = await fetch(process.env.BACKEND_URL+"api/favorite_users", {headers:{
+					"Content-Type": "application/json", 
+					Authorization: "Bearer "+sessionStorage.getItem("token")
+				}})
+				if (response.status !=200) {
+					console.log("error occurred while getting favorite users", response.status)
+					return false
+				} 
+				let data = await response.json()
+				setStore({favoritePeople:data})
+				
+			},
+			addFavoriteBeer: async (beerId) => {
+				try {
+					const response = await fetch(`${process.env.BACKEND_URL}/api/favorite_beers/${beerId}`, {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+							Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+						},
+					});
+			
+					if (response.ok) {
+						await getActions().getFavoriteBeers();
+						console.log("Favorite beer added successfully");
+						return true;
+					} else {
+						console.error("Error adding favorite beer");
+						return false;
+					}
+				} catch (error) {
+					console.error("Error adding favorite beer", error);
+					return false;
 				}
 			},
 

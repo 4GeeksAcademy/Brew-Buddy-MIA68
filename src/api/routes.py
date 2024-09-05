@@ -9,12 +9,16 @@ from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_requir
 import hashlib
 from datetime import datetime, timedelta
 
+from pyeasyencrypt.pyeasyencrypt import encrypt_string, decrypt_string
+from api.send_email import send_email
+import datetime
+import json, os
+
 api = Blueprint('api', __name__)
 
 # Allow CORS requests to this API
 CORS(api)
 
-# User sign up route including authentication to hash passwords
 @api.route('/signup', methods=['POST'])
 def handle_signup():
     body = request.get_json()
@@ -38,28 +42,124 @@ def handle_login():
     user = User.query.filter_by(email = email).first()
     if user and user.password == password:
         if user.is_active:
-            # Check if the user has already logged in today
-            last_login = PointTransaction.query.filter_by(owner_id=user.id, action="Daily login").order_by(PointTransaction.timestamp.desc()).first()
-            
-            if not last_login or (datetime.utcnow() - last_login.timestamp) > timedelta(days=1):
-                # Award points for daily login
-                points_earned = 1
-                user.change_points(points_earned, "Daily login")
-                db.session.commit()
-            else:
-                points_earned = 0
-
             access_token = create_access_token(identity=user.id)
-            return jsonify({
-                "access_token": access_token,
-                "email": user.email,
-                "points_earned": points_earned,
-                "total_points": user.points
-            })
+            return jsonify(access_token=access_token)
         else:
             return jsonify({"error": "User is not active"}), 403
     else:
         return jsonify({"error": "Invalid email or password"}), 401
+
+# User log in route with password hashing - for active users only
+# @api.route('/login', methods=['POST'])
+# def handle_login():
+#     body = request.get_json()
+#     email = body["email"]
+#     password = hashlib.sha256(body["password"].encode("utf-8")).hexdigest()
+#     user = User.query.filter_by(email = email).first()
+#     if user and user.password == password:
+#         if user.is_active:
+            # Check if the user has already logged in today
+            # last_login = PointTransaction.query.filter_by(owner_id=user.id, action="Daily login").order_by(PointTransaction.timestamp.desc()).first()
+            
+            # if not last_login or (datetime.utcnow() - last_login.timestamp) > timedelta(days=1):
+            #     # Award points for daily login
+            #     points_earned = 1
+            #     user.change_points(points_earned, "Daily login")
+            #     db.session.commit()
+            # else:
+            #     points_earned = 0
+
+    #         access_token = create_access_token(identity=user.id)
+    #         return jsonify({
+    #             "access_token": access_token,
+    #             # "points_earned": points_earned,
+    #             "total_points": user.points
+    #         })
+    #     else:
+    #         return jsonify({"error": "User is not active"}), 403
+    # else:
+    #     return jsonify({"error": "Invalid email or password"}), 401
+
+@api.route("/forgot_password", methods=["POST"])
+def forgot_password():
+    data=request.json
+    email=data.get("email")
+    if not email:
+        return jsonify({"message": "email is required"}), 400
+    user = User.query.filter_by(email=email) .first()
+    if user is None:
+        return jsonify({"message": "email does not exist"}), 400
+    
+    # Set token expiry time (e.g., 2 hours from now)
+    expiration_time = (datetime.datetime.now() + datetime.timedelta(hours=2)).isoformat()
+
+    #jwt_access_token 
+    token= encrypt_string(json.dumps({
+        "email": email, 
+        "exp": expiration_time,
+        "current_time": datetime.datetime.now().isoformat()
+    }), os.getenv("FLASK_APP_KEY"))
+    email_value = f"Here is the password recovery link!\n{os.getenv('FRONTEND_URL')}/reset_password/{token}"
+    send_email(email, email_value, "Subject: password recovery for BrewBuddy")
+    return jsonify({"message": "recovery password has been sent"}), 200
+
+
+@api.route("/change_password", methods=["PUT"])
+@jwt_required()  # This ensures that the request includes a valid JWT token
+def change_password():
+    data = request.json
+    secret = data.get("secret")
+    password = data.get("password")
+    
+    if not secret or not password:
+        return jsonify({"message": "Invalid or expired token"}), 400
+    
+    try:
+        # This will now work because @jwt_required() has validated the token
+        user_id = get_jwt_identity()
+        print(f"Decoded JWT Identity: {user_id}")
+        
+        user = User.query.get(user_id)
+        user.password = hashlib.sha256(password.encode("utf-8")).hexdigest()
+        db.session.commit()
+        
+        # Send an email notification after the password has been changed
+        email_body = "Your password has been changed successfully. If you did not request this change, please contact support."
+        send_email(user.email, email_body, "Password Change Notification")
+
+        return jsonify({"message": "Password changed successfully"}), 200
+    except Exception as e:
+        print(f"Token decryption failed: {str(e)}")
+        return jsonify({"message": "Invalid or expired token"}), 400
+
+@api.route("/reset_password", methods=["PUT"])
+def reset_password():
+    data = request.get_json()
+    password = data.get("password")
+    secret = data.get("secret")
+
+    if not password:
+        return jsonify({"message": "Please provide a new password."}), 400
+
+    try:
+        json_secret = json.loads(decrypt_string(secret, os.getenv('FLASK_APP_KEY')))
+    except Exception as e:
+        return jsonify({"message": "Invalid or expired token."}), 400
+
+    email = json_secret.get('email')
+    if not email:
+        return jsonify({"message": "Invalid token data."}), 400
+
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        return jsonify({"message": "Email does not exist"}), 400
+
+    user.password = hashlib.sha256(password.encode()).hexdigest()
+    db.session.commit()
+
+    send_email(email, "Your password has been changed successfully.", "Password Change Notification")
+
+    return jsonify({"message": "Password successfully changed."}), 200
 
 # Get the user from the database - active users only
 def get_current_user():
@@ -75,24 +175,6 @@ def get_current_user():
 def get_all_users():
     users = User.query.all()
     return jsonify([user.serialize() for user in users]), 200
-
-# Get user route to grab the info on the current user including authentication
-@api.route('/user', methods=['GET'])
-@jwt_required()
-def get_user_info():
-    current_user = get_current_user()
-    if not current_user:
-        return jsonify({"error": "User not authenticated"}), 401
-    
-    user_data = current_user.serialize()
-    return jsonify(user_data), 200
-    
-    # return jsonify({
-    #     "id": current_user.id,
-    #     "email": current_user.email,
-    #     "points": current_user.points,
-    #     "is_active": current_user.is_active
-    # }), 200
 
 # Get all beers route
 @api.route('/beers', methods=['GET'])
@@ -114,9 +196,11 @@ def handle_get_favorite_beers():
     current_user = get_current_user()
     if not current_user:
         return jsonify({"error": "User not authenticated"}), 401
-    
-    favorite_beers = FavoriteBeers.query.filter_by(owner_id=current_user.id).all()
-    return jsonify([favorite_beer.serialize() for favorite_beer in favorite_beers]), 200
+    favorite_beers=[]
+    favorite_beersid = FavoriteBeers.query.filter_by(owner_id=current_user.id).all()
+    for x in range(len(favorite_beersid)):
+        favorite_beers.append(Beer.query.filter_by(id=favorite_beersid[x].favorited_beer_id).first().serialize())
+    return jsonify(favorite_beers), 200
 
 # Access user's favorite breweries list (with user authentication)
 @api.route('/favorite_breweries', methods=['GET'])
@@ -134,6 +218,7 @@ def handle_get_favorite_breweries():
 @api.route('/favorite_users', methods=['GET'])
 @jwt_required()
 def handle_get_favorite_users():
+    # update to better resemble favorite beers
     #return jsonify({"message": "Not implemented"}), 405
     current_user = get_current_user()
     if not current_user:

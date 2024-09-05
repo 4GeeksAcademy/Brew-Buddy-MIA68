@@ -12,6 +12,8 @@ import { UserProfile } from "./pages/UserProfile";
 
 import { Navbar } from "./component/navbar";
 import { BreweryRoutes } from "./pages/BreweryRoute";
+import { ForgotPassword } from "./pages/ForgotPassword";
+import { ResetPassword } from "./pages/ResetPassword";
 // import { Footer } from "./component/footer";
 
 //create your first component
@@ -33,6 +35,8 @@ const Layout = () => {
                         <Route element={<BreweryRoutes />} path="/routes" />
                         <Route element={<h1>Not found!</h1>} />
                         <Route element={<Favorites />} path="/favorites" />
+                        <Route element={<ForgotPassword />} path="/forgot-password" />
+                        <Route element={<ResetPassword />} path="/reset_password/:token" />
                         <Route element={<SignUp />} path="/sign-up" />
                         <Route element={<UserProfile />} path="/UserProfile" />
                     </Routes>

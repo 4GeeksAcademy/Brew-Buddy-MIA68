@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Context } from "../store/appContext";
+import { Link } from "react-router-dom";
 
 export const UserProfile = () => {
     const { store, actions } = useContext(Context);
@@ -92,7 +93,7 @@ export const UserProfile = () => {
             </div>
             {/* EJQ - insert link to reset password when the ForgotPassword page is built */}
             {/* <Link to="/ForgotPassword"><button className="btn btn-primary mt-2">Reset Password</button></Link> */}
-            <button className="btn btn-primary mt-3">Reset Password</button>
+            <div className="mt-5"><Link to="/forgot-password">Change My Password</Link></div>
             
             {/* EJQ - maybe allow users to upload their own profile pics */}
             {/* <input type="file" accept="image/*" onChange={handleImageUpload} /> */}

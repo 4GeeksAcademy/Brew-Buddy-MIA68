@@ -1,0 +1,6 @@
+Changes made:
+Forgot Password.js and Reset Password.js 
+Flux.js want signup, login and logout 
+Pages
+
+pipenv install pyeasyencrypt
