@@ -38,7 +38,7 @@ export const BreweryCard = (props) => {
         </div>
     )
 }
-export const JourneyCard = (props, brewery, onReview) => {
+export const JourneyCard = ({brewery, onReview, ...props }) => {
     const { store, actions } = useContext(Context);
     const navigate = useNavigate()
     return (
