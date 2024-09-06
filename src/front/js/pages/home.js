@@ -5,6 +5,7 @@ import "../../styles/home.css";
 import { BreweryCard } from "../component/BootstrapCard";
 import { BreweryRouteCard } from "../component/BootstrapCardRoute";
 import Modal from "../component/searchModal";
+import { Link } from "react-router-dom";
 
 
 export const Home = () => {
@@ -36,6 +37,7 @@ export const Home = () => {
 			</div>
 
 			<button onClick={actions.fetchBreweryInfoTEST}>Fetch Brewery Info</button>
+			{/* <div className="mt-5"><Link to="/forgot-password">Change My Password</Link></div> */}
 		</div>
 	);
 };
