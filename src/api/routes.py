@@ -12,7 +12,6 @@ from sqlalchemy import select
 
 from pyeasyencrypt.pyeasyencrypt import encrypt_string, decrypt_string
 from api.send_email import send_email
-import datetime
 import json, os
 
 api = Blueprint('api', __name__)
@@ -35,22 +34,6 @@ def handle_signup():
     return jsonify(response_body), 200
 
 # User log in route with password hashing - for active users only
-@api.route('/login', methods=['POST'])
-def handle_login():
-    body = request.get_json()
-    email = body["email"]
-    password = hashlib.sha256(body["password"].encode("utf-8")).hexdigest()
-    user = User.query.filter_by(email = email).first()
-    if user and user.password == password:
-        if user.is_active:
-            access_token = create_access_token(identity=user.id)
-            return jsonify(access_token=access_token)
-        else:
-            return jsonify({"error": "User is not active"}), 403
-    else:
-        return jsonify({"error": "Invalid email or password"}), 401
-
-# User log in route with password hashing - for active users only
 # @api.route('/login', methods=['POST'])
 # def handle_login():
 #     body = request.get_json()
@@ -59,27 +42,43 @@ def handle_login():
 #     user = User.query.filter_by(email = email).first()
 #     if user and user.password == password:
 #         if user.is_active:
-            # Check if the user has already logged in today
-            # last_login = PointTransaction.query.filter_by(owner_id=user.id, action="Daily login").order_by(PointTransaction.timestamp.desc()).first()
-            
-            # if not last_login or (datetime.utcnow() - last_login.timestamp) > timedelta(days=1):
-            #     # Award points for daily login
-            #     points_earned = 1
-            #     user.change_points(points_earned, "Daily login")
-            #     db.session.commit()
-            # else:
-            #     points_earned = 0
+#             access_token = create_access_token(identity=user.id)
+#             return jsonify(access_token=access_token)
+#         else:
+#             return jsonify({"error": "User is not active"}), 403
+#     else:
+#         return jsonify({"error": "Invalid email or password"}), 401
 
-    #         access_token = create_access_token(identity=user.id)
-    #         return jsonify({
-    #             "access_token": access_token,
-    #             # "points_earned": points_earned,
-    #             "total_points": user.points
-    #         })
-    #     else:
-    #         return jsonify({"error": "User is not active"}), 403
-    # else:
-    #     return jsonify({"error": "Invalid email or password"}), 401
+# User log in route with password hashing - for active users only
+@api.route('/login', methods=['POST'])
+def handle_login():
+    body = request.get_json()
+    email = body["email"]
+    password = hashlib.sha256(body["password"].encode("utf-8")).hexdigest()
+    user = User.query.filter_by(email = email).first()
+    if user and user.password == password:
+        if user.is_active:
+            # Check if the user has already logged in today
+            last_login = PointTransaction.query.filter_by(owner_id=user.id, action="Daily login").order_by(PointTransaction.timestamp.desc()).first()
+            
+            if not last_login or (datetime.utcnow() - last_login.timestamp) > timedelta(days=1):
+                # Award points for daily login
+                points_earned = 1
+                user.change_points(points_earned, "Daily login")
+                db.session.commit()
+            else:
+                points_earned = 0
+
+            access_token = create_access_token(identity=user.id)
+            return jsonify({
+                "access_token": access_token,
+                "points_earned": points_earned,
+                "total_points": user.points
+            })
+        else:
+            return jsonify({"error": "User is not active"}), 403
+    else:
+        return jsonify({"error": "Invalid email or password"}), 401
 
 @api.route("/forgot_password", methods=["POST"])
 def forgot_password():
@@ -176,6 +175,17 @@ def get_current_user():
 def get_all_users():
     users = User.query.all()
     return jsonify([user.serialize() for user in users]), 200
+
+# Get user route to grab the info on the current user including authentication
+@api.route('/user', methods=['GET'])
+@jwt_required()
+def get_user_info():
+    current_user = get_current_user()
+    if not current_user:
+        return jsonify({"error": "User not authenticated"}), 401
+    
+    user_data = current_user.serialize()
+    return jsonify(user_data), 200
 
 # Get all beers route
 @api.route('/beers', methods=['GET'])
