@@ -12,7 +12,6 @@ from sqlalchemy import select
 import cloudinary.uploader as uploader
 from pyeasyencrypt.pyeasyencrypt import encrypt_string, decrypt_string
 from api.send_email import send_email
-import datetime
 import json, os
 
 api = Blueprint('api', __name__)
@@ -40,7 +39,7 @@ def handle_signup():
 
     return jsonify(response_body), 200
 
-# User log in route with password hashing - for active users only & no points
+# User log in route with password hashing - for active users only
 # @api.route('/login', methods=['POST'])
 # def handle_login():
 #     body = request.get_json()
@@ -56,7 +55,7 @@ def handle_signup():
 #     else:
 #         return jsonify({"error": "Invalid email or password"}), 401
 
-# User log in route with password hashing and awarding points - for active users only
+# User log in route with password hashing - for active users only
 @api.route('/login', methods=['POST'])
 def handle_login():
     body = request.get_json()
@@ -79,7 +78,7 @@ def handle_login():
             access_token = create_access_token(identity=user.id)
             return jsonify({
                 "access_token": access_token,
-                # "points_earned": points_earned,
+                "points_earned": points_earned,
                 "total_points": user.points
             })
         else:
@@ -182,6 +181,17 @@ def get_current_user():
 def get_all_users():
     users = User.query.all()
     return jsonify([user.serialize() for user in users]), 200
+
+# Get user route to grab the info on the current user including authentication
+@api.route('/user', methods=['GET'])
+@jwt_required()
+def get_user_info():
+    current_user = get_current_user()
+    if not current_user:
+        return jsonify({"error": "User not authenticated"}), 401
+    
+    user_data = current_user.serialize()
+    return jsonify(user_data), 200
 
 # Get all beers route
 @api.route('/beers', methods=['GET'])
