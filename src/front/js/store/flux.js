@@ -427,7 +427,19 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 				let data = await response.json()
 				setStore({ favoritePeople: data })
+			},
+			addBreweryReview: async (brewery, overallRating, reviewText, isFavoriteBrewery, beerReviews) => {
+				const store = getStore();
+				const journeys = store.journey;
+				const currentJourney = journeys[0]
 
+				const breweryReview = new BreweryReview(brewery, overallRating, reviewText, isFavoriteBrewery)
+
+				beerReviews.forEach(beerReview => {
+					breweryReview.addBeerReview(new BeerReview(beerReview.beerName, beerReview.rating, beerReview.notes, beerReview.isFavorite));
+				});
+				currentJourney.addBreweryReview(breweryReview);
+				setStore({ journey: journeys });
 			},
 			// you need have a createFavoriteBeer (POST REQUEST) function then can attach it to card button
 			// probably the same thing for people
