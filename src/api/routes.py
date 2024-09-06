@@ -9,7 +9,7 @@ from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_requir
 import hashlib
 from datetime import datetime, timedelta
 from sqlalchemy import select
-import cloudinary.uploader as uploader
+
 from pyeasyencrypt.pyeasyencrypt import encrypt_string, decrypt_string
 from api.send_email import send_email
 import json, os
