@@ -2,14 +2,14 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint, session
-from api.models import db, User, Beer, Brewery, FavoriteUsers, FavoriteBeers, FavoriteBreweries, PointTransaction
+from api.models import db, User, Beer, Brewery, FavoriteUsers, FavoriteBeers, FavoriteBreweries, PointTransaction, UserImage
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 import hashlib
 from datetime import datetime, timedelta
 from sqlalchemy import select
-
+import cloudinary.uploader as uploader
 from pyeasyencrypt.pyeasyencrypt import encrypt_string, decrypt_string
 from api.send_email import send_email
 import datetime
@@ -19,6 +19,12 @@ api = Blueprint('api', __name__)
 
 # Allow CORS requests to this API
 CORS(api)
+
+api.config['UPLOAD_FOLDER'] = os.environ.get('UPLOAD_FOLDER')
+api.config.from_mapping(
+    CLOUDINARY_URL=os.environ.get("CLOUDINARY_URL")
+)
+UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER')
 
 @api.route('/signup', methods=['POST'])
 def handle_signup():
@@ -34,23 +40,7 @@ def handle_signup():
 
     return jsonify(response_body), 200
 
-# User log in route with password hashing - for active users only
-@api.route('/login', methods=['POST'])
-def handle_login():
-    body = request.get_json()
-    email = body["email"]
-    password = hashlib.sha256(body["password"].encode("utf-8")).hexdigest()
-    user = User.query.filter_by(email = email).first()
-    if user and user.password == password:
-        if user.is_active:
-            access_token = create_access_token(identity=user.id)
-            return jsonify(access_token=access_token)
-        else:
-            return jsonify({"error": "User is not active"}), 403
-    else:
-        return jsonify({"error": "Invalid email or password"}), 401
-
-# User log in route with password hashing - for active users only
+# User log in route with password hashing - for active users only & no points
 # @api.route('/login', methods=['POST'])
 # def handle_login():
 #     body = request.get_json()
@@ -59,27 +49,43 @@ def handle_login():
 #     user = User.query.filter_by(email = email).first()
 #     if user and user.password == password:
 #         if user.is_active:
-            # Check if the user has already logged in today
-            # last_login = PointTransaction.query.filter_by(owner_id=user.id, action="Daily login").order_by(PointTransaction.timestamp.desc()).first()
-            
-            # if not last_login or (datetime.utcnow() - last_login.timestamp) > timedelta(days=1):
-            #     # Award points for daily login
-            #     points_earned = 1
-            #     user.change_points(points_earned, "Daily login")
-            #     db.session.commit()
-            # else:
-            #     points_earned = 0
+#             access_token = create_access_token(identity=user.id)
+#             return jsonify(access_token=access_token)
+#         else:
+#             return jsonify({"error": "User is not active"}), 403
+#     else:
+#         return jsonify({"error": "Invalid email or password"}), 401
 
-    #         access_token = create_access_token(identity=user.id)
-    #         return jsonify({
-    #             "access_token": access_token,
-    #             # "points_earned": points_earned,
-    #             "total_points": user.points
-    #         })
-    #     else:
-    #         return jsonify({"error": "User is not active"}), 403
-    # else:
-    #     return jsonify({"error": "Invalid email or password"}), 401
+# User log in route with password hashing and awarding points - for active users only
+@api.route('/login', methods=['POST'])
+def handle_login():
+    body = request.get_json()
+    email = body["email"]
+    password = hashlib.sha256(body["password"].encode("utf-8")).hexdigest()
+    user = User.query.filter_by(email = email).first()
+    if user and user.password == password:
+        if user.is_active:
+            # Check if the user has already logged in today
+            last_login = PointTransaction.query.filter_by(owner_id=user.id, action="Daily login").order_by(PointTransaction.timestamp.desc()).first()
+            
+            if not last_login or (datetime.utcnow() - last_login.timestamp) > timedelta(days=1):
+                # Award points for daily login
+                points_earned = 1
+                user.change_points(points_earned, "Daily login")
+                db.session.commit()
+            else:
+                points_earned = 0
+
+            access_token = create_access_token(identity=user.id)
+            return jsonify({
+                "access_token": access_token,
+                # "points_earned": points_earned,
+                "total_points": user.points
+            })
+        else:
+            return jsonify({"error": "User is not active"}), 403
+    else:
+        return jsonify({"error": "Invalid email or password"}), 401
 
 @api.route("/forgot_password", methods=["POST"])
 def forgot_password():
@@ -397,6 +403,125 @@ def delete_favorite_user(user_id):
         return jsonify({"done": True}), 200
     else:
         return jsonify({"error": "Favorite not found"}), 404
+    
+# user images endpoint
+@app.route("/images", methods=["POST", "GET"])
+@app.route("/images/<int:id>", methods=["DELETE"])
+@jwt_required()
+def handle_user_images(username, id=0):
+    headers = {
+        "Content-Type": "application/json"
+    }
+    # check if user exists
+    if User.query.filter_by(username=username).first():
+        # user exists
+
+        if request.method == "GET":
+            # get user images and return them
+            user_images = UserImage.query.filter_by(user_username=username).all()
+            response_body = []
+            if len(user_images) > 0:
+                for image in user_images:
+                    response_body.append(image.serialize())
+                status_code = 200
+            else:
+                response_body = []
+                status_code = 200
+
+        elif request.method == "POST":
+            # check if user has less than 5 images stored
+            if len(UserImage.query.filter_by(user_username=username).all()) < 5:
+                # receive file, secure its name, save it and
+                # create object to store title and image_url
+                # target = os.path.join(UPLOAD_FOLDER, "images")
+                # if not os.path.isdir(target):
+                #     os.mkdir(target)
+                try:
+                    image_file = request.files['file']
+                    # filename = secure_filename(image_file.filename)
+                    # extension = filename.rsplit(".", 1)[1]
+                    # hash_name = uuid.uuid4().hex
+                    # hashed_filename = ".".join([hash_name, extension])
+                    # destination = os.path.join(target, hashed_filename)
+                    response = uploader.upload(image_file)
+                    print(f"{response.items()}")
+                    try:
+                        new_image = UserImage(request.form.get("title"), response["public_id"], response["secure_url"], username)
+                        db.session.add(new_image)
+
+                        try:
+                            db.session.commit()
+                            response_body = {
+                                "result": "HTTP_201_CREATED. image created for user"
+                            }
+                            status_code = 201
+                        except Exception as error:
+                            db.session.rollback()
+                            response_body = {
+                                "result": f"HTTP_400_BAD_REQUEST. {type(error)} {error.args}"
+                            }
+                            status_code = 400
+                    except:
+                        db.session.rollback()
+                        status_code = 400
+                        response_body = {
+                            "result": "HTTP_400_BAD_REQUEST. no title in key/value"
+                        }
+                except Exception as error:
+                    status_code = 400
+                    response_body = {
+                        "result": f"HTTP_400_BAD_REQUEST. {type(error)} {error.args}"
+                    }
+                
+                
+            else:
+                # user has 5 images uploaded
+                response_body = {
+                    "result": "HTTP_404_BAD_REQUEST. cannot upload more than five images, please delete one first."
+                }
+                status_code = 404
+
+        elif request.method == "DELETE":
+            # user wants to delete a certain image, check id
+            if id != 0 and UserImage.query.filter_by(id=id).first():
+                image_to_delete = UserImage.query.filter_by(id=id).first()
+                response = uploader.destroy(image_to_delete.public_id)
+                if "result" in response and response["result"] == "ok":
+                    db.session.delete(image_to_delete)
+                    try:
+                        db.session.commit()
+                        response_body = {
+                            "result": "HTTP_204_NO_CONTENT. image deleted."
+                        }
+                        status_code = 204
+                    except Exception as error:
+                        db.session.rollback()
+                        response_body = {
+                            "result": f"HTTP_500_INTERNAL_SERVER_ERROR. {type(error)} {error.args}"
+                        }
+                else:
+                    response_body = {
+                        "result": f"HTTP_404_NOT_FOUND. {response['result'] if 'result' in response else 'image not found...'}"
+                    }
+                    status_code = 404
+        else:
+            # bad request method...
+            response_body = {
+                "result": "HTTP_400_BAD_REQUEST. This is not a valid method for this endpoint."
+            }
+            status_code = 400
+    else:
+        # user doesn't exist
+        response_body = {
+            "result": "HTTP_400_BAD_REQUEST. cannot handle images for non existing user..."
+        }
+        status_code = 400
+
+    return make_response(
+        jsonify(response_body),
+        status_code,
+        headers
+    )
 
 @api.route('/hello', methods=['POST', 'GET'])
 def handle_hello():
