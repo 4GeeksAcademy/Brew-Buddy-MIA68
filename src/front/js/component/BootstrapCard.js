@@ -38,17 +38,17 @@ export const BreweryCard = (props) => {
         </div>
     )
 }
-export const JourneyCard = ({brewery, onReview, ...props }) => {
+export const JourneyCard = ({breweryData, brewery, onReview, ...props }) => {
     const { store, actions } = useContext(Context);
     const navigate = useNavigate()
     return (
         <div className="card">
-            <h5 className="card-header">{props.breweryData.name}</h5>
+            <h5 className="card-header">{breweryData.name}</h5>
             <div className="card-body">
                 <h5 className="card-title">Special title treatment</h5>
                 <p className="card-text">Travel Time: {store.journey[0].routes[0].travelTime} Minutes</p>
                 <p className="card-text">Distance: {store.journey[0].routes[0].miles} Miles</p>
-                <button className="btn btn-primary" onClick={() => onReview(brewery)}>
+                <button className="btn btn-primary" onClick={() => onReview(breweryData)}>
                     Add Review
                 </button>
                 <a href="#" className="btn btn-primary">Go somewhere</a>

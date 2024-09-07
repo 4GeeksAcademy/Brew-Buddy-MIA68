@@ -22,7 +22,15 @@ import { BreweryRouteCard } from "../component/BootstrapCardRoute";
 // window.initMap = initMap;
 export const BreweryRoutes = () => {
     const { store, actions } = useContext(Context);
+    const [selectedBrewery, setSelectedBrewery] = useState(null);
 
+    const handleReview = (brewery) => {
+        setSelectedBrewery(brewery);
+    }
+    const handleSaveReview = (brewery, overallRating, reviewText, isFavoriteBrewery, beerReviews) => {
+        actions.addBreweryReview(brewery, overallRating, reviewText, isFavoriteBrewery, beerReviews);
+        setSelectedBrewery(null); //hide the form after saving the review
+    }
     // const breweryRoute = store.routes.map((brewery, index) => (
     //     <BreweryCard key={index} breweryData={brewery} />
     // ))
@@ -33,7 +41,7 @@ export const BreweryRoutes = () => {
         <div key={journeyIndex}>
             <h2>Current Journey</h2>
             {journey.routes.map((route, routeIndex) => (
-                <JourneyCard key={routeIndex} breweryData={route.breweryDestination} />
+                <JourneyCard key={routeIndex} breweryData={route.breweryDestination} onReview={handleReview} />
             ))}
         </div>
     ));
@@ -65,12 +73,18 @@ export const BreweryRoutes = () => {
                 {journeystest}
 
             </div>
+
             <button onClick={actions.fetchBreweryInfo}>Fetch Brewery Info</button>
+            {selectedBrewery && (
+                <ReviewForm
+                    brewery={selectedBrewery}
+                    onSaveReview={handleSaveReview}
+                />
+            )}
             {/* <div id="map">
                 {myMap}
                 
             </div> */}
         </div>
     )
-
 }
