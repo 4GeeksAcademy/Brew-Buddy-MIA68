@@ -14,6 +14,10 @@ export const Favorites = () => {
       if (beersSuccess == false) {
         console.log("no beers were retrieved")
       }
+      let allBeersSuccess = await actions.getAllBeers()
+      if (allBeersSuccess == false) {
+        console.log("no beers were retrieved")
+      }
       let peopleSuccess = await actions.getFavoritePeople()
       if (peopleSuccess == false) {
         console.log("no people were retrieved")
