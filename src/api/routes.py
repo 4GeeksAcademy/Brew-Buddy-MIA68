@@ -19,11 +19,12 @@ api = Blueprint('api', __name__)
 # Allow CORS requests to this API
 CORS(api)
 
-api.config['UPLOAD_FOLDER'] = os.environ.get('UPLOAD_FOLDER')
-api.config.from_mapping(
-    CLOUDINARY_URL=os.environ.get("CLOUDINARY_URL")
-)
+# Configuration for upload folder and Cloudinary
 UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER')
+CLOUDINARY_URL = os.environ.get("CLOUDINARY_URL")
+
+# Ensure the upload folder exists
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 @api.route('/signup', methods=['POST'])
 def handle_signup():
@@ -231,8 +232,6 @@ def get_all_breweries():
     breweries = Brewery.query.all()
     return jsonify([brewery.serialize() for brewery in breweries]), 200
 
-
-
 # Access user's favorite beers list (with user authentication)
 @api.route('/favorite_beers', methods=['GET'])
 @jwt_required()
@@ -422,116 +421,79 @@ def handle_user_images(username, id=0):
     headers = {
         "Content-Type": "application/json"
     }
-    # check if user exists
-    if User.query.filter_by(username=username).first():
-        # user exists
+    
+    user = User.query.filter_by(username=username).first()
+    if not user:
+        return jsonify({"result": "HTTP_400_BAD_REQUEST. Cannot handle images for non-existing user..."}), 400
 
-        if request.method == "GET":
-            # get user images and return them
-            user_images = UserImage.query.filter_by(user_username=username).all()
-            response_body = []
-            if len(user_images) > 0:
-                for image in user_images:
-                    response_body.append(image.serialize())
-                status_code = 200
-            else:
-                response_body = []
-                status_code = 200
+    if request.method == "GET":
+        user_images = UserImage.query.filter_by(user_username=username).all()
+        response_body = [image.serialize() for image in user_images]
+        return jsonify(response_body), 200
 
-        elif request.method == "POST":
-            # check if user has less than 5 images stored
-            if len(UserImage.query.filter_by(user_username=username).all()) < 5:
-                # receive file, secure its name, save it and
-                # create object to store title and image_url
-                # target = os.path.join(UPLOAD_FOLDER, "images")
-                # if not os.path.isdir(target):
-                #     os.mkdir(target)
-                try:
-                    image_file = request.files['file']
-                    # filename = secure_filename(image_file.filename)
-                    # extension = filename.rsplit(".", 1)[1]
-                    # hash_name = uuid.uuid4().hex
-                    # hashed_filename = ".".join([hash_name, extension])
-                    # destination = os.path.join(target, hashed_filename)
-                    response = uploader.upload(image_file)
-                    print(f"{response.items()}")
-                    try:
-                        new_image = UserImage(request.form.get("title"), response["public_id"], response["secure_url"], username)
-                        db.session.add(new_image)
+    elif request.method == "POST":
+        user_images = UserImage.query.filter_by(user_username=username).all()
+        if len(user_images) >= 5:
+            return jsonify({"result": "HTTP_400_BAD_REQUEST. Cannot upload more than five images, please delete one first."}), 400
 
-                        try:
-                            db.session.commit()
-                            response_body = {
-                                "result": "HTTP_201_CREATED. image created for user"
-                            }
-                            status_code = 201
-                        except Exception as error:
-                            db.session.rollback()
-                            response_body = {
-                                "result": f"HTTP_400_BAD_REQUEST. {type(error)} {error.args}"
-                            }
-                            status_code = 400
-                    except:
-                        db.session.rollback()
-                        status_code = 400
-                        response_body = {
-                            "result": "HTTP_400_BAD_REQUEST. no title in key/value"
-                        }
-                except Exception as error:
-                    status_code = 400
-                    response_body = {
-                        "result": f"HTTP_400_BAD_REQUEST. {type(error)} {error.args}"
-                    }
+        if 'file' not in request.files:
+            return jsonify({"result": "HTTP_400_BAD_REQUEST. No file part"}), 400
+
+        image_file = request.files['file']
+        if image_file.filename == '':
+            return jsonify({"result": "HTTP_400_BAD_REQUEST. No selected file"}), 400
+
+        if image_file and allowed_file(image_file.filename):
+            try:
+                # Upload to Cloudinary
+                response = uploader.upload(image_file)
                 
-                
-            else:
-                # user has 5 images uploaded
-                response_body = {
-                    "result": "HTTP_404_BAD_REQUEST. cannot upload more than five images, please delete one first."
-                }
-                status_code = 404
+                # Create new UserImage object
+                new_image = UserImage(
+                    title=request.form.get("title"),
+                    public_id=response["public_id"],
+                    image_url=response["secure_url"],
+                    user_username=username
+                )
+                db.session.add(new_image)
+                db.session.commit()
 
-        elif request.method == "DELETE":
-            # user wants to delete a certain image, check id
-            if id != 0 and UserImage.query.filter_by(id=id).first():
-                image_to_delete = UserImage.query.filter_by(id=id).first()
-                response = uploader.destroy(image_to_delete.public_id)
-                if "result" in response and response["result"] == "ok":
-                    db.session.delete(image_to_delete)
-                    try:
-                        db.session.commit()
-                        response_body = {
-                            "result": "HTTP_204_NO_CONTENT. image deleted."
-                        }
-                        status_code = 204
-                    except Exception as error:
-                        db.session.rollback()
-                        response_body = {
-                            "result": f"HTTP_500_INTERNAL_SERVER_ERROR. {type(error)} {error.args}"
-                        }
-                else:
-                    response_body = {
-                        "result": f"HTTP_404_NOT_FOUND. {response['result'] if 'result' in response else 'image not found...'}"
-                    }
-                    status_code = 404
+                return jsonify({"result": "HTTP_201_CREATED. Image created for user"}), 201
+
+            except Exception as error:
+                db.session.rollback()
+                return jsonify({"result": f"HTTP_400_BAD_REQUEST. {type(error).__name__}: {str(error)}"}), 400
         else:
-            # bad request method...
-            response_body = {
-                "result": "HTTP_400_BAD_REQUEST. This is not a valid method for this endpoint."
-            }
-            status_code = 400
-    else:
-        # user doesn't exist
-        response_body = {
-            "result": "HTTP_400_BAD_REQUEST. cannot handle images for non existing user..."
-        }
-        status_code = 400
+            return jsonify({"result": "HTTP_400_BAD_REQUEST. File type not allowed"}), 400
 
-    return make_response(
-        jsonify(response_body),
-        status_code,
-        headers
-    )
+    elif request.method == "DELETE":
+        if id == 0:
+            return jsonify({"result": "HTTP_400_BAD_REQUEST. Invalid image ID"}), 400
+
+        image_to_delete = UserImage.query.filter_by(id=id, user_username=username).first()
+        if not image_to_delete:
+            return jsonify({"result": "HTTP_404_NOT_FOUND. Image not found"}), 404
+
+        try:
+            # Delete from Cloudinary
+            response = uploader.destroy(image_to_delete.public_id)
+            if response.get("result") == "ok":
+                db.session.delete(image_to_delete)
+                db.session.commit()
+                return jsonify({"result": "HTTP_204_NO_CONTENT. Image deleted."}), 204
+            else:
+                return jsonify({"result": f"HTTP_500_INTERNAL_SERVER_ERROR. Failed to delete image from Cloudinary"}), 500
+
+        except Exception as error:
+            db.session.rollback()
+            return jsonify({"result": f"HTTP_500_INTERNAL_SERVER_ERROR. {type(error).__name__}: {str(error)}"}), 500
+
+    else:
+        return jsonify({"result": "HTTP_405_METHOD_NOT_ALLOWED. This method is not allowed for this endpoint."}), 405
+
+def allowed_file(filename):
+    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @api.route('/hello', methods=['POST', 'GET'])
 def handle_hello():
