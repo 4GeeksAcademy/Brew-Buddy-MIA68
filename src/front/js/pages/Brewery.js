@@ -18,7 +18,7 @@ export const Brewery = () => {
     const eachBeer = store.beerData.map((beerData, index) => (
 		<BeerCard key={index} beerData={beerData} />
 	))
-
+    // add beer info
 	return (
         <h1>
             {eachBeer}
