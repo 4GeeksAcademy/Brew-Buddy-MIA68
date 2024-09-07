@@ -32,10 +32,6 @@ export const Home = () => {
 				< Modal />
 				{eachBrewery}
 			</div>
-			<div>
-				<BreweryRouteCard />
-			</div>
-
 			<button onClick={actions.fetchBreweryInfoTEST}>Fetch Brewery Info</button>
 			{/* <div className="mt-5"><Link to="/forgot-password">Change My Password</Link></div> */}
 		</div>
