@@ -58,6 +58,11 @@ export const Navbar = () => {
 						Current Route
 					</Link>
 				</li>
+				<li className="nav-item">
+					<Link to="/maptest" className="nav-link">
+						maptest
+					</Link>
+				</li>
 
 			</ul>
 		</nav >

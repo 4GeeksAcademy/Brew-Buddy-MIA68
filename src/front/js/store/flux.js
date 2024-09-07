@@ -208,6 +208,32 @@ const getState = ({ getStore, getActions, setStore }) => {
 					console.error("Error fetching brewery info", error);
 				}
 			},
+			fetchBreweryInfoTEST: async () => {
+				try {
+					const resp = await fetch("https://api.openbrewerydb.org/v1/breweries?per_page=3", {
+						method: "GET",
+						headers: {
+							"Content-type": "application/json"
+						}
+					});
+					let data = await resp.json();
+					console.log(data);
+					const breweryInfos = data.map(brewery => new BreweryInfo(brewery));
+					// Create routes based on the brewery information (for example purposes, using dummy travel times and distances)
+					const routes = breweryInfos.map(info => new Route(new BreweryDestination(info), Math.floor(Math.random() * 60), Math.floor(Math.random() * 20)));
+					const journey = new Journey();
+					routes.forEach(route => journey.addRoute(route));
+					journey.setActiveRoute(0);
+					setStore({
+						breweryData: breweryInfos,
+						routes: routes,
+						journey: journey
+					});
+					return journey;
+				} catch (error) {
+					console.error("Error fetching brewery info", error);
+				}
+			},
 			addFavoriteBrewery: async (brewery) => {
 			try {
 				const resp = await fetch(process.env.BACKEND_URL+"/api/favorite_breweries/" +brewery.id, {
@@ -427,7 +453,19 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 				let data = await response.json()
 				setStore({ favoritePeople: data })
+			},
+			addBreweryReview: async (brewery, overallRating, reviewText, isFavoriteBrewery, beerReviews) => {
+				const store = getStore();
+				const journeys = store.journey;
+				const currentJourney = journeys[0]
 
+				const breweryReview = new BreweryReview(brewery, overallRating, reviewText, isFavoriteBrewery)
+
+				beerReviews.forEach(beerReview => {
+					breweryReview.addBeerReview(new BeerReview(beerReview.beerName, beerReview.rating, beerReview.notes, beerReview.isFavorite));
+				});
+				currentJourney.addBreweryReview(breweryReview);
+				setStore({ journey: journeys });
 			},
 			// you need have a createFavoriteBeer (POST REQUEST) function then can attach it to card button
 			// probably the same thing for people
