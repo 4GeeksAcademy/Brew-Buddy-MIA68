@@ -32,6 +32,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			searchedBreweryData: [],
 			modalIsOpen: false,
 			favoriteBeers: [],
+			allBeers: [],
 			favoritePeople: []
 		},
 		actions: {
@@ -205,6 +206,25 @@ const getState = ({ getStore, getActions, setStore }) => {
 					if (response.ok) {
 						const data = await response.json();
 						setStore({ favoriteBeers: data });
+					} else {
+						console.error("Failed to fetch favorite beers", response.status);
+					}
+				} catch (error) {
+					console.error("Error fetching favorite beers", error);
+				}
+			},
+			getAllBeers: async () => {
+				try {
+					const response = await fetch(`${process.env.BACKEND_URL}/api/beers`, {
+						headers: {
+							"Content-Type": "application/json",
+							Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+						},
+					});
+			
+					if (response.ok) {
+						const data = await response.json();
+						setStore({ allBeers: data });
 					} else {
 						console.error("Failed to fetch favorite beers", response.status);
 					}
