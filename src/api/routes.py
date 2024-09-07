@@ -19,12 +19,13 @@ api = Blueprint('api', __name__)
 # Allow CORS requests to this API
 CORS(api)
 
-# Configuration for upload folder and Cloudinary
-UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER')
+# Configuration for Cloudinary
 CLOUDINARY_URL = os.environ.get("CLOUDINARY_URL")
 
-# Ensure the upload folder exists
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+# Only create UPLOAD_FOLDER if it's defined in environment variables
+UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER')
+if UPLOAD_FOLDER:
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 @api.route('/signup', methods=['POST'])
 def handle_signup():
@@ -414,34 +415,28 @@ def delete_favorite_user(user_id):
         return jsonify({"error": "Favorite not found"}), 404
     
 # user images endpoint
-@app.route("/images", methods=["POST", "GET"])
-@app.route("/images/<int:id>", methods=["DELETE"])
+@api.route('/images', methods=['GET', 'POST'])
+@api.route('/images/<int:id>', methods=['DELETE'])
 @jwt_required()
-def handle_user_images(username, id=0):
-    headers = {
-        "Content-Type": "application/json"
-    }
-    
-    user = User.query.filter_by(username=username).first()
-    if not user:
-        return jsonify({"result": "HTTP_400_BAD_REQUEST. Cannot handle images for non-existing user..."}), 400
+def handle_user_images(id=0):
+    current_user = get_current_user()
+    if not current_user:
+        return jsonify({"error": "User not authenticated"}), 401
 
     if request.method == "GET":
-        user_images = UserImage.query.filter_by(user_username=username).all()
-        response_body = [image.serialize() for image in user_images]
-        return jsonify(response_body), 200
+        user_images = UserImage.query.filter_by(owner_id=current_user.id).all()
+        return jsonify([image.serialize() for image in user_images]), 200
 
     elif request.method == "POST":
-        user_images = UserImage.query.filter_by(user_username=username).all()
-        if len(user_images) >= 5:
-            return jsonify({"result": "HTTP_400_BAD_REQUEST. Cannot upload more than five images, please delete one first."}), 400
+        if len(current_user.user_images) >= 5:
+            return jsonify({"error": "Cannot upload more than five images, please delete one first."}), 400
 
         if 'file' not in request.files:
-            return jsonify({"result": "HTTP_400_BAD_REQUEST. No file part"}), 400
+            return jsonify({"error": "No file part"}), 400
 
         image_file = request.files['file']
         if image_file.filename == '':
-            return jsonify({"result": "HTTP_400_BAD_REQUEST. No selected file"}), 400
+            return jsonify({"error": "No selected file"}), 400
 
         if image_file and allowed_file(image_file.filename):
             try:
@@ -453,26 +448,26 @@ def handle_user_images(username, id=0):
                     title=request.form.get("title"),
                     public_id=response["public_id"],
                     image_url=response["secure_url"],
-                    user_username=username
+                    owner_id=current_user.id
                 )
                 db.session.add(new_image)
                 db.session.commit()
 
-                return jsonify({"result": "HTTP_201_CREATED. Image created for user"}), 201
+                return jsonify({"message": "Image created for user", "image": new_image.serialize()}), 201
 
             except Exception as error:
                 db.session.rollback()
-                return jsonify({"result": f"HTTP_400_BAD_REQUEST. {type(error).__name__}: {str(error)}"}), 400
+                return jsonify({"error": f"{type(error).__name__}: {str(error)}"}), 400
         else:
-            return jsonify({"result": "HTTP_400_BAD_REQUEST. File type not allowed"}), 400
+            return jsonify({"error": "File type not allowed"}), 400
 
     elif request.method == "DELETE":
         if id == 0:
-            return jsonify({"result": "HTTP_400_BAD_REQUEST. Invalid image ID"}), 400
+            return jsonify({"error": "Invalid image ID"}), 400
 
-        image_to_delete = UserImage.query.filter_by(id=id, user_username=username).first()
+        image_to_delete = UserImage.query.filter_by(id=id, owner_id=current_user.id).first()
         if not image_to_delete:
-            return jsonify({"result": "HTTP_404_NOT_FOUND. Image not found"}), 404
+            return jsonify({"error": "Image not found or doesn't belong to the user"}), 404
 
         try:
             # Delete from Cloudinary
@@ -480,16 +475,16 @@ def handle_user_images(username, id=0):
             if response.get("result") == "ok":
                 db.session.delete(image_to_delete)
                 db.session.commit()
-                return jsonify({"result": "HTTP_204_NO_CONTENT. Image deleted."}), 204
+                return jsonify({"message": "Image deleted successfully"}), 200
             else:
-                return jsonify({"result": f"HTTP_500_INTERNAL_SERVER_ERROR. Failed to delete image from Cloudinary"}), 500
+                return jsonify({"error": "Failed to delete image from Cloudinary"}), 500
 
         except Exception as error:
             db.session.rollback()
-            return jsonify({"result": f"HTTP_500_INTERNAL_SERVER_ERROR. {type(error).__name__}: {str(error)}"}), 500
+            return jsonify({"error": f"{type(error).__name__}: {str(error)}"}), 500
 
     else:
-        return jsonify({"result": "HTTP_405_METHOD_NOT_ALLOWED. This method is not allowed for this endpoint."}), 405
+        return jsonify({"error": "Method not allowed"}), 405
 
 def allowed_file(filename):
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
