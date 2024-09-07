@@ -41,7 +41,7 @@ def handle_signup():
 
     return jsonify(response_body), 200
 
-# User log in route with password hashing - for active users only
+# User log in route with password hashing - for active users only & no points
 # @api.route('/login', methods=['POST'])
 # def handle_login():
 #     body = request.get_json()
@@ -57,7 +57,7 @@ def handle_signup():
 #     else:
 #         return jsonify({"error": "Invalid email or password"}), 401
 
-# User log in route with password hashing - for active users only
+# User log in route with password hashing and awarding points - for active users only
 @api.route('/login', methods=['POST'])
 def handle_login():
     body = request.get_json()
@@ -66,6 +66,17 @@ def handle_login():
     user = User.query.filter_by(email = email).first()
     if user and user.password == password:
         if user.is_active:
+            # Check if the user has already logged in today
+            last_login = PointTransaction.query.filter_by(owner_id=user.id, action="Daily login").order_by(PointTransaction.timestamp.desc()).first()
+            
+            if not last_login or (datetime.utcnow() - last_login.timestamp) > timedelta(days=1):
+                # Award points for daily login
+                points_earned = 1
+                user.change_points(points_earned, "Daily login")
+                db.session.commit()
+            else:
+                points_earned = 0
+
             # Check if the user has already logged in today
             last_login = PointTransaction.query.filter_by(owner_id=user.id, action="Daily login").order_by(PointTransaction.timestamp.desc()).first()
             

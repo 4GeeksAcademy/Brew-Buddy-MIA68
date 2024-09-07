@@ -167,6 +167,7 @@ class Beer(db.Model):
     # added repr to help with debugging by providing a readable string representation of the model instances
     #def __repr__(self):
      #   return f'<Beer {self.beer_name}>'
+     # commit for funsies
 
     def serialize(self):
         return {
