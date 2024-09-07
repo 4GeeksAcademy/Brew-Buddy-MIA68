@@ -5,6 +5,7 @@ import "../../styles/home.css";
 import { BreweryCard, JourneyCard } from "../component/BootstrapCard";
 import { ReviewForm } from '../component/ReviewForm';
 import "../../styles/BreweryRoute.css"
+import { BreweryRouteCard } from "../component/BootstrapCardRoute";
 
 // let map;
 // function myMap() {
@@ -36,6 +37,19 @@ export const BreweryRoutes = () => {
             ))}
         </div>
     ));
+
+    const journeystest = store.journey.map((journey, journeyIndex) => (
+        <div key={journeyIndex}>
+            <h2>Current Journey</h2>
+            {journey.routes.map((route, routeIndex) => (
+                <BreweryRouteCard key={routeIndex} breweryData={route.breweryDestination} />
+            ))}
+        </div>
+    ));
+
+    // const eachBrewery = store.breweryData.map((breweryData, index) => (
+	// 	<BreweryRouteCard key={index} breweryData={breweryData} />
+	// ));
     return (
         <div className="text-center mt-5">
             <h1>Hello Brew Buddy!!</h1>
@@ -45,6 +59,11 @@ export const BreweryRoutes = () => {
             </div>
             <div>
                 {journeys}
+            </div>
+            <div>
+                {/* {eachBrewery} */}
+                {journeystest}
+
             </div>
             <button onClick={actions.fetchBreweryInfo}>Fetch Brewery Info</button>
             {/* <div id="map">
