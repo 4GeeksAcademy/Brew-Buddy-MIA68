@@ -10,7 +10,18 @@ body{
     margin:0;
     padding:0;
 }
-#map{
-    height: 800px;
-    width: 100%;
+.journey-map-container {
+    display: flex;
+    justify-content: space-between; /* Ensures the journeys and map stay on opposite sides */
+    align-items: flex-start; /* Align the items to the top of the container */
+    gap: 20px; /* Adds some space between the journeys and map */
+}
+
+.journeys-section {
+    flex: 1; /* The journey section takes up more space */
+}
+
+.map-section {
+    flex: 1; /* The map section takes up an equal amount of space */
+    max-width: 500px; /* Ensure the map doesn't take up too much space */
 }

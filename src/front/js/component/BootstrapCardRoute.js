@@ -32,10 +32,10 @@ export const BreweryRouteCard = (props) => {
                             </ul>
                         </div>
                     </div>
-                    {/* map side of brewery locator */}
+                    {/* map side of brewery locator
                     <div className="col-8 border border-solid">
                         <p>Map Side</p>
-                    </div>
+                    </div> */}
                 </div>
             </div>
         </div>
