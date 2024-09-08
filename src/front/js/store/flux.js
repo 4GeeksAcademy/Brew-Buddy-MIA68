@@ -12,8 +12,8 @@ class BreweryInfo {
 		this.state_province = resultFromServer.state_province;
 		this.postal_code = resultFromServer.postal_code
 		this.country = resultFromServer.country;
-		this.longitude = resultFromServer.longitude;
-		this.latitude = resultFromServer.latitude;
+		this.longitude = parseFloat(resultFromServer.longitude);
+		this.latitude = parseFloat(resultFromServer.latitude);
 		this.phone = resultFromServer.phone
 		this.website_url = resultFromServer.website_url
 		this.state = resultFromServer.state;
@@ -36,6 +36,8 @@ class BreweryDestination {
 		this.brewery_type = breweryInfo.brewery_type;
 		this.phone = breweryInfo.phone
 		this.website_url = breweryInfo.website_url;
+		this.longitude = breweryInfo.longitude;
+		this.latitude = breweryInfo.latitude;
 		this.address = new Address(breweryInfo); //create an address instance using BreweryInfo
 	}
 }
@@ -113,7 +115,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			userEmail: sessionStorage.getItem("userEmail") || null,
 			breweryData: [],
 			beerData: [],
-			journey: [],
+			journey: new Journey(),
 			city: "",
 			state: "",
 			searchedBreweryData: [],
@@ -191,7 +193,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					console.error("error during logout", error);
 				}
 			},
-			
+
 			fetchBreweryInfo: async () => {
 				try {
 					const resp = await fetch("https://api.openbrewerydb.org/v1/breweries?per_page=3", {
@@ -222,7 +224,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					const breweryInfos = data.map(brewery => new BreweryInfo(brewery));
 					// Create routes based on the brewery information (for example purposes, using dummy travel times and distances)
 					const routes = breweryInfos.map(info => new Route(new BreweryDestination(info), Math.floor(Math.random() * 60), Math.floor(Math.random() * 20)));
-					const journey = new Journey();
+					const journey = getStore().journey;
 					routes.forEach(route => journey.addRoute(route));
 					journey.setActiveRoute(0);
 					setStore({
@@ -236,25 +238,25 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 			addFavoriteBrewery: async (brewery) => {
-			try {
-				const resp = await fetch(process.env.BACKEND_URL+"/api/favorite_breweries/" +brewery.id, {
-					method: "POST",
-					headers: {
-						Authorization: "Bearer " + sessionStorage.getItem("token")
+				try {
+					const resp = await fetch(process.env.BACKEND_URL + "/api/favorite_breweries/" + brewery.id, {
+						method: "POST",
+						headers: {
+							Authorization: "Bearer " + sessionStorage.getItem("token")
+						}
+					})
+					if (response.ok) {
+						const data = await response.json();
+						console.log("brewery added favorites");
+					} else {
+						const errorData = await response.json();
+						console.error("failed to add", errorData);
 					}
-				})
-				if (response.ok) {
-					const data = await response.json();
-					console.log("brewery added favorites");
-				} else {
-					const errorData = await response.json();
-					console.error("failed to add", errorData);
+				} catch (error) {
+					console.error("error adding brewery", error);
 				}
-			} catch (error) {
-				console.error("error adding brewery", error);
-			}
-				
-		
+
+
 			},
 			searchFunctionWithCity: async () => {
 				try {
@@ -312,7 +314,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				setStore({ city: city, state: state })
 				actions.searchFunctionWithCity()
 			},
-			
+
 			createBreweryList: (data) => {
 				const store = getStore();
 				const brewery = new BreweryInfo(data);
@@ -363,34 +365,33 @@ const getState = ({ getStore, getActions, setStore }) => {
 					let currentJourney;
 					if (store.journey.length === 0) {
 						currentJourney = new Journey();
-						setStore({ ...store, journey: [currentJourney] });
+						setStore({ ...store, journey: currentJourney });
 					} else {
 						// Retrieve the existing journey
-						currentJourney = store.journey[0];
+						currentJourney = store.journey;
 						// If the existing journey is not an instance of Journey, reinitialize it
 						if (!(currentJourney instanceof Journey)) {
 							console.warn("Reinitializing current journey");
 							currentJourney = new Journey();
-							setStore({ ...store, journey: [currentJourney] });
+							setStore({ ...store, journey: currentJourney });
 						}
 					}
 					// Add the new route to the journey
 					currentJourney.addRoute(newRoute);
-					setStore({ ...store, journey: [currentJourney] });
-					console.log(store.journey[0].routes[0].travelTime);
+					setStore({ ...store, journey: currentJourney });
 				} catch (error) {
 					console.error("Error adding to current journey", error);
 				}
 			},
 			getFavoriteBeers: async () => {
-					try {
+				try {
 					const response = await fetch(`${process.env.BACKEND_URL}/api/favorite_beers`, {
 						headers: {
 							"Content-Type": "application/json",
 							Authorization: `Bearer ${sessionStorage.getItem("token")}`,
 						},
 					});
-			
+
 					if (response.ok) {
 						const data = await response.json();
 						setStore({ favoriteBeers: data });
@@ -425,7 +426,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 							Authorization: `Bearer ${sessionStorage.getItem("token")}`,
 						},
 					});
-			
+
 					if (response.ok) {
 						const data = await response.json();
 						setStore({ allBeers: data });
@@ -446,7 +447,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 							Authorization: `Bearer ${sessionStorage.getItem("token")}`,
 						},
 					});
-			
+
 					if (response.ok) {
 						await getActions().getFavoriteBeers();
 						console.log("Favorite beer added successfully");
