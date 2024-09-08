@@ -12,6 +12,7 @@ const initialCenter = {
 };
 
 export function MyMap() {
+
     const { isLoaded } = useJsApiLoader({
         id: 'google-map-script',
         googleMapsApiKey: process.env.GOOGLE_API_KEY
