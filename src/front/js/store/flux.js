@@ -264,6 +264,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 			addFavoriteBrewery: async (brewery) => {
+				console.log(brewery)
 				try {
 					const resp = await fetch(process.env.BACKEND_URL + "/api/favorite_breweries/" + brewery.id, {
 						method: "POST",

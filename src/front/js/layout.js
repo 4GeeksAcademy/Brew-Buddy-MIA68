@@ -13,9 +13,9 @@ import { ResetPassword } from "./pages/ResetPassword";
 import { UserProfile } from "./pages/UserProfile";
 
 import { Navbar } from "./component/navbar";
-// import { BreweryRoutes } from "./pages/BreweryRoute";
+import { BreweryRoutes } from "./pages/BreweryRoute";
 import { Brewery } from "./pages/Brewery";
-// import { MyMap } from "./pages/MapTest";
+import { MyMap } from "./pages/MapTest";
 // import { Footer } from "./component/footer";
 
 //create your first component

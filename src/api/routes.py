@@ -335,7 +335,20 @@ def add_favorite_brewery(brewery_id):
     current_user = get_current_user()
     if not current_user:
         return jsonify({"error": "User not authenticated"}), 401
-    
+    data=request.json()
+    existing_brewery=Brewery.query.get(brewery_id)
+    if not existing_brewery:
+        new_brewery=Brewery(brewery_name=data.get("brewery_name"), 
+                            brewery_type=data.get("brewery_type"), 
+                            id=brewery_id, address=data.get("address"), 
+                            city=data.get("city"), state_province=data.get("state_province"), 
+                            longitude=data.get("longitude"),
+                            latitude=data.get("latitude"),
+                            phone=data.get("phone"),
+                            website_url=data.get("website_url")  )
+        db.session.add(new_brewery)
+        db.session.commit("Added brewery to favorites")
+        db.session.refresh(new_brewery)
     # Check if the brewery is already favorited
     existing_favorite = FavoriteBreweries.query.filter_by(owner_id=current_user.id, favorited_brewery_id=brewery_id).first()
     if existing_favorite:
