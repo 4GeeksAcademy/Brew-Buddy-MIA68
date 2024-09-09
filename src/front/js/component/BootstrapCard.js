@@ -24,6 +24,10 @@ export const BreweryCard = (props) => {
     const navigate = useNavigate()
     const breweryType = props.breweryData.brewery_type;
 
+    const handleFavBrewery= () => {
+      actions.addFavoriteBrewery(props.breweryData);  
+    }
+
     return (
         <div className="card">
             <div className="card-body">
