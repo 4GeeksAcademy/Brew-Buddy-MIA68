@@ -6,13 +6,20 @@ const Modal = () => {
     const { store, actions, setStore } = useContext(Context);;
     const [cityValue, setCityValue] = useState("")
     const [stateValue, setStateValue] = useState("")
+    const [typeValue, setTypeValue] = useState("")
 
     if (!store.modalIsOpen) return null;
 
     const beginCitySearch = () => {
         let city = cityValue
         let state = stateValue
-        actions.handleSearch(city, state)
+        let type = typeValue
+        actions.handleSearch(city, state, type)
+    }
+
+    const beginLocationSearch = () => {
+        let type = typeValue
+        actions.searchFunctionWithLocation(type)
     }
 
     return (
@@ -77,18 +84,28 @@ const Modal = () => {
                         <option value="Wyoming">Wyoming</option>
                     </select>
                     <button className="my-2" onClick={beginCitySearch}>
-                        Begin Search
+                        Search
                     </button>
                 </div>
                 <div className="col-1">
                     <h2 className="mt-5">OR</h2>
                 </div>
                 <div className="col">
-                    <h3>Search By Current Position</h3>
-                    <button onClick={actions.searchFunctionWithLocation}>Search</button>
+                    <h3>Search by Location</h3>
+                    <button onClick={beginLocationSearch}>Search</button>
+                </div>
+                <div className=" border-top my-2">
+                    <h4>Filter by type (optional)</h4>
+                    <select className="mx-2" onChange={e => setTypeValue(e.target.value)}>
+                        <option value="">Select Type</option>
+                        <option value="brewpub">Brewpub</option>
+                        <option value="micro">Micro</option>
+                        <option value="regional">Regional</option>
+                        <option value="nano">Nano</option>
+                    </select>
                 </div>
                 <div>
-                    <button className="close-button" onClick={actions.toggleSearch}>
+                    <button className="close-button m-1" onClick={actions.toggleSearch}>
                         Cancel
                     </button>
 

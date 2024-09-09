@@ -118,11 +118,13 @@ const getState = ({ getStore, getActions, setStore }) => {
 			journey: new Journey(),
 			city: "",
 			state: "",
+			type: "",
 			searchedBreweryData: [],
 			modalIsOpen: false,
 			favoriteBeers: [],
 			allBeers: [],
 			favoritePeople: []
+
 		},
 		actions: {
 			signUp: async (email, password) => {
@@ -282,9 +284,10 @@ const getState = ({ getStore, getActions, setStore }) => {
 					console.error("Error fetching brewery info", error);
 				}
 			},
-			searchFunctionWithLocation: async () => {
+			searchFunctionWithLocation: async (type) => {
 				const store = getStore();
 				const actions = getActions();
+				setStore({ type: type })
 				if ("geolocation" in navigator) {
 					try {
 						navigator.geolocation.getCurrentPosition(async (position) => {
@@ -309,28 +312,40 @@ const getState = ({ getStore, getActions, setStore }) => {
 					setStore({ modalIsOpen: false, state: "", city: "" })
 				}
 			},
-			handleSearch: (city, state) => {
+			handleSearch: (city, state, type) => {
 				const actions = getActions();
-				setStore({ city: city, state: state })
+				setStore({ city: city, state: state, type: type })
 				actions.searchFunctionWithCity()
 			},
 
 			createBreweryList: (data) => {
 				const store = getStore();
 				const brewery = new BreweryInfo(data);
+				const breweryType = store.type
 				const breweries = [];
 				const micro = "micro";
 				const nano = "nano";
 				const brewpub = "brewpub";
 				const regional = "regional";
-				for (const element of data) {
-					if (element.brewery_type === micro || element.brewery_type === nano || element.brewery_type === brewpub || element.brewery_type === regional) {
-						if (element.address_1 === null || element.latitude === null) {
-							continue
+				console.log("type:", store.type)
+				if (store.type = "") {
+					for (const element of data) {
+						if (element.brewery_type === micro || element.brewery_type === nano || element.brewery_type === brewpub || element.brewery_type === regional) {
+							if (element.address_1 === null || element.latitude === null) {
+								continue
+							}
+							breweries.push(element)
 						}
-						breweries.push(element)
 					}
-
+				} else {
+					for (const element of data) {
+						if (element.brewery_Type === store.type) {
+							if (element.address_1 === null || element.latitude === null) {
+								continue
+							}
+							breweries.push(element)
+						}
+					}
 				}
 				setStore({ breweryData: breweries })
 				console.log(store.breweryData)
