@@ -413,6 +413,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					})
 					const data = await response.json();
 					setStore({ beerData: data });
+					console.log(data)
 				}
 				catch (error) {
 					console.error("Error fetching beer info", error);
