@@ -13,6 +13,7 @@ class User(db.Model):
     favorite_beers = db.relationship("FavoriteBeers", back_populates="owner", foreign_keys="FavoriteBeers.owner_id")
     favorite_breweries = db.relationship("FavoriteBreweries", back_populates="owner", foreign_keys="FavoriteBreweries.owner_id")
     point_transactions = db.relationship("PointTransaction", back_populates="owner")
+    user_images = db.relationship("UserImage", back_populates="owner")
 
     def __init__(self, email, password, is_active=True):
         self.email = email
@@ -166,6 +167,7 @@ class Beer(db.Model):
     # added repr to help with debugging by providing a readable string representation of the model instances
     #def __repr__(self):
      #   return f'<Beer {self.beer_name}>'
+     # commit for funsies
 
     def serialize(self):
         return {
@@ -196,4 +198,29 @@ class PointTransaction(db.Model):
             "points": self.points,
             "action": self.action,
             "timestamp": self.timestamp.isoformat()
+        }
+
+# model for user uploaded images
+class UserImage(db.Model):
+    __table_args__ = (
+        db.UniqueConstraint("title", "owner_id", name="unique_img_title_user"),
+    )
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(80), nullable=False)
+    public_id = db.Column(db.String(500), nullable=False, unique=True)
+    image_url = db.Column(db.String(500), nullable=False, unique=True)
+    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    owner = db.relationship("User", back_populates="user_images", foreign_keys=[owner_id])
+
+    def __init__(self, title, public_id, image_url, owner_id):
+        self.title = title.strip()
+        self.public_id = public_id
+        self.image_url = image_url.strip()
+        self.owner_id = owner_id.strip()
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "title": self.title,
+            "image_url": self.image_url
         }
