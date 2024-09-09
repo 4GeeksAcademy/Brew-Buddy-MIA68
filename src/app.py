@@ -2,6 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 import os
+import cloudinary
 from flask import Flask, request, jsonify, url_for, send_from_directory
 from flask_migrate import Migrate
 from flask_swagger import swagger
@@ -37,6 +38,13 @@ app.config["JWT_SECRET_KEY"] = os.environ.get("FLASK_APP_KEY")
 app.config['JWT_TOKEN_LOCATION'] = ['headers']  # Assumes the token location is the headers rather that elsewhere (e.g. cookies)
 jwt = JWTManager(app)
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = 100000
+
+# Configure Cloudinary
+cloudinary.config(
+    cloud_name = "dprmqr54a",
+    api_key = "273378123875624",
+    api_secret = "qHRontlwdPSYQ3-0OqfKJwiUW0A"
+)
 
 # add the admin
 setup_admin(app)

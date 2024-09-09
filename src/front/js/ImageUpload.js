@@ -4,7 +4,7 @@ import { auto } from '@cloudinary/url-gen/actions/resize';
 import { autoGravity } from '@cloudinary/url-gen/qualifiers/gravity';
 import { AdvancedImage } from '@cloudinary/react';
 
-const App = () => {
+const ImageUpload = () => {
   const cld = new Cloudinary({ cloud: { cloudName: 'dprmqr54a' } });
   
   // Use this sample image or upload your own via the Media Explorer
@@ -17,4 +17,4 @@ const App = () => {
   return (<AdvancedImage cldImg={img}/>);
 };
 
-export default App
+export default ImageUpload

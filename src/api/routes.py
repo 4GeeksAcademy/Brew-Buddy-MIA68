@@ -426,6 +426,12 @@ def delete_favorite_user(user_id):
         return jsonify({"error": "Favorite not found"}), 404
     
 # user images endpoint
+from flask import jsonify, request
+from flask_jwt_extended import jwt_required
+from models import db, UserImage
+from cloudinary.uploader import upload, destroy
+from . import api
+
 @api.route('/images', methods=['GET', 'POST'])
 @api.route('/images/<int:id>', methods=['DELETE'])
 @jwt_required()
@@ -445,54 +451,53 @@ def handle_user_images(id=0):
         if 'file' not in request.files:
             return jsonify({"error": "No file part"}), 400
 
-        image_file = request.files['file']
-        if image_file.filename == '':
+        file = request.files['file']
+        if file.filename == '':
             return jsonify({"error": "No selected file"}), 400
 
-        if image_file and allowed_file(image_file.filename):
+        if file and allowed_file(file.filename):
             try:
                 # Upload to Cloudinary
-                response = uploader.upload(image_file)
+                result = upload(file)
                 
                 # Create new UserImage object
                 new_image = UserImage(
                     title=request.form.get("title"),
-                    public_id=response["public_id"],
-                    image_url=response["secure_url"],
+                    public_id=result['public_id'],
+                    image_url=result['secure_url'],
                     owner_id=current_user.id
                 )
                 db.session.add(new_image)
                 db.session.commit()
 
-                return jsonify({"message": "Image created for user", "image": new_image.serialize()}), 201
-
-            except Exception as error:
+                return jsonify({"message": "Image uploaded successfully", "image": new_image.serialize()}), 201
+            except Exception as e:
                 db.session.rollback()
-                return jsonify({"error": f"{type(error).__name__}: {str(error)}"}), 400
-        else:
-            return jsonify({"error": "File type not allowed"}), 400
+                return jsonify({"error": str(e)}), 400
+
+        return jsonify({"error": "File type not allowed"}), 400
 
     elif request.method == "DELETE":
         if id == 0:
             return jsonify({"error": "Invalid image ID"}), 400
 
-        image_to_delete = UserImage.query.filter_by(id=id, owner_id=current_user.id).first()
-        if not image_to_delete:
-            return jsonify({"error": "Image not found or doesn't belong to the user"}), 404
+        image = UserImage.query.filter_by(id=id, owner_id=current_user.id).first()
+        if not image:
+            return jsonify({"error": "Image not found"}), 404
 
         try:
             # Delete from Cloudinary
-            response = uploader.destroy(image_to_delete.public_id)
-            if response.get("result") == "ok":
-                db.session.delete(image_to_delete)
+            result = destroy(image.public_id)
+            if result.get('result') == 'ok':
+                # Delete from database
+                db.session.delete(image)
                 db.session.commit()
                 return jsonify({"message": "Image deleted successfully"}), 200
             else:
                 return jsonify({"error": "Failed to delete image from Cloudinary"}), 500
-
-        except Exception as error:
+        except Exception as e:
             db.session.rollback()
-            return jsonify({"error": f"{type(error).__name__}: {str(error)}"}), 500
+            return jsonify({"error": str(e)}), 400
 
     else:
         return jsonify({"error": "Method not allowed"}), 405
