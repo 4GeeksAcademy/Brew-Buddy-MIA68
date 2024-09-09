@@ -9,10 +9,10 @@ from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_requir
 import hashlib
 from datetime import datetime, timedelta
 from sqlalchemy import select
-import cloudinary.uploader as uploader
 from pyeasyencrypt.pyeasyencrypt import encrypt_string, decrypt_string
 from api.send_email import send_email
 import json, os
+from cloudinary.uploader import upload, destroy
 
 api = Blueprint('api', __name__)
 
@@ -426,12 +426,6 @@ def delete_favorite_user(user_id):
         return jsonify({"error": "Favorite not found"}), 404
     
 # user images endpoint
-from flask import jsonify, request
-from flask_jwt_extended import jwt_required
-from models import db, UserImage
-from cloudinary.uploader import upload, destroy
-from . import api
-
 @api.route('/images', methods=['GET', 'POST'])
 @api.route('/images/<int:id>', methods=['DELETE'])
 @jwt_required()
