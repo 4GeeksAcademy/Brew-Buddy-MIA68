@@ -323,25 +323,18 @@ const getState = ({ getStore, getActions, setStore }) => {
 					const resp = await fetch(process.env.BACKEND_URL + "/api/favorite_breweries/" + brewery.id, {
 						method: "DELETE",
 						headers: {
-							"Content-Type": "application/json",
+							"Content-Type": "application/json", 
 							Authorization: "Bearer " + sessionStorage.getItem("token")
-
-						},
+						}
 					});
 					if (resp.ok) {
-						const data = await resp.json();
-						console.log("brewery deleted from favorites: ", data);
+						const data = await response.json();
+						console.log("brewery added favorites: ", data);
 
-						const store = getStore();
-
+						const store=getStore();
 						setStore({
-							favoriteBreweries: getStore().favoriteBreweries.filter((x) => {
-								return x != brewery;
-							})
+							favoriteBreweries: [ ...store.favoriteBreweries, brewery ]
 						});
-						console.log(getStore().favoriteBreweries)
-						// alert("This Brewery has been deleted from your Favorites");
-
 					} else {
 						const errorData = await resp.json();
 						console.error("failed to add", errorData);
