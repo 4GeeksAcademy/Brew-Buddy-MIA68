@@ -25,5 +25,6 @@ def setup_admin(app):
     admin.add_view(ModelView(Route, db.session))
 
 
+
     # You can duplicate that line to add new models
     # admin.add_view(ModelView(YourModelName, db.session))
