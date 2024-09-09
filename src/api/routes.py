@@ -2,14 +2,13 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint, session
-from api.models import db, User, Beer, Brewery, FavoriteUsers, FavoriteBeers, FavoriteBreweries, PointTransaction, UserImage
+from api.models import db, User, Beer, Brewery, FavoriteUsers, FavoriteBeers, FavoriteBreweries, PointTransaction, UserImage, BreweryReview, BeerReview
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 import hashlib
 from datetime import datetime, timedelta
 from sqlalchemy import select
-
 from pyeasyencrypt.pyeasyencrypt import encrypt_string, decrypt_string
 from api.send_email import send_email
 import json, os
@@ -501,6 +500,48 @@ def allowed_file(filename):
     ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+@api.route('/add_brewery_review', methods=['Post'])
+def add_brewery_review():
+    data = request.json
+    brewery_review = BreweryReview(
+        brewery_name=data.get('brewery_name'),
+        overall_rating=data['overall_rating'],
+        review_text=data.get('review_text', ""),
+        is_favorite_brewery=data.get('is_favorite_brewery', False)
+    )
+    for beer_review_data in data['beer_reviews']:
+        beer_review = BeerReview(
+        beer_name=beer_review_data['beer_name'],
+        rating=beer_review_data['rating'],
+        notes=beer_review_data.get('notes', ""),
+        is_favorite=beer_review_data.get('is_favorite', False)
+    )
+    db.session.add(beer_review)
+    db.session.add(brewery_review)
+    db.session.commit()
+    return jsonify({"message": "Review added successfully"}), 201
+
+@api.route('/add_brewery_review', methods=['Post'])
+def add_brewery_review():
+    data = request.json
+    brewery_review = BreweryReview(
+        brewery_name=data.get('brewery_name'),
+        overall_rating=data['overall_rating'],
+        review_text=data.get('review_text', ""),
+        is_favorite_brewery=data.get('is_favorite_brewery', False)
+    )
+    for beer_review_data in data['beer_reviews']:
+        beer_review = BeerReview(
+        beer_name=beer_review_data['beer_name'],
+        rating=beer_review_data['rating'],
+        notes=beer_review_data.get('notes', ""),
+        is_favorite=beer_review_data.get('is_favorite', False)
+    )
+    db.session.add(beer_review)
+    db.session.add(brewery_review)
+    db.session.commit()
+    return jsonify({"message": "Review added successfully"}), 201
+
 @api.route('/hello', methods=['POST', 'GET'])
 def handle_hello():
 
@@ -509,3 +550,4 @@ def handle_hello():
     }
 
     return jsonify(response_body), 200
+
