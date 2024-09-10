@@ -39,13 +39,13 @@ export const Navbar = () => {
 
 			<ul className="nav nav-tabs mt-2 ps-3">
 				<li className="nav-item">
-					<Link style={{textDecoration: "none"}} to="/">
+					<Link style={{ textDecoration: "none" }} to="/">
 						<button className="nav-link">Home</button>
 
 					</Link>
 				</li>
 				<li className="nav-item">
-					<Link style={{textDecoration: "none"}} to="/favorites">
+					<Link style={{ textDecoration: "none" }} to="/favorites">
 						<button className="nav-link">Favorites</button>
 
 					</Link>
@@ -58,12 +58,6 @@ export const Navbar = () => {
 						Current Route
 					</Link>
 				</li>
-				<li className="nav-item">
-					<Link to="/maptest" className="nav-link">
-						maptest
-					</Link>
-				</li>
-
 			</ul>
 		</nav >
 	);
