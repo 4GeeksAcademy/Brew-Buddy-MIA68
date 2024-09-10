@@ -3,10 +3,26 @@ import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
 import { Link } from "react-router-dom";
+import microIcon from '../../img/micro1.png';
+import nanoIcon from '../../img/nano1.png';
+import regionalIcon from '../../img/regional1.png';
+import largeIcon from '../../img/large1.png';
+import brewpubIcon from '../../img/brewpub1.png';
+
+
+const breweryTypeIcons = {
+    micro: microIcon,
+    nano: nanoIcon,
+    regional: regionalIcon,
+    large: largeIcon,
+    brewpub: brewpubIcon
+};
+
 
 export const BreweryCard = (props) => {
     const { store, actions } = useContext(Context);
     const navigate = useNavigate()
+    const breweryType = props.breweryData.brewery_type;
 
     const handleFavBrewery= () => {
       actions.addFavoriteBrewery(props.breweryData);  
@@ -16,11 +32,23 @@ export const BreweryCard = (props) => {
         <div className="card">
             <div className="card-body">
                 <h4 className="card-title">
-                    {/* J.R.: A specific image for brewery type */}
                     <a href={props.breweryData.brewery_type}>
-                        <img src="" title="beer icons" alt="brewery-type-icon" style={{ width: '20px', height: '20px', marginRight: '8px' }} />
+                        <img 
+                            src={breweryTypeIcons[breweryType]} 
+                            title="brewery type icon" 
+                            alt={`${breweryType} icon`} 
+                            style={{ width: '30px', height: '30px', marginRight: '8px' }} 
+                        />
                     </a>
                     {props.breweryData.name}
+                    <a href={props.breweryData.brewery_type}>
+                        <img 
+                            src={breweryTypeIcons[breweryType]} 
+                            title="brewery type icon" 
+                            alt={`${breweryType} icon`} 
+                            style={{ width: '30px', height: '30px', marginLeft: '8px' }} 
+                        />
+                    </a>
                 </h4>
                 <h5>{props.breweryData.city}, {props.breweryData.state}</h5>
                 <p className="card-text">With supporting text below as a natural lead-in to additional content.</p>
@@ -29,7 +57,7 @@ export const BreweryCard = (props) => {
                 <a href="#" className="btn btn-info"><i className="fa-regular fa-star" onClick={handleFavBrewery}></i></a>
                 {/* J.R.: A button for contact information of brewery */}
                 <a href={props.breweryData.phone}>{props.breweryData.phone}</a>
-                {/* J.R.: A button for website of brewery */}
+                {/* A button for website of brewery */}
                 <p>
                     <a href={props.breweryData.website_url} target="blank">
                         <button className="btn btn-secondary">Visit Our Website!</button>
@@ -42,6 +70,7 @@ export const BreweryCard = (props) => {
         </div>
     )
 }
+
 export const JourneyCard = ({ key, breweryData, onReview, onRefocus }) => {
     const { store, actions } = useContext(Context);
     const navigate = useNavigate()

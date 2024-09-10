@@ -2,24 +2,33 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint, session
-from api.models import db, User, Beer, Brewery, FavoriteUsers, FavoriteBeers, FavoriteBreweries, PointTransaction
+from api.models import db, User, Beer, Brewery, FavoriteUsers, FavoriteBeers, FavoriteBreweries, PointTransaction, UserImage, BreweryReview, BeerReview
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
 import hashlib
 from datetime import datetime, timedelta
 from sqlalchemy import select
-
 from pyeasyencrypt.pyeasyencrypt import encrypt_string, decrypt_string
 from api.send_email import send_email
 import json, os
 from dotenv import load_dotenv
 load_dotenv()
+# added line 18 my lines 15 & 16
+from cloudinary.uploader import upload, destroy
 
 api = Blueprint('api', __name__)
 
 # Allow CORS requests to this API
 CORS(api)
+
+# Configuration for Cloudinary
+CLOUDINARY_URL = os.environ.get("CLOUDINARY_URL")
+
+# Only create UPLOAD_FOLDER if it's defined in environment variables
+UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER')
+if UPLOAD_FOLDER:
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 @api.route('/signup', methods=['POST'])
 def handle_signup():
@@ -35,7 +44,7 @@ def handle_signup():
 
     return jsonify(response_body), 200
 
-# User log in route with password hashing - for active users only
+# User log in route with password hashing - for active users only & no points
 # @api.route('/login', methods=['POST'])
 # def handle_login():
 #     body = request.get_json()
@@ -51,7 +60,7 @@ def handle_signup():
 #     else:
 #         return jsonify({"error": "Invalid email or password"}), 401
 
-# User log in route with password hashing - for active users only
+# User log in route with password hashing and awarding points - for active users only
 @api.route('/login', methods=['POST'])
 def handle_login():
     body = request.get_json()
@@ -60,6 +69,17 @@ def handle_login():
     user = User.query.filter_by(email = email).first()
     if user and user.password == password:
         if user.is_active:
+            # Check if the user has already logged in today
+            last_login = PointTransaction.query.filter_by(owner_id=user.id, action="Daily login").order_by(PointTransaction.timestamp.desc()).first()
+            
+            if not last_login or (datetime.utcnow() - last_login.timestamp) > timedelta(days=1):
+                # Award points for daily login
+                points_earned = 1
+                user.change_points(points_earned, "Daily login")
+                db.session.commit()
+            else:
+                points_earned = 0
+
             # Check if the user has already logged in today
             last_login = PointTransaction.query.filter_by(owner_id=user.id, action="Daily login").order_by(PointTransaction.timestamp.desc()).first()
             
@@ -259,8 +279,6 @@ def get_all_breweries():
     breweries = Brewery.query.all()
     return jsonify([brewery.serialize() for brewery in breweries]), 200
 
-
-
 # Access user's favorite beers list (with user authentication)
 @api.route('/favorite_beers', methods=['GET'])
 @jwt_required()
@@ -454,6 +472,102 @@ def delete_favorite_user(user_id):
         return jsonify({"done": True}), 200
     else:
         return jsonify({"error": "Favorite not found"}), 404
+    
+# user images endpoint
+@api.route('/images', methods=['GET', 'POST'])
+@api.route('/images/<int:id>', methods=['DELETE'])
+@jwt_required()
+def handle_user_images(id=0):
+    current_user = get_current_user()
+    if not current_user:
+        return jsonify({"error": "User not authenticated"}), 401
+
+    if request.method == "GET":
+        user_images = UserImage.query.filter_by(owner_id=current_user.id).all()
+        return jsonify([image.serialize() for image in user_images]), 200
+
+    elif request.method == "POST":
+        if len(current_user.user_images) >= 5:
+            return jsonify({"error": "Cannot upload more than five images, please delete one first."}), 400
+
+        if 'file' not in request.files:
+            return jsonify({"error": "No file part"}), 400
+
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({"error": "No selected file"}), 400
+
+        if file and allowed_file(file.filename):
+            try:
+                # Upload to Cloudinary
+                result = upload(file)
+                
+                # Create new UserImage object
+                new_image = UserImage(
+                    title=request.form.get("title"),
+                    public_id=result['public_id'],
+                    image_url=result['secure_url'],
+                    owner_id=current_user.id
+                )
+                db.session.add(new_image)
+                db.session.commit()
+
+                return jsonify({"message": "Image uploaded successfully", "image": new_image.serialize()}), 201
+            except Exception as e:
+                db.session.rollback()
+                return jsonify({"error": str(e)}), 400
+
+        return jsonify({"error": "File type not allowed"}), 400
+
+    elif request.method == "DELETE":
+        if id == 0:
+            return jsonify({"error": "Invalid image ID"}), 400
+
+        image = UserImage.query.filter_by(id=id, owner_id=current_user.id).first()
+        if not image:
+            return jsonify({"error": "Image not found"}), 404
+
+        try:
+            # Delete from Cloudinary
+            result = destroy(image.public_id)
+            if result.get('result') == 'ok':
+                # Delete from database
+                db.session.delete(image)
+                db.session.commit()
+                return jsonify({"message": "Image deleted successfully"}), 200
+            else:
+                return jsonify({"error": "Failed to delete image from Cloudinary"}), 500
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"error": str(e)}), 400
+
+    else:
+        return jsonify({"error": "Method not allowed"}), 405
+
+def allowed_file(filename):
+    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@api.route('/add_brewery_review', methods=['Post'])
+def add_brewery_review():
+    data = request.json
+    brewery_review = BreweryReview(
+        brewery_name=data.get('brewery_name'),
+        overall_rating=data['overall_rating'],
+        review_text=data.get('review_text', ""),
+        is_favorite_brewery=data.get('is_favorite_brewery', False)
+    )
+    for beer_review_data in data['beer_reviews']:
+        beer_review = BeerReview(
+        beer_name=beer_review_data['beer_name'],
+        rating=beer_review_data['rating'],
+        notes=beer_review_data.get('notes', ""),
+        is_favorite=beer_review_data.get('is_favorite', False)
+    )
+    db.session.add(beer_review)
+    db.session.add(brewery_review)
+    db.session.commit()
+    return jsonify({"message": "Review added successfully"}), 201
 
 @api.route('/hello', methods=['POST', 'GET'])
 def handle_hello():
@@ -463,3 +577,4 @@ def handle_hello():
     }
 
     return jsonify(response_body), 200
+
