@@ -45,7 +45,7 @@ class Route {
 	constructor(breweryDestination, travelTime, miles) {
 		this.breweryDestination = breweryDestination; // this is an instance of the brewery destination class
 		this.travelTime = travelTime; //shown in minutes ideally
-		this.miles = miles //shown in miles ideally.. Km?
+		this.miles = miles //shown in miles ideally... Km?
 	}
 }
 class Journey {
