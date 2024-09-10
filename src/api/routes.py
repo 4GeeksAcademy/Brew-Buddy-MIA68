@@ -521,27 +521,6 @@ def add_brewery_review():
     db.session.commit()
     return jsonify({"message": "Review added successfully"}), 201
 
-@api.route('/add_brewery_review', methods=['Post'])
-def add_brewery_review():
-    data = request.json
-    brewery_review = BreweryReview(
-        brewery_name=data.get('brewery_name'),
-        overall_rating=data['overall_rating'],
-        review_text=data.get('review_text', ""),
-        is_favorite_brewery=data.get('is_favorite_brewery', False)
-    )
-    for beer_review_data in data['beer_reviews']:
-        beer_review = BeerReview(
-        beer_name=beer_review_data['beer_name'],
-        rating=beer_review_data['rating'],
-        notes=beer_review_data.get('notes', ""),
-        is_favorite=beer_review_data.get('is_favorite', False)
-    )
-    db.session.add(beer_review)
-    db.session.add(brewery_review)
-    db.session.commit()
-    return jsonify({"message": "Review added successfully"}), 201
-
 @api.route('/hello', methods=['POST', 'GET'])
 def handle_hello():
 
