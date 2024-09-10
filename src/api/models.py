@@ -14,11 +14,13 @@ class User(db.Model):
     favorite_breweries = db.relationship("FavoriteBreweries", back_populates="owner", foreign_keys="FavoriteBreweries.owner_id")
     point_transactions = db.relationship("PointTransaction", back_populates="owner")
     user_images = db.relationship("UserImage", back_populates="owner")
+    profile_image_id = db.Column(db.String(255), default='samples/man-portrait')
 
-    def __init__(self, email, password, is_active=True):
+    def __init__(self, email, password, is_active=True, profile_image_id='samples/man-portrait'):
         self.email = email
         self.password = password
         self.is_active = is_active
+        self.profile_image_id = profile_image_id
     
     # added repr to help with debugging by providing a readable string representation of the model instances
     def __repr__(self):
@@ -46,7 +48,8 @@ class User(db.Model):
             "favorite_users": favorite_users_dictionaries,
             "favorite_beers": favorite_beers_dictionaries,
             "favorite_breweries": favorite_breweries_dictionaries,
-            "points": self.points
+            "points": self.points,
+            "profile_image_id": self.profile_image_id
             # do not serialize the password, it's a security breach
         }
     

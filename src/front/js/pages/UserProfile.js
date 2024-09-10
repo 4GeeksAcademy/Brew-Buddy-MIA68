@@ -80,14 +80,14 @@ export const UserProfile = () => {
                     <p>You have {userInfo.points} points. Congratulations!</p>
                     {userInfo.profileImage && (
                         <AdvancedImage
-                            cldImg={cld.image(userInfo.profileImage).resize(fill().width(200).height(200))}
-                            alt="Profile"
+                        cldImg={cld.image(userInfo.profile_image_id || 'default_profile_image').resize(fill().width(200).height(200))}
+                        alt="Profile"
                         />
                     )}
                     <div className="mt-3">
-                        <input type="file" accept="image/*" onChange={handleImageChange} />
-                        <button onClick={handleImageUpload} className="btn btn-primary mt-2">Upload Profile Picture</button>
-                    </div>
+                    <input type="file" accept="image/*" onChange={handleImageChange} />
+                    <button onClick={handleImageUpload} className="btn btn-primary mt-2">Upload Profile Picture</button>
+                </div>
                 </>
             )}
             <div className="mt-5">
