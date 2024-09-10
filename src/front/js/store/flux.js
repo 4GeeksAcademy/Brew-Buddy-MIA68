@@ -158,30 +158,33 @@ const getState = ({ getStore, getActions, setStore }) => {
 							"Content-type": "application/json"
 						},
 						body: JSON.stringify({ email, password })
-					})
-					if (response.ok) {
-						const data = await response.json();
-						sessionStorage.setItem("token", data.access_token);
-						sessionStorage.setItem("userEmail", data.email);
-						setStore({
-							token: data.access_token,
-							userPoints: data.total_points,
-							userEmail: email
-						});
-						console.log("login successful");
-						return {
-							success: true,
-							points_earned: data.points_earned,
-							total_points: data.total_points
-						};
-					} else {
+					});
+			
+					if (!response.ok) {
 						const errorData = await response.json();
-						console.error("login failed", errorData);
-						return { success: false };
+						console.error("Login failed", errorData);
+						return { success: false, error: errorData.error }; 
 					}
+			
+					const data = await response.json();
+					sessionStorage.setItem("token", data.access_token);
+					sessionStorage.setItem("userEmail", email);
+			
+					setStore({
+						token: data.access_token,
+						userPoints: data.total_points,
+						userEmail: email
+					});
+			
+					console.log("Login successful");
+					return {
+						success: true,
+						points_earned: data.points_earned,
+						total_points: data.total_points
+					};
 				} catch (error) {
-					console.error("error during login", error);
-					return { success: false };
+					console.error("Error during login", error);
+					return { success: false, error: error.message };
 				}
 			},
 
