@@ -20,5 +20,5 @@ def setup_admin(app):
     admin.add_view(ModelView(PointTransaction, db.session))
 
 
-    # You can duplicate that line to add mew models
+    # You can duplicate that line to add new models
     # admin.add_view(ModelView(YourModelName, db.session))
