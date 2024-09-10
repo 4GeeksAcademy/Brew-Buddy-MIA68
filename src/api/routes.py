@@ -36,8 +36,8 @@ def handle_signup():
     user = User(
         email=email, 
         password=password, 
-        is_active=True
-        # profile_image_id will use the default value
+        is_active=True,
+        profile_image_id='samples/man-portrait'  # Set default image
     )
     db.session.add(user)
     db.session.commit()

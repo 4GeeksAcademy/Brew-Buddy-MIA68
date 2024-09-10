@@ -188,7 +188,7 @@ class PointTransaction(db.Model):
     points = db.Column(db.Integer, nullable=False)
     action = db.Column(db.String(250), nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
-
+    # will need to revisit at a later time to see if the below needs to be owner = db.relationship("User", back_populates="point_transactions")
     owner = db.relationship('User', )
 
     def __repr__(self):

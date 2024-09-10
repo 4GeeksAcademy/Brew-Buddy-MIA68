@@ -76,18 +76,25 @@ export const UserProfile = () => {
         <div className="container mt-4">
             {userInfo && (
                 <>
-                    <h1>Hello and welcome {userInfo.email}!</h1>
-                    <p>You have {userInfo.points} points. Congratulations!</p>
-                    {userInfo.profileImage && (
-                        <AdvancedImage
-                        cldImg={cld.image(userInfo.profile_image_id || 'default_profile_image').resize(fill().width(200).height(200))}
-                        alt="Profile"
-                        />
-                    )}
-                    <div className="mt-3">
-                    <input type="file" accept="image/*" onChange={handleImageChange} />
-                    <button onClick={handleImageUpload} className="btn btn-primary mt-2">Upload Profile Picture</button>
-                </div>
+                    <div className="row align-items-center mb-4">
+                        <div className="col-1">
+                            <AdvancedImage
+                                cldImg={cld.image(userInfo.profile_image_id || 'samples/man-portrait').resize(fill().width(250).height(250))}
+                                alt="Profile"
+                                className="img-fluid"
+                            />
+                        </div>
+                        <div className="col-11">
+                            <h1>Hello and welcome {userInfo.email}!</h1>
+                            <p>You have {userInfo.points} points. Congratulations!</p>
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="col-2">
+                            <input type="file" accept="image/*" onChange={handleImageChange} className="form-control mb-2" />
+                            <button onClick={handleImageUpload} className="btn btn-primary w-100">Upload Profile Picture</button>
+                        </div>
+                    </div>
                 </>
             )}
             <div className="mt-5">

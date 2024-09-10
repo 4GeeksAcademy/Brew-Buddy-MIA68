@@ -155,26 +155,20 @@ const getState = ({ getStore, getActions, setStore }) => {
 				try {
 					const response = await fetch(`${process.env.BACKEND_URL}/api/login`, {
 						method: "POST",
-						headers: {
-							"Content-type": "application/json"
-						},
+						headers: { "Content-type": "application/json" },
 						body: JSON.stringify({ email, password })
-					})
+					});
 					if (response.ok) {
 						const data = await response.json();
 						sessionStorage.setItem("token", data.access_token);
-						sessionStorage.setItem("userEmail", data.email);
-						setStore({
-							token: data.access_token,
-							userPoints: data.total_points,
+						sessionStorage.setItem("userEmail", email);
+						setStore({ 
+							token: data.access_token, 
+							userPoints: data.total_points, 
 							userEmail: email
 						});
 						console.log("login successful");
-						return {
-							success: true,
-							points_earned: data.points_earned,
-							total_points: data.total_points
-						};
+						return { success: true, points_earned: data.points_earned, total_points: data.total_points };
 					} else {
 						const errorData = await response.json();
 						console.error("login failed", errorData);
