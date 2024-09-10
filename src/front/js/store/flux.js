@@ -179,8 +179,32 @@ const getState = ({ getStore, getActions, setStore }) => {
 						return { success: false };
 					}
 				} catch (error) {
-					console.error("error during login", error);
-					return { success: false };
+					console.error("Error during login", error);
+					return { success: false, error: error.message };
+				}
+			},
+
+			fetchUserInfo: async () => {
+				const store = getStore();
+				try {
+					const response = await fetch(`${process.env.BACKEND_URL}/api/user`, {
+						headers: { 
+							"Content-Type": "application/json",
+							Authorization: `Bearer ${store.token}`
+						}
+					});
+					if (response.ok) {
+						const data = await response.json();
+						setStore({ 
+							userEmail: data.email,
+							userProfileImageId: data.profile_image_id,
+							userPoints: data.points
+						});
+					} else {
+						console.error("Failed to fetch user info", response.status);
+					}
+				} catch (error) {
+					console.error("Error fetching user info", error);
 				}
 			},
 
