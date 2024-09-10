@@ -321,14 +321,14 @@ const getState = ({ getStore, getActions, setStore }) => {
 			createBreweryList: (data) => {
 				const store = getStore();
 				const brewery = new BreweryInfo(data);
-				const breweryType = store.type
+				const breweryType = `${store.type}`
 				const breweries = [];
 				const micro = "micro";
 				const nano = "nano";
 				const brewpub = "brewpub";
 				const regional = "regional";
-				console.log("type:", store.type)
-				if (store.type = "") {
+				console.log("type:", breweryType)
+				if (breweryType === "") {
 					for (const element of data) {
 						if (element.brewery_type === micro || element.brewery_type === nano || element.brewery_type === brewpub || element.brewery_type === regional) {
 							if (element.address_1 === null || element.latitude === null) {
@@ -339,7 +339,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					}
 				} else {
 					for (const element of data) {
-						if (element.brewery_Type === store.type) {
+						if (element.brewery_type === `${breweryType}`) {
 							if (element.address_1 === null || element.latitude === null) {
 								continue
 							}
