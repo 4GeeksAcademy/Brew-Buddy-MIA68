@@ -12,7 +12,7 @@ export const BeerCard = (props) => {
             <div className="card-body">
                 <div className="d-flex">    
                     <h2 className="card-title mx-auto">
-                        {/* J.R.: A specific image for brewery type */}
+                        {/* J.R.: A specific image for brewery types */}
                         {props.beerData.beer_name}
                     </h2>
                 </div>
