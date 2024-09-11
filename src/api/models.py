@@ -106,6 +106,7 @@ class FavoriteBreweries(db.Model):
 
 class Brewery(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    brewery_api_id= db.Column(db.String(250), nullable = True)
     brewery_name = db.Column(db.String(250))
     brewery_type = db.Column(db.String(250))
     address = db.Column(db.String(250))
@@ -118,9 +119,10 @@ class Brewery(db.Model):
 
     favorited_by_users = db.relationship("FavoriteBreweries", back_populates="brewery", foreign_keys="FavoriteBreweries.favorited_brewery_id")
 
-    def __init__(self, brewery_name, brewery_type, address, city, state_province, longitude, latitude, phone, website_url):
+    def __init__(self, brewery_name, brewery_type, brewery_api_id, address, city, state_province, longitude, latitude, phone, website_url):
         self.brewery_name = brewery_name
         self.brewery_type = brewery_type
+        self.brewery_api_id = brewery_api_id
         self.address = address
         self.city = city
         self.state_province = state_province

@@ -349,33 +349,40 @@ def add_favorite_beer(beer_id):
     return jsonify({"done": True}), 201
 
 # Add a favorite brewery for the current user with authentication
-@api.route('/favorite_breweries/<int:brewery_id>', methods=['POST'])
+@api.route('/favorite_breweries', methods=['POST'])
 @jwt_required()
-def add_favorite_brewery(brewery_id):
-    #return jsonify({"message": "Not implemented"}), 405
+def add_favorite_brewery():
     current_user = get_current_user()
+    data=request.get_json()
+    
     if not current_user:
         return jsonify({"error": "User not authenticated"}), 401
-    data=request.json()
-    existing_brewery=Brewery.query.get(brewery_id)
+    existing_brewery=Brewery.query.filter_by(brewery_api_id = data.get("id")).first()
+    new_brewery=None 
     if not existing_brewery:
-        new_brewery=Brewery(brewery_name=data.get("brewery_name"), 
+        new_brewery=Brewery(brewery_name=data.get("name"), 
                             brewery_type=data.get("brewery_type"), 
-                            id=brewery_id, address=data.get("address"), 
+                            brewery_api_id=data.get("id"), address=data.get("address_1"), 
                             city=data.get("city"), state_province=data.get("state_province"), 
                             longitude=data.get("longitude"),
                             latitude=data.get("latitude"),
                             phone=data.get("phone"),
                             website_url=data.get("website_url")  )
         db.session.add(new_brewery)
-        db.session.commit("Added brewery to favorites")
+        db.session.commit()
         db.session.refresh(new_brewery)
-    # Check if the brewery is already favorited
-    existing_favorite = FavoriteBreweries.query.filter_by(owner_id=current_user.id, favorited_brewery_id=brewery_id).first()
-    if existing_favorite:
-        return jsonify({"error": "Brewery already favorited"}), 400
-
-    new_favorite_brewery = FavoriteBreweries(owner_id=current_user.id, favorited_brewery_id=brewery_id)
+    # Check if the brewery is already favorite
+    new_favorite_brewery=None 
+    if new_brewery:
+        existing_favorite = FavoriteBreweries.query.filter_by(owner_id=current_user.id, favorited_brewery_id=new_brewery.id).first()
+        if existing_favorite:
+            return jsonify({"error": "Brewery already favorited by this user"}), 400
+        new_favorite_brewery = FavoriteBreweries(owner_id=current_user.id, favorited_brewery_id=new_brewery.id)
+    if existing_brewery:
+        existing_favorite = FavoriteBreweries.query.filter_by(owner_id=current_user.id, favorited_brewery_id=existing_brewery.id).first()
+        if existing_favorite:
+            return jsonify({"error": "Brewery already favorited by this user"}), 400
+        new_favorite_brewery = FavoriteBreweries(owner_id=current_user.id, favorited_brewery_id=existing_brewery.id)
     db.session.add(new_favorite_brewery)
     
     # Award points for favoriting a brewery
@@ -389,6 +396,7 @@ def add_favorite_brewery(brewery_id):
         "points_earned": points_earned,
         "total_points": current_user.points
     }), 201
+   
 
 # Add a favorite user for the current user with authentication
 @api.route('/favorite_users/<int:user_id>', methods=['POST'])
