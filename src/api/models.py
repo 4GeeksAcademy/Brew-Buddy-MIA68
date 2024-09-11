@@ -232,7 +232,7 @@ journey_reviews = db.Table('journey_reviews',
 
 class BreweryReview(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    brewer_name = db.Column(db.String, nullable=False)
+    brewery_name = db.Column(db.String, nullable=False)
     overall_rating = db.Column(db.Float, nullable=False)
     review_text = db.Column(db.String(500), nullable=True)
     is_favorite_brewery = db.Column(db.Boolean, default=False)
@@ -252,7 +252,7 @@ class BreweryReview(db.Model):
 
 class BeerReview(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    brewery_review_id = db.Column(db.Integer, db.ForeignKey('brewery_review.id'), nullable=False)
+    brewery_review_id = db.Column(db.Integer, db.ForeignKey('brewery_review.id'), nullable=True)
     beer_name = db.Column(db.String(100), nullable=False)
     rating = db.Column(db.Float, nullable=False)
     notes = db.Column(db.String(500), nullable=True)
