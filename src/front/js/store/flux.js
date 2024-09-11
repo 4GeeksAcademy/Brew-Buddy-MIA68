@@ -113,6 +113,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 		store: {
 			token: sessionStorage.getItem("token") || "",
 			userEmail: sessionStorage.getItem("userEmail") || null,
+			userProfileImageId: null,
 			breweryData: [],
 			beerData: [],
 			journey: new Journey(),
@@ -162,10 +163,12 @@ const getState = ({ getStore, getActions, setStore }) => {
 						const data = await response.json();
 						sessionStorage.setItem("token", data.access_token);
 						sessionStorage.setItem("userEmail", email);
+						sessionStorage.setItem("userProfileImageId", data.profile_image_id);
 						setStore({ 
 							token: data.access_token, 
 							userPoints: data.total_points, 
-							userEmail: email
+							userEmail: email,
+							userProfileImageId: data.profile_image_id
 						});
 						console.log("login successful");
 						return { success: true, points_earned: data.points_earned, total_points: data.total_points };
@@ -180,10 +183,36 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 
+			fetchUserInfo: async () => {
+				const store = getStore();
+				try {
+					const response = await fetch(`${process.env.BACKEND_URL}/api/user`, {
+						headers: { 
+							"Content-Type": "application/json",
+							Authorization: `Bearer ${store.token}`
+						}
+					});
+					if (response.ok) {
+						const data = await response.json();
+						setStore({ 
+							userEmail: data.email,
+							userProfileImageId: data.profile_image_id,
+							userPoints: data.points
+						});
+					} else {
+						console.error("Failed to fetch user info", response.status);
+					}
+				} catch (error) {
+					console.error("Error fetching user info", error);
+				}
+			},
+
 			logout: () => {
 				try {
 					sessionStorage.removeItem("token");
-					setStore({ token: null })
+					sessionStorage.removeItem("userEmail");
+    				sessionStorage.removeItem("userProfileImageId");
+					setStore({ token: null, userEmail: null, userProfileImageId: null })
 					console.log("logout successful");
 				} catch (error) {
 					console.error("error during logout", error);
