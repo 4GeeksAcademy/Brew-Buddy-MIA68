@@ -45,7 +45,7 @@ class Route {
 	constructor(breweryDestination, travelTime, miles) {
 		this.breweryDestination = breweryDestination; // this is an instance of the brewery destination class
 		this.travelTime = travelTime; //shown in minutes ideally
-		this.miles = miles //shown in miles ideally.. Km?
+		this.miles = miles //shown in miles ideally... Km?
 	}
 }
 class Journey {
@@ -320,7 +320,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 			createBreweryList: (data) => {
 				const store = getStore();
-				const brewery = new BreweryInfo(data);
+				//const brewery = new BreweryInfo(data);
 				const breweryType = `${store.type}`
 				const breweries = [];
 				const micro = "micro";
@@ -334,7 +334,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 							if (element.address_1 === null || element.latitude === null) {
 								continue
 							}
-							breweries.push(element)
+							const breweryInfo = new BreweryInfo(element)
+							breweries.push(breweryInfo)
 						}
 					}
 				} else {
@@ -349,7 +350,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 				setStore({ breweryData: breweries })
 				console.log(store.breweryData)
-				return brewery
 			},
 			fetchUserPoints: async () => {
 				try {
