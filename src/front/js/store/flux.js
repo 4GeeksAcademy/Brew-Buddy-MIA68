@@ -343,7 +343,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 			createBreweryList: (data) => {
 				const store = getStore();
-				const brewery = new BreweryInfo(data);
+				//const brewery = new BreweryInfo(data);
 				const breweryType = `${store.type}`
 				const breweries = [];
 				const micro = "micro";
@@ -357,7 +357,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 							if (element.address_1 === null || element.latitude === null) {
 								continue
 							}
-							breweries.push(element)
+							const breweryInfo = new BreweryInfo(element)
+							breweries.push(breweryInfo)
 						}
 					}
 				} else {
@@ -372,7 +373,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 				setStore({ breweryData: breweries })
 				console.log(store.breweryData)
-				return brewery
 			},
 			fetchUserPoints: async () => {
 				try {
