@@ -76,28 +76,26 @@ export const UserProfile = () => {
         <div className="container mt-4">
             {userInfo && (
                 <>
-                    <div className="row align-items-center mb-4">
-                        <div className="col-1">
-                            <AdvancedImage
-                                cldImg={cld.image(userInfo.profile_image_id || 'samples/man-portrait').resize(fill().width(250).height(250))}
-                                alt="Profile"
-                                className="img-fluid"
-                            />
-                        </div>
-                        <div className="col-11">
+                    <div className="row align-items-center mb-1">
+                        <div className="col-9">
                             <h1>Hello and welcome {userInfo.email}!</h1>
                             <p>You have {userInfo.points} points. Congratulations!</p>
                         </div>
-                    </div>
-                    <div className="row">
-                        <div className="col-2">
-                            <input type="file" accept="image/*" onChange={handleImageChange} className="form-control mb-2" />
-                            <button onClick={handleImageUpload} className="btn btn-primary w-100">Upload Profile Picture</button>
+                        <div className="col-2 d-flex flex-column align-items-center">
+                            <AdvancedImage
+                                cldImg={cld.image(userInfo.profile_image_id || 'samples/man-portrait').resize(fill().width(200).height(200))}
+                                alt="Profile"
+                                className="img-fluid mb-3"
+                            />
+                            <div className="text-end w-100">
+                                <input type="file" accept="image/*" onChange={handleImageChange} className="form-control mb-2" />
+                                <button onClick={handleImageUpload} className="btn btn-primary">Upload Profile Picture</button>
+                            </div>
                         </div>
                     </div>
                 </>
             )}
-            <div className="mt-5">
+            <div className="mt-1">
                 <h2>Point History</h2>
                 <table className="table">
                     <thead>
