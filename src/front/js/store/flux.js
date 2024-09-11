@@ -266,12 +266,14 @@ const getState = ({ getStore, getActions, setStore }) => {
 			addFavoriteBrewery: async (brewery) => {
 				console.log(brewery)
 				try {
-					const resp = await fetch(process.env.BACKEND_URL + "/api/favorite_breweries/" + brewery.id, {
+					const resp = await fetch(process.env.BACKEND_URL + "/api/favorite_breweries/", {
 						method: "POST",
 						headers: {
 							"Content-Type": "application/json", 
 							Authorization: "Bearer " + sessionStorage.getItem("token")
-						}
+							
+						},
+						body:JSON.stringify(brewery)
 					});
 					if (resp.ok) {
 						const data = await response.json();
@@ -282,7 +284,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 							favoriteBreweries: [ ...store.favoriteBreweries, brewery ]
 						});
 					} else {
-						const errorData = await response.json();
+						const errorData = await resp.json();
 						console.error("failed to add", errorData);
 					}
 				} catch (error) {
