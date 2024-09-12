@@ -69,7 +69,7 @@ export const FavoriteBeers = () => {
       </select>
 
       <ul>
-        <form>
+        {/* <form>
           <div className="mb-3">
             <label htmlFor="beerDropdown" className="form-label">Select a beer</label>
             <select
@@ -114,7 +114,7 @@ export const FavoriteBeers = () => {
             <input type="text" class="form-control" id="ABV" placeholder="Another input placeholder" />
           </div>
           <button className="btn btn-primary" type="submit">Submit</button>
-        </form>
+        </form> */}
         {items.map((item, index) => {
           return (
             <div class="card text-center mb-3 mx-auto" style={{ width: "18rem" }}>

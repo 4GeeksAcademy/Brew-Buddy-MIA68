@@ -297,13 +297,23 @@ def handle_get_favorite_beers():
 @api.route('/favorite_breweries', methods=['GET'])
 @jwt_required()
 def handle_get_favorite_breweries():
-    #return jsonify({"message": "Not implemented"}), 405
     current_user = get_current_user()
     if not current_user:
         return jsonify({"error": "User not authenticated"}), 401
-    
+
+    # Fetch the favorite brewery records
     favorite_breweries = FavoriteBreweries.query.filter_by(owner_id=current_user.id).all()
-    return jsonify([favorite_brewery.serialize() for favorite_brewery in favorite_breweries]), 200
+
+    # Prepare a list to store detailed brewery information
+    detailed_breweries = []
+
+    # Loop through each favorite brewery and fetch full brewery details
+    for favorite in favorite_breweries:
+        brewery = Brewery.query.get(favorite.favorited_brewery_id)  # Get the full brewery details
+        if brewery:
+            detailed_breweries.append(brewery.serialize())  # Add the serialized brewery to the list
+
+    return jsonify(detailed_breweries), 200  # Return the detailed breweries as JSON
 
 # Access user's favorite users list (including authentication piece)
 @api.route('/favorite_users', methods=['GET'])
