@@ -25,7 +25,7 @@ export const Home = () => {
 	return (
 		<div className="text-center mt-5">
 			<h1>Hello Brew Buddy!!</h1>
-			<img src={brewbuddyimg} />
+			<img src={brewbuddyimg} className="home-logo-img" />
 			<div className="my-2">
 				<button onClick={actions.toggleSearch}>Search</button>
 

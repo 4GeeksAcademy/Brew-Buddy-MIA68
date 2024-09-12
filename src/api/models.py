@@ -14,11 +14,13 @@ class User(db.Model):
     favorite_breweries = db.relationship("FavoriteBreweries", back_populates="owner", foreign_keys="FavoriteBreweries.owner_id")
     point_transactions = db.relationship("PointTransaction", back_populates="owner")
     user_images = db.relationship("UserImage", back_populates="owner")
+    profile_image_id = db.Column(db.String(255), default='samples/man-portrait')
 
-    def __init__(self, email, password, is_active=True):
+    def __init__(self, email, password, is_active=True, profile_image_id='samples/man-portrait'):
         self.email = email
         self.password = password
         self.is_active = is_active
+        self.profile_image_id = profile_image_id
     
     # added repr to help with debugging by providing a readable string representation of the model instances
     def __repr__(self):
@@ -46,7 +48,8 @@ class User(db.Model):
             "favorite_users": favorite_users_dictionaries,
             "favorite_beers": favorite_beers_dictionaries,
             "favorite_breweries": favorite_breweries_dictionaries,
-            "points": self.points
+            "points": self.points,
+            "profile_image_id": self.profile_image_id
             # do not serialize the password, it's a security breach
         }
     
@@ -185,7 +188,7 @@ class PointTransaction(db.Model):
     points = db.Column(db.Integer, nullable=False)
     action = db.Column(db.String(250), nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
-
+    # will need to revisit at a later time to see if the below needs to be owner = db.relationship("User", back_populates="point_transactions")
     owner = db.relationship('User', )
 
     def __repr__(self):
@@ -203,25 +206,22 @@ class PointTransaction(db.Model):
 # model for user uploaded images
 class UserImage(db.Model):
     __table_args__ = (
-        db.UniqueConstraint("title", "owner_id", name="unique_img_title_user"),
+        db.UniqueConstraint("owner_id", name="unique_img_title_user"),
     )
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(80), nullable=False)
     public_id = db.Column(db.String(500), nullable=False, unique=True)
     image_url = db.Column(db.String(500), nullable=False, unique=True)
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     owner = db.relationship("User", back_populates="user_images", foreign_keys=[owner_id])
 
-    def __init__(self, title, public_id, image_url, owner_id):
-        self.title = title.strip()
+    def __init__(self, public_id, image_url, owner_id):
         self.public_id = public_id
-        self.image_url = image_url.strip()
-        self.owner_id = owner_id.strip()
+        self.image_url = image_url
+        self.owner_id = owner_id
 
     def serialize(self):
         return {
             "id": self.id,
-            "title": self.title,
             "image_url": self.image_url
         }
     
