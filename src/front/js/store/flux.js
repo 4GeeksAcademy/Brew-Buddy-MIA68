@@ -45,7 +45,7 @@ class Route {
 	constructor(breweryDestination, travelTime, miles) {
 		this.breweryDestination = breweryDestination; // this is an instance of the brewery destination class
 		this.travelTime = travelTime; //shown in minutes ideally
-		this.miles = miles //shown in miles ideally.. Km?
+		this.miles = miles //shown in miles ideally... Km?
 	}
 }
 class Journey {
@@ -113,6 +113,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 		store: {
 			token: sessionStorage.getItem("token") || "",
 			userEmail: sessionStorage.getItem("userEmail") || null,
+			userProfileImageId: null,
 			breweryData: [],
 			beerData: [],
 			journey: new Journey(),
@@ -156,44 +157,63 @@ const getState = ({ getStore, getActions, setStore }) => {
 				try {
 					const response = await fetch(`${process.env.BACKEND_URL}/api/login`, {
 						method: "POST",
-						headers: {
-							"Content-type": "application/json"
-						},
+						headers: { "Content-type": "application/json" },
 						body: JSON.stringify({ email, password })
 					});
-
-					if (!response.ok) {
+					if (response.ok) {
+						const data = await response.json();
+						sessionStorage.setItem("token", data.access_token);
+						sessionStorage.setItem("userEmail", email);
+						sessionStorage.setItem("userProfileImageId", data.profile_image_id);
+						setStore({ 
+							token: data.access_token, 
+							userPoints: data.total_points, 
+							userEmail: email,
+							userProfileImageId: data.profile_image_id
+						});
+						console.log("login successful");
+						return { success: true, points_earned: data.points_earned, total_points: data.total_points };
+					} else {
 						const errorData = await response.json();
-						console.error("Login failed", errorData);
-						return { success: false, error: errorData.error };
+						console.error("login failed", errorData);
+						return { success: false };
 					}
-
-					const data = await response.json();
-					sessionStorage.setItem("token", data.access_token);
-					sessionStorage.setItem("userEmail", email);
-
-					setStore({
-						token: data.access_token,
-						userPoints: data.total_points,
-						userEmail: email
-					});
-
-					console.log("Login successful");
-					return {
-						success: true,
-						points_earned: data.points_earned,
-						total_points: data.total_points
-					};
 				} catch (error) {
-					console.error("Error during login", error);
-					return { success: false, error: error.message };
+					console.error("error during login", error);
+					return { success: false };
+				}
+			},
+
+			fetchUserInfo: async () => {
+				const store = getStore();
+				try {
+					const response = await fetch(`${process.env.BACKEND_URL}/api/user`, {
+						headers: { 
+							"Content-Type": "application/json",
+							Authorization: `Bearer ${store.token}`
+						}
+					});
+					if (response.ok) {
+						const data = await response.json();
+						setStore({ 
+							userEmail: data.email,
+							userProfileImageId: data.profile_image_id,
+							userPoints: data.points
+						});
+					} else {
+						console.error("Failed to fetch user info", response.status);
+					}
+				} catch (error) {
+					console.error("Error fetching user info", error);
 				}
 			},
 
 			logout: () => {
 				try {
 					sessionStorage.removeItem("token");
-					setStore({ token: null })
+					sessionStorage.removeItem("userEmail");
+    				sessionStorage.removeItem("userProfileImageId");
+					setStore({ token: null, userEmail: null, userProfileImageId: null })
 					console.log("logout successful");
 				} catch (error) {
 					console.error("error during logout", error);
@@ -333,7 +353,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 			createBreweryList: (data) => {
 				const store = getStore();
-				const brewery = new BreweryInfo(data);
+				//const brewery = new BreweryInfo(data);
 				const breweryType = `${store.type}`
 				const breweries = [];
 				const micro = "micro";
@@ -347,7 +367,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 							if (element.address_1 === null || element.latitude === null) {
 								continue
 							}
-							breweries.push(element)
+							const breweryInfo = new BreweryInfo(element)
+							breweries.push(breweryInfo)
 						}
 					}
 				} else {
@@ -362,7 +383,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 				setStore({ breweryData: breweries })
 				console.log(store.breweryData)
-				return brewery
 			},
 			fetchUserPoints: async () => {
 				try {

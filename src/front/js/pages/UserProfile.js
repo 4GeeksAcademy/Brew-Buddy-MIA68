@@ -1,11 +1,17 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Context } from "../store/appContext";
 import { Link } from "react-router-dom";
+import { Cloudinary } from '@cloudinary/url-gen';
+import { AdvancedImage } from '@cloudinary/react';
+import { fill } from '@cloudinary/url-gen/actions/resize';
 
 export const UserProfile = () => {
     const { store, actions } = useContext(Context);
     const [userInfo, setUserInfo] = useState(null);
     const [pointHistory, setPointHistory] = useState([]);
+    const [imageFile, setImageFile] = useState(null);
+
+    const cld = new Cloudinary({ cloud: { cloudName: 'dprmqr54a' } });
 
     useEffect(() => {
         fetchUserInfo();
@@ -40,37 +46,60 @@ export const UserProfile = () => {
         }
     };
 
-    // EJQ - ADDING SKELETON CODE TO MAYBE ALLOW USERS TO UPLOAD THEIR OWN PROFILE IMAGES
-    // const handleImageUpload = async (event) => {
-    //     const file = event.target.files[0];
-    //     const formData = new FormData();
-    //     formData.append('image', file);
+    const handleImageChange = (event) => {
+        setImageFile(event.target.files[0]);
+    };
+
+    const handleImageUpload = async () => {
+        if (!imageFile) return;
     
-    //     try {
-    //         const response = await fetch(`${process.env.BACKEND_URL}/api/upload_profile_image`, {
-    //             method: 'POST',
-    //             headers: { Authorization: `Bearer ${store.token}` },
-    //             body: formData
-    //         });
-    //         if (response.ok) {
-    //             const data = await response.json();
-    //             // Update user info with new image URL
-    //             setUserInfo({ ...userInfo, profileImage: data.imageUrl });
-    //         }
-    //     } catch (error) {
-    //         console.error("Error uploading image:", error);
-    //     }
-    // };
+        const formData = new FormData();
+        formData.append('file', imageFile);
+    
+        try {
+            const response = await fetch(`${process.env.BACKEND_URL}/api/images`, {
+                method: 'POST',
+                headers: { 
+                    Authorization: `Bearer ${store.token}`
+                },
+                body: formData
+            });
+            if (response.ok) {
+                const data = await response.json();
+                setUserInfo({ ...userInfo, profileImage: data.image_url });
+                setImageFile(null);
+            } else {
+                console.error("Failed to upload image:", response.status, response.statusText);
+            }
+        } catch (error) {
+            console.error("Error uploading image:", error);
+        }
+    };
 
     return (
         <div className="container mt-4">
             {userInfo && (
                 <>
-                    <h1>Hello and welcome {userInfo.email}!</h1>
-                    <p>You have {userInfo.points} points. Congratulations!</p>
+                    <div className="row align-items-center mb-1">
+                        <div className="col-9">
+                            <h1>Hello and welcome {userInfo.email}!</h1>
+                            <p>You have {userInfo.points} points. Congratulations!</p>
+                        </div>
+                        <div className="col-2 d-flex flex-column align-items-center">
+                            <AdvancedImage
+                                cldImg={cld.image(userInfo.profile_image_id || 'samples/man-portrait').resize(fill().width(200).height(200))}
+                                alt="Profile"
+                                className="img-fluid mb-3"
+                            />
+                            <div className="text-end w-100">
+                                <input type="file" accept="image/*" onChange={handleImageChange} className="form-control mb-2" />
+                                <button onClick={handleImageUpload} className="btn btn-primary">Upload Profile Picture</button>
+                            </div>
+                        </div>
+                    </div>
                 </>
             )}
-            <div className="mt-5">
+            <div className="mt-1">
                 <h2>Point History</h2>
                 <table className="table">
                     <thead>
@@ -91,12 +120,7 @@ export const UserProfile = () => {
                     </tbody>
                 </table>
             </div>
-            {/* EJQ - insert link to reset password when the ForgotPassword page is built */}
-            {/* <Link to="/ForgotPassword"><button className="btn btn-primary mt-2">Reset Password</button></Link> */}
             <div className="mt-5"><Link to="/forgot-password">Change My Password</Link></div>
-            
-            {/* EJQ - maybe allow users to upload their own profile pics */}
-            {/* <input type="file" accept="image/*" onChange={handleImageUpload} /> */}
         </div>
     );
 };

@@ -30,18 +30,23 @@ UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER')
 if UPLOAD_FOLDER:
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+# EJQ-updated the signup function to have users have a default profile pic
 @api.route('/signup', methods=['POST'])
 def handle_signup():
     body = request.get_json()
     email = body["email"]
     password = hashlib.sha256(body["password"].encode("utf-8")).hexdigest()
-    user = User(email = email, password = password, is_active = True)
+    user = User(
+        email=email, 
+        password=password, 
+        is_active=True,
+        profile_image_id='samples/man-portrait'  # Set default image
+    )
     db.session.add(user)
     db.session.commit()
     response_body = {
         "message": "User successfully created"
     }
-
     return jsonify(response_body), 200
 
 # User log in route with password hashing - for active users only & no points
@@ -230,16 +235,25 @@ def get_all_users():
     users = User.query.all()
     return jsonify([user.serialize() for user in users]), 200
 
-# Get user route to grab the info on the current user including authentication
-@api.route('/user', methods=['GET'])
+# Get user route to grab the info on the current user including authentication; updated to include ability to change profile pic
+@api.route('/user', methods=['GET', 'PUT'])
 @jwt_required()
-def get_user_info():
+def handle_user_info():
     current_user = get_current_user()
     if not current_user:
         return jsonify({"error": "User not authenticated"}), 401
     
-    user_data = current_user.serialize()
-    return jsonify(user_data), 200
+    if request.method == 'GET':
+        user_data = current_user.serialize()
+        return jsonify(user_data), 200
+    
+    elif request.method == 'PUT':
+        body = request.get_json()
+        if 'profile_image_id' in body:
+            current_user.profile_image_id = body['profile_image_id']
+        # You can add more fields to update here if needed
+        db.session.commit()
+        return jsonify({"message": "User info updated successfully"}), 200
 
 # Get all beers route
 @api.route('/beers', methods=['GET'])
@@ -522,7 +536,6 @@ def handle_user_images(id=0):
                 
                 # Create new UserImage object
                 new_image = UserImage(
-                    title=request.form.get("title"),
                     public_id=result['public_id'],
                     image_url=result['secure_url'],
                     owner_id=current_user.id
