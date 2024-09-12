@@ -470,7 +470,6 @@ def handle_user_images(id=0):
                 
                 # Create new UserImage object
                 new_image = UserImage(
-                    title=request.form.get("title"),
                     public_id=result['public_id'],
                     image_url=result['secure_url'],
                     owner_id=current_user.id

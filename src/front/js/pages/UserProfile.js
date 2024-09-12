@@ -52,20 +52,24 @@ export const UserProfile = () => {
 
     const handleImageUpload = async () => {
         if (!imageFile) return;
-
+    
         const formData = new FormData();
         formData.append('file', imageFile);
-
+    
         try {
-            const response = await fetch(`${process.env.BACKEND_URL}/api/upload_profile_image`, {
+            const response = await fetch(`${process.env.BACKEND_URL}/api/images`, {
                 method: 'POST',
-                headers: { Authorization: `Bearer ${store.token}` },
+                headers: { 
+                    Authorization: `Bearer ${store.token}`
+                },
                 body: formData
             });
             if (response.ok) {
                 const data = await response.json();
                 setUserInfo({ ...userInfo, profileImage: data.image_url });
                 setImageFile(null);
+            } else {
+                console.error("Failed to upload image:", response.status, response.statusText);
             }
         } catch (error) {
             console.error("Error uploading image:", error);
