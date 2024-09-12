@@ -269,19 +269,19 @@ const getState = ({ getStore, getActions, setStore }) => {
 					const resp = await fetch(process.env.BACKEND_URL + "/api/favorite_breweries/", {
 						method: "POST",
 						headers: {
-							"Content-Type": "application/json", 
+							"Content-Type": "application/json",
 							Authorization: "Bearer " + sessionStorage.getItem("token")
-							
+
 						},
-						body:JSON.stringify(brewery)
+						body: JSON.stringify(brewery)
 					});
 					if (resp.ok) {
-						const data = await response.json();
+						const data = await resp.json();
 						console.log("brewery added favorites: ", data);
 
-						const store=getStore();
+						const store = getStore();
 						setStore({
-							favoriteBreweries: [ ...store.favoriteBreweries, brewery ]
+							favoriteBreweries: [...store.favoriteBreweries, brewery]
 						});
 					} else {
 						const errorData = await resp.json();
@@ -537,6 +537,28 @@ const getState = ({ getStore, getActions, setStore }) => {
 				currentJourney.addBreweryReview(breweryReview);
 				setStore({ journey: journeys });
 			},
+			getFavoriteBreweries: async () => {
+				const token = sessionStorage.getItem("token");
+				try {
+					// Fetch favorite breweries with full details
+					const response = await fetch(`${process.env.BACKEND_URL}/api/favorite_breweries`, {
+						method: 'GET',
+						headers: {
+							Authorization: `Bearer ${token}`,
+							"Content-Type": "application/json"
+						}
+					});
+
+					if (response.ok) {
+						const data = await response.json();
+						setStore({ favoriteBreweries: data });  // Store the detailed favorite breweries
+					} else {
+						console.error("Failed to fetch favorite breweries");
+					}
+				} catch (error) {
+					console.error("Error fetching favorite breweries", error);
+				}
+			}
 			// you need have a createFavoriteBeer (POST REQUEST) function then can attach it to card button
 			// probably the same thing for people
 		}

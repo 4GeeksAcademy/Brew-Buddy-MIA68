@@ -5,6 +5,7 @@ import { Context } from "../store/appContext";
 import "../../styles/favorites.css";
 import {FavoriteBeers} from "../component/FavoriteBeers"
 import craft from "../../img/craft.jpg"
+import {FavoriteBreweries} from "../component/FavoriteBreweries"
 
 export const Favorites = () => {
   const { store, actions } = useContext(Context);
@@ -143,7 +144,8 @@ export const Favorites = () => {
           aria-labelledby="pills-home-tab"
           tabindex="0"
         >
-          Breweries
+          <h1>Breweries</h1>
+          <FavoriteBreweries/>
         </div>
         <div
           class="tab-pane text-center justify-content-center fade"
