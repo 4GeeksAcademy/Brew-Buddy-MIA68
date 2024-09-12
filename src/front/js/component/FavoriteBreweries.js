@@ -4,31 +4,28 @@ import { Context } from "../store/appContext";
 export const FavoriteBreweries = () => {
     const { store, actions } = useContext(Context);
     const [sortOption, setSortOption] = useState("");
-
+    const [items, setItems] = useState([])
     useEffect(() => {
-        actions.getFavoriteBreweries();
-        if (store.favoriteBreweries.length > 0) {
-            console.log("First Favorite Brewery Data: ", store.favoriteBreweries[0]);
-        }
-    }, [actions, store.favoriteBreweries]);
+       
+      setItems(store.favoriteBreweries)
+        
+    }, [store.favoriteBreweries]);
 
     const handleSortChange = (e) => {
         const option = e.target.value;
         setSortOption(option);
-
-        let sortedItems = [...store.favoriteBreweries];
+    
+        let sortedItems = [...items];
         if (option === "name-asc") {
-            sortedItems.sort((a, b) => a.brewery_name.localeCompare(b.brewery_name));
+          sortedItems.sort((a, b) => a.brewery_name.localeCompare(b.brewery_name));
         } else if (option === "name-desc") {
-            sortedItems.sort((a, b) => b.brewery_name.localeCompare(a.brewery_name));
+          sortedItems.sort((a, b) => b.brewery_name.localeCompare(a.brewery_name));
         }
-
-        actions.setStore({ favoriteBreweries: sortedItems }); // Update the sorted list in the store
-    };
-
+        setItems(sortedItems);
+    }
     return (
         <div>
-            <h2>Breweries</h2>
+            
             <select value={sortOption} onChange={handleSortChange}>
                 <option value="">Sort by...</option>
                 <option value="name-asc">Name (A-Z)</option>
@@ -39,7 +36,7 @@ export const FavoriteBreweries = () => {
                 {store.favoriteBreweries.length === 0 ? (
                     <p>No favorite breweries found.</p>
                 ) : (
-                    store.favoriteBreweries.map((item, index) => (
+                   items.map((item, index) => (
                         <div className="card text-center mb-3 mx-auto" style={{ width: "18rem" }} key={index}>
                             <div className="card-body">
                                 <h5 className="card-title">{item.brewery_name || "Unknown Brewery"}</h5> {/* Display brewery name */}
