@@ -304,12 +304,12 @@ const getState = ({ getStore, getActions, setStore }) => {
 						}
 					});
 					if (resp.ok) {
-						const data = await response.json();
+						const data = await resp.json();
 						console.log("brewery added favorites: ", data);
 
-						const store=getStore();
+						const store = getStore();
 						setStore({
-							favoriteBreweries: [ ...store.favoriteBreweries, brewery ]
+							favoriteBreweries: [...store.favoriteBreweries, brewery]
 						});
 					} else {
 						const errorData = await resp.json();
