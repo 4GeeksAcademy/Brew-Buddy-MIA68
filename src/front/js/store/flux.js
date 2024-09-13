@@ -283,6 +283,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 						setStore({
 							favoriteBreweries: [...store.favoriteBreweries, brewery]
 						});
+						// alert("This Brewery has been added to your Favorites");
+
 					} else {
 						const errorData = await resp.json();
 						console.error("failed to add", errorData);
