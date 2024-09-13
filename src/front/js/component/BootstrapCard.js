@@ -24,6 +24,10 @@ export const BreweryCard = (props) => {
     const navigate = useNavigate()
     const breweryType = props.breweryData.brewery_type;
 
+    const handleFavBrewery= () => {
+      actions.addFavoriteBrewery(props.breweryData);  
+    }
+
     return (
         <div className="card">
             <div className="card-body">
@@ -49,9 +53,9 @@ export const BreweryCard = (props) => {
                 <h5>{props.breweryData.city}, {props.breweryData.state}</h5>
                 <p className="card-text">With supporting text below as a natural lead-in to additional content.</p>
                 <button className="btn btn-primary" onClick={() => actions.addToCurrentJourney(props.breweryData)}>Add to my current route</button>
-                {/* A favorites button for brewery */}
-                <a href="#" className="btn btn-info"><i className="fa-regular fa-star"></i></a>
-                {/* A button for contact information of brewery */}
+                {/* J.R.: A favorites button for brewery */}
+                <a href="#" className="btn btn-info"><i className="fa-regular fa-star" onClick={handleFavBrewery}></i></a>
+                {/* J.R.: A button for contact information of brewery */}
                 <a href={props.breweryData.phone}>{props.breweryData.phone}</a>
                 {/* A button for website of brewery */}
                 <p>

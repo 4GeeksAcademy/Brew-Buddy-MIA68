@@ -30,9 +30,9 @@ export const FavoriteBeers = () => {
 
     let sortedItems = [...items];
     if (option === "name-asc") {
-      sortedItems.sort((a, b) => a.name.localeCompare(b.name));
+      sortedItems.sort((a, b) => a.beer_name.localeCompare(b.beer_name));
     } else if (option === "name-desc") {
-      sortedItems.sort((a, b) => b.name.localeCompare(a.name));
+      sortedItems.sort((a, b) => b.beer_name.localeCompare(a.beer_name));
     } else if (option === "flavor-asc") {
       sortedItems.sort((a, b) => a.flavor.localeCompare(b.flavor));
     } else if (option === "flavor-desc") {
@@ -42,9 +42,9 @@ export const FavoriteBeers = () => {
     } else if (option === "type-desc") {
       sortedItems.sort((a, b) => b.type.localeCompare(a.type));
     } else if (option === "abv-asc") {
-      sortedItems.sort((a, b) => a.ABV - b.ABV);
+      sortedItems.sort((a, b) => a.ABV.split("%")[0] - b.ABV.split("%")[0]);
     } else if (option === "abv-desc") {
-      sortedItems.sort((a, b) => b.ABV - a.ABV);
+      sortedItems.sort((a, b) => b.ABV.split("%")[0] - a.ABV.split("%")[0]);
     }
 
     setItems(sortedItems);
@@ -69,7 +69,7 @@ export const FavoriteBeers = () => {
       </select>
 
       <ul>
-        <form>
+        {/* <form>
           <div className="mb-3">
             <label htmlFor="beerDropdown" className="form-label">Select a beer</label>
             <select
@@ -114,7 +114,7 @@ export const FavoriteBeers = () => {
             <input type="text" class="form-control" id="ABV" placeholder="Another input placeholder" />
           </div>
           <button className="btn btn-primary" type="submit">Submit</button>
-        </form>
+        </form> */}
         {items.map((item, index) => {
           return (
             <div class="card text-center mb-3 mx-auto" style={{ width: "18rem" }}>

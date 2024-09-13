@@ -12,6 +12,9 @@ from sqlalchemy import select
 from pyeasyencrypt.pyeasyencrypt import encrypt_string, decrypt_string
 from api.send_email import send_email
 import json, os
+from dotenv import load_dotenv
+load_dotenv()
+# added line 18 my lines 15 & 16
 from cloudinary.uploader import upload, destroy
 
 api = Blueprint('api', __name__)
@@ -104,27 +107,51 @@ def handle_login():
     else:
         return jsonify({"error": "Invalid email or password"}), 401
 
+
+@api.route("/profile/change_password", methods=["PUT"])
+@jwt_required()  # Ensures JWT token is valid
+def profile_change_password():
+    data = request.get_json()
+    new_password = data.get("password")
+
+    if not new_password:
+        return jsonify({"message": "Please provide a new password."}), 400
+
+   
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+
+    if not user:
+        return jsonify({"message": "User not found."}), 404
+
+   
+    user.password = hashlib.sha256(new_password.encode()).hexdigest()
+    db.session.commit()
+
+    return jsonify({"message": "Password changed successfully."}), 200        
+
 @api.route("/forgot_password", methods=["POST"])
 def forgot_password():
-    data=request.json
-    email=data.get("email")
+    data = request.json
+    email = data.get("email")
     if not email:
         return jsonify({"message": "email is required"}), 400
-    user = User.query.filter_by(email=email) .first()
+
+    user = User.query.filter_by(email=email).first()
     if user is None:
         return jsonify({"message": "email does not exist"}), 400
-    
-    # Set token expiry time (e.g., 2 hours from now)
-    expiration_time = (datetime.datetime.now() + datetime.timedelta(hours=2)).isoformat()
 
-    #jwt_access_token 
-    token= encrypt_string(json.dumps({
-        "email": email, 
+    expiration_time = (datetime.utcnow() + timedelta(hours=2)).isoformat()
+
+    token = encrypt_string(json.dumps({
+        "email": email,
         "exp": expiration_time,
-        "current_time": datetime.datetime.now().isoformat()
+        "current_time": datetime.now().isoformat()  
     }), os.getenv("FLASK_APP_KEY"))
+
     email_value = f"Here is the password recovery link!\n{os.getenv('FRONTEND_URL')}/reset_password/{token}"
     send_email(email, email_value, "Subject: password recovery for BrewBuddy")
+    
     return jsonify({"message": "recovery password has been sent"}), 200
 
 
@@ -156,34 +183,42 @@ def change_password():
         print(f"Token decryption failed: {str(e)}")
         return jsonify({"message": "Invalid or expired token"}), 400
 
+
 @api.route("/reset_password", methods=["PUT"])
 def reset_password():
     data = request.get_json()
-    password = data.get("password")
+    new_password = data.get("password")
     secret = data.get("secret")
 
-    if not password:
-        return jsonify({"message": "Please provide a new password."}), 400
+    if not new_password or not secret:
+        return jsonify({"message": "Invalid request."}), 400
 
     try:
-        json_secret = json.loads(decrypt_string(secret, os.getenv('FLASK_APP_KEY')))
+        
+        decrypted_token = decrypt_string(secret, os.getenv('FLASK_APP_KEY'))
+        json_secret = json.loads(decrypted_token)
+
+   
+        expiration_time = datetime.fromisoformat(json_secret.get("exp"))
+        if datetime.utcnow() > expiration_time:
+            return jsonify({"message": "Token has expired."}), 400
+
+        
+        email = json_secret.get("email")
+        user = User.query.filter_by(email=email).first()
+
+        if not user:
+            return jsonify({"message": "User not found."}), 404
+
+       
+        user.password = hashlib.sha256(new_password.encode()).hexdigest()
+        db.session.commit()
+
+        return jsonify({"message": "Password reset successfully."}), 200
+
     except Exception as e:
+        print(f"Decryption failed: {str(e)}")
         return jsonify({"message": "Invalid or expired token."}), 400
-
-    email = json_secret.get('email')
-    if not email:
-        return jsonify({"message": "Invalid token data."}), 400
-
-    user = User.query.filter_by(email=email).first()
-    if not user:
-        return jsonify({"message": "Email does not exist"}), 400
-
-    user.password = hashlib.sha256(password.encode()).hexdigest()
-    db.session.commit()
-
-    send_email(email, "Your password has been changed successfully.", "Password Change Notification")
-
-    return jsonify({"message": "Password successfully changed."}), 200
 
 # Get the user from the database - active users only
 def get_current_user():
@@ -276,13 +311,23 @@ def handle_get_favorite_beers():
 @api.route('/favorite_breweries', methods=['GET'])
 @jwt_required()
 def handle_get_favorite_breweries():
-    #return jsonify({"message": "Not implemented"}), 405
     current_user = get_current_user()
     if not current_user:
         return jsonify({"error": "User not authenticated"}), 401
-    
+
+    # Fetch the favorite brewery records
     favorite_breweries = FavoriteBreweries.query.filter_by(owner_id=current_user.id).all()
-    return jsonify([favorite_brewery.serialize() for favorite_brewery in favorite_breweries]), 200
+
+    # Prepare a list to store detailed brewery information
+    detailed_breweries = []
+
+    # Loop through each favorite brewery and fetch full brewery details
+    for favorite in favorite_breweries:
+        brewery = Brewery.query.get(favorite.favorited_brewery_id)  # Get the full brewery details
+        if brewery:
+            detailed_breweries.append(brewery.serialize())  # Add the serialized brewery to the list
+
+    return jsonify(detailed_breweries), 200  # Return the detailed breweries as JSON
 
 # Access user's favorite users list (including authentication piece)
 @api.route('/favorite_users', methods=['GET'])
@@ -328,20 +373,40 @@ def add_favorite_beer(beer_id):
     return jsonify({"done": True}), 201
 
 # Add a favorite brewery for the current user with authentication
-@api.route('/favorite_breweries/<int:brewery_id>', methods=['POST'])
+@api.route('/favorite_breweries', methods=['POST'])
 @jwt_required()
-def add_favorite_brewery(brewery_id):
-    #return jsonify({"message": "Not implemented"}), 405
+def add_favorite_brewery():
     current_user = get_current_user()
+    data=request.get_json()
+    
     if not current_user:
         return jsonify({"error": "User not authenticated"}), 401
-    
-    # Check if the brewery is already favorited
-    existing_favorite = FavoriteBreweries.query.filter_by(owner_id=current_user.id, favorited_brewery_id=brewery_id).first()
-    if existing_favorite:
-        return jsonify({"error": "Brewery already favorited"}), 400
-
-    new_favorite_brewery = FavoriteBreweries(owner_id=current_user.id, favorited_brewery_id=brewery_id)
+    existing_brewery=Brewery.query.filter_by(brewery_api_id = data.get("id")).first()
+    new_brewery=None 
+    if not existing_brewery:
+        new_brewery=Brewery(brewery_name=data.get("name"), 
+                            brewery_type=data.get("brewery_type"), 
+                            brewery_api_id=data.get("id"), address=data.get("address_1"), 
+                            city=data.get("city"), state_province=data.get("state_province"), 
+                            longitude=data.get("longitude"),
+                            latitude=data.get("latitude"),
+                            phone=data.get("phone"),
+                            website_url=data.get("website_url")  )
+        db.session.add(new_brewery)
+        db.session.commit()
+        db.session.refresh(new_brewery)
+    # Check if the brewery is already favorite
+    new_favorite_brewery=None 
+    if new_brewery:
+        existing_favorite = FavoriteBreweries.query.filter_by(owner_id=current_user.id, favorited_brewery_id=new_brewery.id).first()
+        if existing_favorite:
+            return jsonify({"error": "Brewery already favorited by this user"}), 400
+        new_favorite_brewery = FavoriteBreweries(owner_id=current_user.id, favorited_brewery_id=new_brewery.id)
+    if existing_brewery:
+        existing_favorite = FavoriteBreweries.query.filter_by(owner_id=current_user.id, favorited_brewery_id=existing_brewery.id).first()
+        if existing_favorite:
+            return jsonify({"error": "Brewery already favorited by this user"}), 400
+        new_favorite_brewery = FavoriteBreweries(owner_id=current_user.id, favorited_brewery_id=existing_brewery.id)
     db.session.add(new_favorite_brewery)
     
     # Award points for favoriting a brewery
@@ -355,6 +420,7 @@ def add_favorite_brewery(brewery_id):
         "points_earned": points_earned,
         "total_points": current_user.points
     }), 201
+   
 
 # Add a favorite user for the current user with authentication
 @api.route('/favorite_users/<int:user_id>', methods=['POST'])
