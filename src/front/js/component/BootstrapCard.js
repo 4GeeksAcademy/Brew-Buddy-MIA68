@@ -26,6 +26,7 @@ export const BreweryCard = (props) => {
 
     const handleFavBrewery= () => {
       actions.addFavoriteBrewery(props.breweryData);  
+      alert("This Brewery has been added to your Favorites");
     }
 
     return (
