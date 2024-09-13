@@ -261,7 +261,8 @@ class BeerReview(db.Model):
     is_favorite = db.Column(db.Boolean, default=False)
     date_tried = db.Column(db.DateTime, default=datetime.utcnow)
 
-    def __init__(self, beer_name, rating, notes="", is_favorite=False):
+    def __init__(self, brewery_review_id, beer_name, rating, notes="", is_favorite=False):
+        self.brewery_review_id = brewery_review_id
         self.beer_name = beer_name
         self.rating = rating
         self.notes = notes

@@ -570,6 +570,24 @@ const getState = ({ getStore, getActions, setStore }) => {
 				currentJourney.addBreweryReview(breweryReview);
 				setStore({ journey: journeys });
 			},
+			addBreweryReviewToBackend: async (breweryData) => {
+				const response = await fetch('/add_brewery_review', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify(breweryData)
+				});
+
+				if (response.ok) {
+					const data = await response.json();
+					console.log(data.message);  // "Review added successfully"
+					return data;
+				} else {
+					console.error("Failed to add review", response.status);
+					return null;
+				}
+			},
 			getFavoriteBreweries: async () => {
 				const token = sessionStorage.getItem("token");
 				try {
