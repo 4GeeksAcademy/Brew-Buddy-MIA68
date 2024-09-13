@@ -561,6 +561,9 @@ const getState = ({ getStore, getActions, setStore }) => {
 			}
 			// you need have a createFavoriteBeer (POST REQUEST) function then can attach it to card button
 			// probably the same thing for people
+			addNewBeer: async (name, flavor, type, ABV) => {
+
+			}
 		}
 	};
 };
