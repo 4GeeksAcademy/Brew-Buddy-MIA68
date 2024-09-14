@@ -2,11 +2,11 @@ import React, { useState, useContext } from 'react';
 import { Context } from '../store/appContext';
 
 export const ReviewForm = ({ brewery, onSaveReview }) => {
-    const {actions} = useContext(Context);
     const [overallRating, setOverallRating] = useState(0);
     const [reviewText, setReviewText] = useState("");
     const [isFavoriteBrewery, setIsFavoriteBrewery] = useState(false);
     const [beerReviews, setBeerReviews] = useState([]);
+    const { store, actions } = useContext(Context);
 
     const addBeerReview = () => {
         setBeerReviews([...beerReviews, { beerName: "", rating: 0, notes: "", isFavorite: false }]);
@@ -18,9 +18,9 @@ export const ReviewForm = ({ brewery, onSaveReview }) => {
         setBeerReviews(updatedReviews);
     };
 
-    const handleFavBrewery= () => {
-        actions.addFavoriteBrewery(brewery);  
-      }
+    const handleFavBrewery = () => {
+        actions.addFavoriteBrewery(brewery);
+    }
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -40,19 +40,7 @@ export const ReviewForm = ({ brewery, onSaveReview }) => {
             </div>
             <div>
                 <label>
-                    <input 
-                        type="checkbox" 
-                        checked={isFavoriteBrewery} 
-                        // onChange={(e) => setIsFavoriteBrewery(e.target.checked)} 
-                        onChange={(e) => {
-                            setIsFavoriteBrewery(e.target.checked);
-                            if (e.target.checked) {
-                                handleFavBrewery();
-                                
-                            }
-                        } } 
-
-                    />
+                    <input type="checkbox" checked={isFavoriteBrewery} onChange={(e) => setIsFavoriteBrewery(e.target.checked)} />
                     Mark as Favorite Brewery
                 </label>
             </div>
