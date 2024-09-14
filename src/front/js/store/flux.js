@@ -165,9 +165,9 @@ const getState = ({ getStore, getActions, setStore }) => {
 						sessionStorage.setItem("token", data.access_token);
 						sessionStorage.setItem("userEmail", email);
 						sessionStorage.setItem("userProfileImageId", data.profile_image_id);
-						setStore({ 
-							token: data.access_token, 
-							userPoints: data.total_points, 
+						setStore({
+							token: data.access_token,
+							userPoints: data.total_points,
 							userEmail: email,
 							userProfileImageId: data.profile_image_id
 						});
@@ -188,14 +188,14 @@ const getState = ({ getStore, getActions, setStore }) => {
 				const store = getStore();
 				try {
 					const response = await fetch(`${process.env.BACKEND_URL}/api/user`, {
-						headers: { 
+						headers: {
 							"Content-Type": "application/json",
 							Authorization: `Bearer ${store.token}`
 						}
 					});
 					if (response.ok) {
 						const data = await response.json();
-						setStore({ 
+						setStore({
 							userEmail: data.email,
 							userProfileImageId: data.profile_image_id,
 							userPoints: data.points
@@ -212,7 +212,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				try {
 					sessionStorage.removeItem("token");
 					sessionStorage.removeItem("userEmail");
-    				sessionStorage.removeItem("userProfileImageId");
+					sessionStorage.removeItem("userProfileImageId");
 					setStore({ token: null, userEmail: null, userProfileImageId: null })
 					console.log("logout successful");
 				} catch (error) {
@@ -558,11 +558,31 @@ const getState = ({ getStore, getActions, setStore }) => {
 				} catch (error) {
 					console.error("Error fetching favorite breweries", error);
 				}
-			}
+			},
 			// you need have a createFavoriteBeer (POST REQUEST) function then can attach it to card button
 			// probably the same thing for people
-			addNewBeer: async (name, flavor, type, ABV) => {
+			addNewBeer: async (name, flavor, type, ABV, brewery) => {
+				try {
+					let response = await fetch(`${process.env.BACKEND_URL}/api/beers/add`, {
+						method: 'POST',
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify(
+							{
+								"beer_name": name,
+								"flavor": flavor,
+								"type": type,
+								"ABV": ABV,
+								"brewery_Id": brewery
+							}
+						)
+					})
 
+				}
+				catch (error) {
+					console.error("Error adding new beer", error)
+				}
 			}
 		}
 	};
