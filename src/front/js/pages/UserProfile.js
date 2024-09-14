@@ -55,6 +55,7 @@ export const UserProfile = () => {
     
         const formData = new FormData();
         formData.append('file', imageFile);
+        formData.append("mode", "profile");
     
         try {
             const response = await fetch(`${process.env.BACKEND_URL}/api/images`, {

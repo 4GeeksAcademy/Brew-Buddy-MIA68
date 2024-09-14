@@ -14,8 +14,6 @@ class User(db.Model):
     favorite_breweries = db.relationship("FavoriteBreweries", back_populates="owner", foreign_keys="FavoriteBreweries.owner_id")
     point_transactions = db.relationship("PointTransaction", back_populates="owner")
     user_images = db.relationship("UserImage", back_populates="owner", foreign_keys="UserImage.owner_id")
-    profile_image_id = db.Column(db.Integer, db.ForeignKey('user_image.id'), nullable=True)
-    profile_image = db.relationship("UserImage", uselist=False, foreign_keys=[profile_image_id])
 
     def __init__(self, email, password, is_active=True):
         self.email = email
@@ -25,7 +23,17 @@ class User(db.Model):
     # added repr to help with debugging by providing a readable string representation of the model instances
     def __repr__(self):
             return f'<User {self.email}>'
-    
+    @property
+    def profile_image(self):
+        image = list(filter(
+            lambda user_image: user_image.is_profile_image == True,
+            self.user_images
+        ))
+        if len(image) == 0: 
+            return None
+        return image[0]
+
+
     @property
     def points(self):
         total = 0
@@ -221,21 +229,24 @@ class UserImage(db.Model):
         db.UniqueConstraint("owner_id", name="unique_img_title_user"),
     )
     id = db.Column(db.Integer, primary_key=True)
+    is_profile_image = db.Column(db.Boolean(), nullable=False, default=False)
     public_id = db.Column(db.String(500), nullable=False, unique=True)
     image_url = db.Column(db.String(500), nullable=False, unique=True)
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     owner = db.relationship("User", back_populates="user_images", foreign_keys=[owner_id])
 
-    def __init__(self, public_id, image_url, owner_id):
+    def __init__(self, public_id, image_url, owner_id, is_profile_image=False):
         self.public_id = public_id
         self.image_url = image_url
         self.owner_id = owner_id
+        self.is_profile_image = is_profile_image
 
     def serialize(self):
         return {
             "id": self.id,
             "public_id": self.public_id,
-            "image_url": self.image_url
+            "image_url": self.image_url,
+            "is_profile_image": self.is_profile_image
         }
     
 journey_reviews = db.Table('journey_reviews',
