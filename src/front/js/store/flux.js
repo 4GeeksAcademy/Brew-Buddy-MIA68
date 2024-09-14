@@ -165,9 +165,9 @@ const getState = ({ getStore, getActions, setStore }) => {
 						sessionStorage.setItem("token", data.access_token);
 						sessionStorage.setItem("userEmail", email);
 						sessionStorage.setItem("userProfileImageId", data.profile_image_id);
-						setStore({ 
-							token: data.access_token, 
-							userPoints: data.total_points, 
+						setStore({
+							token: data.access_token,
+							userPoints: data.total_points,
 							userEmail: email,
 							userProfileImageId: data.profile_image_id
 						});
@@ -188,14 +188,14 @@ const getState = ({ getStore, getActions, setStore }) => {
 				const store = getStore();
 				try {
 					const response = await fetch(`${process.env.BACKEND_URL}/api/user`, {
-						headers: { 
+						headers: {
 							"Content-Type": "application/json",
 							Authorization: `Bearer ${store.token}`
 						}
 					});
 					if (response.ok) {
 						const data = await response.json();
-						setStore({ 
+						setStore({
 							userEmail: data.email,
 							userProfileImageId: data.profile_image_id,
 							userPoints: data.points
@@ -212,7 +212,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				try {
 					sessionStorage.removeItem("token");
 					sessionStorage.removeItem("userEmail");
-    				sessionStorage.removeItem("userProfileImageId");
+					sessionStorage.removeItem("userProfileImageId");
 					setStore({ token: null, userEmail: null, userProfileImageId: null })
 					console.log("logout successful");
 				} catch (error) {
@@ -283,6 +283,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 						setStore({
 							favoriteBreweries: [...store.favoriteBreweries, brewery]
 						});
+						// alert("This Brewery has been added to your Favorites");
+
 					} else {
 						const errorData = await resp.json();
 						console.error("failed to add", errorData);
@@ -290,8 +292,39 @@ const getState = ({ getStore, getActions, setStore }) => {
 				} catch (error) {
 					console.error("error adding brewery", error);
 				}
+			},
+			deleteFavoriteBrewery: async (brewery) => {
+				console.log(brewery)
+				try {
+					const resp = await fetch(process.env.BACKEND_URL + "/api/favorite_breweries/" + brewery.id, {
+						method: "DELETE",
+						headers: {
+							"Content-Type": "application/json",
+							Authorization: "Bearer " + sessionStorage.getItem("token")
 
+						},
+					});
+					if (resp.ok) {
+						const data = await resp.json();
+						console.log("brewery deleted from favorites: ", data);
 
+						const store = getStore();
+
+						setStore({
+							favoriteBreweries: getStore().favoriteBreweries.filter((x) => {
+								return x != brewery;
+							})
+						});
+						console.log(getStore().favoriteBreweries)
+						// alert("This Brewery has been deleted from your Favorites");
+
+					} else {
+						const errorData = await resp.json();
+						console.error("failed to add", errorData);
+					}
+				} catch (error) {
+					console.error("error adding brewery", error);
+				}
 			},
 			searchFunctionWithCity: async () => {
 				try {

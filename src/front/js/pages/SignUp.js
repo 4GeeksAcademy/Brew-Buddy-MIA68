@@ -39,6 +39,7 @@ export const SignUp = () => {
                     <label>Password</label>
                     <input type="text" placeholder="type password here" className="form-control" id="password" value={credentials.password} onChange={handleChange} required />
                 </div>
+                {/* TODO: IF EXTRA TIME CONFIRM PASSWORD AND CHANGE TYPE TO PASSWORD (SHOW OR HIDE PW, FOR LOGIN AS WELL)  */}
                 {errorMessage && <div className="alert alert-danger mt-4">{errorMessage}</div>}
                 <button type="submit" className="btn btn-dark mt-3">Submit</button>
             </form>
