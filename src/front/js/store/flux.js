@@ -248,7 +248,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					let data = await resp.json();
 					console.log(data);
 					const breweryInfos = data.map(brewery => new BreweryInfo(brewery));
-					// Create routes based on the brewery information (for example purposes, using dummy travel times and distances)
+					// .Create routes based on the brewery information (for example purposes, using dummy travel times and distances)
 					const routes = breweryInfos.map(info => new Route(new BreweryDestination(info), Math.floor(Math.random() * 60), Math.floor(Math.random() * 20)));
 					const journey = getStore().journey;
 					routes.forEach(route => journey.addRoute(route));
