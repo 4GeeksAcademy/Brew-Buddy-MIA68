@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
@@ -23,31 +23,58 @@ export const BreweryCard = (props) => {
     const { store, actions } = useContext(Context);
     const navigate = useNavigate()
     const breweryType = props.breweryData.brewery_type;
+    const [currentFavorite, setCurrentFavorite] = useState(false)
+    const [favoriteBrewery, setFavoriteBrewery] = useState("")
 
-    const handleFavBrewery= () => {
-      actions.addFavoriteBrewery(props.breweryData);  
-      alert("This Brewery has been added to your Favorites");
-    }
+
+    useEffect(() => {
+        let getData = async () => {
+            await actions.getFavoriteBreweries()
+            for (let fav in store.favoriteBreweries) {
+                if (store.favoriteBreweries[fav].phone === props.breweryData.phone) {
+                    setFavoriteBrewery(store.favoriteBreweries[fav])
+                    setCurrentFavorite(true);
+                    break; // exit loop once a match is found
+                }
+            }
+        }
+        getData()
+    }, [])
+
+    const handleFavBrewery = (e) => {
+        e.preventDefault();
+        console.log(currentFavorite)
+        if (currentFavorite == true) {
+            // remove
+            actions.deleteFavoriteBrewery(favoriteBrewery);
+            setCurrentFavorite(false)
+        } else {
+            // add
+            actions.addFavoriteBrewery(props.breweryData);
+            alert("This Brewery has been added to your Favorites");
+            setCurrentFavorite(false)
+        }
+    };
 
     return (
         <div className="card">
             <div className="card-body">
                 <h4 className="card-title">
                     <a href={props.breweryData.brewery_type}>
-                        <img 
-                            src={breweryTypeIcons[breweryType]} 
-                            title="brewery type icon" 
-                            alt={`${breweryType} icon`} 
-                            style={{ width: '30px', height: '30px', marginRight: '8px' }} 
+                        <img
+                            src={breweryTypeIcons[breweryType]}
+                            title="brewery type icon"
+                            alt={`${breweryType} icon`}
+                            style={{ width: '30px', height: '30px', marginRight: '8px' }}
                         />
                     </a>
                     {props.breweryData.name}
                     <a href={props.breweryData.brewery_type}>
-                        <img 
-                            src={breweryTypeIcons[breweryType]} 
-                            title="brewery type icon" 
-                            alt={`${breweryType} icon`} 
-                            style={{ width: '30px', height: '30px', marginLeft: '8px' }} 
+                        <img
+                            src={breweryTypeIcons[breweryType]}
+                            title="brewery type icon"
+                            alt={`${breweryType} icon`}
+                            style={{ width: '30px', height: '30px', marginLeft: '8px' }}
                         />
                     </a>
                 </h4>
@@ -55,7 +82,7 @@ export const BreweryCard = (props) => {
                 <p className="card-text">With supporting text below as a natural lead-in to additional content.</p>
                 <button className="btn btn-primary" onClick={() => actions.addToCurrentJourney(props.breweryData)}>Add to my current route</button>
                 {/* J.R.: A favorites button for brewery */}
-                <a href="#" className="btn btn-info"><i className="fa-regular fa-star" onClick={handleFavBrewery}></i></a>
+                <a href="#" className="btn btn-info"><i className={currentFavorite == true ? "fa-solid fa-star" : "fa-regular fa-star"} onClick={(e) => handleFavBrewery(e)}></i></a>
                 {/* J.R.: A button for contact information of brewery */}
                 <a href={props.breweryData.phone}>{props.breweryData.phone}</a>
                 {/* A button for website of brewery */}
