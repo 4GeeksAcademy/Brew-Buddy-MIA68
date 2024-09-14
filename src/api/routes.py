@@ -533,12 +533,16 @@ def handle_user_images(id=0):
             try:
                 # Upload to Cloudinary
                 result = upload(file)
-                
+                is_profile_image = False
+                if request.form.get("mode") == "profile":
+                    is_profile_image = True
+
                 # Create new UserImage object
                 new_image = UserImage(
                     public_id=result['public_id'],
                     image_url=result['secure_url'],
-                    owner_id=current_user.id
+                    owner_id=current_user.id,
+                    is_profile_image=is_profile_image
                 )
                 db.session.add(new_image)
                 db.session.commit()
