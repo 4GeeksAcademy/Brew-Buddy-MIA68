@@ -570,6 +570,32 @@ const getState = ({ getStore, getActions, setStore }) => {
 				currentJourney.addBreweryReview(breweryReview);
 				setStore({ journey: journeys });
 			},
+			addBreweryReview: async (brewery, overallRating, reviewText, isFavoriteBrewery, beerReviews) => {
+				const store = getStore();
+				const journeyList = store.journey; // Assuming this is an array of journeys
+
+				// Ensure there's at least one journey to add the review to
+				if (journeyList.length === 0) {
+					console.error("No journeys available to add the brewery review.");
+					return;
+				}
+
+				const currentJourney = journeyList[0]; // Use the first journey in the list or change this logic
+
+				// Create a new BreweryReview instance
+				const breweryReview = new BreweryReview(brewery, overallRating, reviewText, isFavoriteBrewery);
+
+				// Iterate over beer reviews and add them to the brewery review
+				beerReviews.forEach(beerReview => {
+					breweryReview.addBeerReview(new BeerReview(beerReview.beerName, beerReview.rating, beerReview.notes, beerReview.isFavorite));
+				});
+
+				// Add the brewery review to the current journey
+				currentJourney.addBreweryReview(breweryReview);
+
+				// Update the store
+				setStore({ journey: journeyList });
+			},
 			addBreweryReviewToBackend: async (breweryData) => {
 				const response = await fetch('/add_brewery_review', {
 					method: 'POST',
