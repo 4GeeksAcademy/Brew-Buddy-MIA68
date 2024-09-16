@@ -164,12 +164,11 @@ const getState = ({ getStore, getActions, setStore }) => {
 						const data = await response.json();
 						sessionStorage.setItem("token", data.access_token);
 						sessionStorage.setItem("userEmail", email);
-						sessionStorage.setItem("userProfileImageId", data.profile_image_id);
 						setStore({
 							token: data.access_token,
 							userPoints: data.total_points,
 							userEmail: email,
-							userProfileImageId: data.profile_image_id
+							userProfileImageId: data.profile_image ? data.profile_image.image_url : null
 						});
 						console.log("login successful");
 						return { success: true, points_earned: data.points_earned, total_points: data.total_points };
@@ -187,56 +186,36 @@ const getState = ({ getStore, getActions, setStore }) => {
 			fetchUserInfo: async () => {
 				const store = getStore();
 				try {
-					const response = await fetch(`${process.env.BACKEND_URL}/api/user`, {
-						headers: { 
-							"Content-Type": "application/json",
-							Authorization: `Bearer ${store.token}`
-						}
-					});
-					if (response.ok) {
-						const data = await response.json();
-						setStore({ 
-							userEmail: data.email,
-							userProfileImageId: data.profile_image_id,
-							userPoints: data.points
-						});
-					} else {
-						console.error("Failed to fetch user info", response.status);
+				  const response = await fetch(`${process.env.BACKEND_URL}/api/user`, {
+					headers: {
+					  "Content-Type": "application/json",
+					  Authorization: `Bearer ${store.token}`
 					}
+				  });
+				  if (response.ok) {
+					const data = await response.json();
+					setStore({
+					  userEmail: data.email,
+					  userProfileImageId: data.profile_image ? data.profile_image.image_url : null,
+					  userPoints: data.points
+					});
+				  } else {
+					console.error("Failed to fetch user info", response.status);
+				  }
 				} catch (error) {
-					console.error("Error fetching user info", error);
+				  console.error("Error fetching user info", error);
 				}
-			},
+			  },
 
-			fetchUserInfo: async () => {
-				const store = getStore();
-				try {
-					const response = await fetch(`${process.env.BACKEND_URL}/api/user`, {
-						headers: {
-							"Content-Type": "application/json",
-							Authorization: `Bearer ${store.token}`
-						}
-					});
-					if (response.ok) {
-						const data = await response.json();
-						setStore({
-							userEmail: data.email,
-							userProfileImageId: data.profile_image_id,
-							userPoints: data.points
-						});
-					} else {
-						console.error("Failed to fetch user info", response.status);
-					}
-				} catch (error) {
-					console.error("Error fetching user info", error);
-				}
+			// EJQ-created function to add new profile pic to user's profile
+			updateUserProfileImage: (imageUrl) => {
+				setStore({ userProfileImageId: imageUrl });
 			},
 
 			logout: () => {
 				try {
 					sessionStorage.removeItem("token");
 					sessionStorage.removeItem("userEmail");
-					sessionStorage.removeItem("userProfileImageId");
 					setStore({ token: null, userEmail: null, userProfileImageId: null })
 					console.log("logout successful");
 				} catch (error) {

@@ -35,14 +35,27 @@ def handle_signup():
     body = request.get_json()
     email = body["email"]
     password = hashlib.sha256(body["password"].encode("utf-8")).hexdigest()
+    
     user = User(
-        email=email, 
-        password=password, 
-        is_active=True,
-        profile_image_id='samples/man-portrait'  # Set default image
+        email=email,
+        password=password,
+        is_active=True
     )
+    
     db.session.add(user)
     db.session.commit()
+    
+    # Create a UserImage instance for the default profile picture
+    default_profile_image = UserImage(
+        public_id='samples/man-portrait',
+        image_url='https://res.cloudinary.com/demo/image/upload/samples/man-portrait',
+        owner_id=user.id,
+        is_profile_image=True
+    )
+    
+    db.session.add(default_profile_image)
+    db.session.commit()
+    
     response_body = {
         "message": "User successfully created"
     }
@@ -513,14 +526,7 @@ def handle_user_images(id=0):
     if not current_user:
         return jsonify({"error": "User not authenticated"}), 401
 
-    if request.method == "GET":
-        user_images = UserImage.query.filter_by(owner_id=current_user.id).all()
-        return jsonify([image.serialize() for image in user_images]), 200
-
-    elif request.method == "POST":
-        if len(current_user.user_images) >= 5:
-            return jsonify({"error": "Cannot upload more than five images, please delete one first."}), 400
-
+    if request.method == "POST":
         if 'file' not in request.files:
             return jsonify({"error": "No file part"}), 400
 
@@ -532,10 +538,14 @@ def handle_user_images(id=0):
             try:
                 # Upload to Cloudinary
                 result = upload(file)
-                is_profile_image = False
-                if request.form.get("mode") == "profile":
-                    is_profile_image = True
-
+                
+                # Check if this should be the profile image
+                is_profile_image = request.form.get("mode") == "profile"
+                
+                # If it's a profile image, set all other images to not be profile images
+                if is_profile_image:
+                    UserImage.query.filter_by(owner_id=current_user.id, is_profile_image=True).update({UserImage.is_profile_image: False})
+                
                 # Create new UserImage object
                 new_image = UserImage(
                     public_id=result['public_id'],
@@ -543,9 +553,10 @@ def handle_user_images(id=0):
                     owner_id=current_user.id,
                     is_profile_image=is_profile_image
                 )
+                
                 db.session.add(new_image)
                 db.session.commit()
-
+                
                 return jsonify({"message": "Image uploaded successfully", "image": new_image.serialize()}), 201
             except Exception as e:
                 db.session.rollback()

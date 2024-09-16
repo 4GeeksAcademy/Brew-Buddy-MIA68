@@ -67,7 +67,8 @@ export const UserProfile = () => {
             });
             if (response.ok) {
                 const data = await response.json();
-                setUserInfo({ ...userInfo, profileImage: data.image_url });
+                setUserInfo({ ...userInfo, profile_image_id: data.image.image_url });
+                actions.updateUserProfileImage(data.image.image_url);
                 setImageFile(null);
             } else {
                 console.error("Failed to upload image:", response.status, response.statusText);
