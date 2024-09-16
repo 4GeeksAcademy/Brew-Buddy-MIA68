@@ -263,6 +263,7 @@ def handle_user_info():
         body = request.get_json()
         if 'profile_image_id' in body:
             current_user.profile_image_id = body['profile_image_id']
+        # EJQ do not update profile imade ID directly
         # You can add more fields to update here if needed
         db.session.commit()
         return jsonify({"message": "User info updated successfully"}), 200

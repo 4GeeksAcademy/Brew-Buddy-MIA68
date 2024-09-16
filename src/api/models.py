@@ -228,8 +228,8 @@ class UserImage(db.Model):
     __table_args__ = (db.UniqueConstraint('owner_id', 'is_profile_image', name='unique_profile_image_per_user'),)
     id = db.Column(db.Integer, primary_key=True)
     is_profile_image = db.Column(db.Boolean(), nullable=False, default=False)
-    public_id = db.Column(db.String(500), nullable=False, unique=True)
-    image_url = db.Column(db.String(500), nullable=False, unique=True)
+    public_id = db.Column(db.String(500), nullable=False)
+    image_url = db.Column(db.String(500), nullable=False)
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     owner = db.relationship("User", back_populates="user_images", foreign_keys=[owner_id])
 
