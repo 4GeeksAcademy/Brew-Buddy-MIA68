@@ -195,8 +195,10 @@ const getState = ({ getStore, getActions, setStore }) => {
 				  if (response.ok) {
 					const data = await response.json();
 					setStore({
+					// EJQ - user: data,
 					  userEmail: data.email,
 					  userProfileImageId: data.profile_image ? data.profile_image.image_url : null,
+					  userProfilePublicId: data.profile_image ? data.profile_image.public_id : null,
 					  userPoints: data.points
 					});
 				  } else {

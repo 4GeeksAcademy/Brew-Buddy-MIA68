@@ -56,10 +56,6 @@ export const BreweryCard = (props) => {
         }
     };
 
-    const handleFavBrewery= () => {
-      actions.addFavoriteBrewery(props.breweryData);  
-    }
-
     return (
         <div className="card">
             <div className="card-body">
