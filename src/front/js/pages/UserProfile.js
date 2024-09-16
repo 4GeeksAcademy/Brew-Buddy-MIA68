@@ -55,6 +55,7 @@ export const UserProfile = () => {
     
         const formData = new FormData();
         formData.append('file', imageFile);
+        formData.append("mode", "profile");
     
         try {
             const response = await fetch(`${process.env.BACKEND_URL}/api/images`, {
@@ -66,8 +67,10 @@ export const UserProfile = () => {
             });
             if (response.ok) {
                 const data = await response.json();
-                setUserInfo({ ...userInfo, profileImage: data.image_url });
+                setUserInfo({ ...userInfo, profile_image_id: data.image.public_id });
+                actions.updateUserProfileImage(data.image.image_url);
                 setImageFile(null);
+                actions.fetchUserInfo();
             } else {
                 console.error("Failed to upload image:", response.status, response.statusText);
             }
@@ -87,7 +90,7 @@ export const UserProfile = () => {
                         </div>
                         <div className="col-2 d-flex flex-column align-items-center">
                             <AdvancedImage
-                                cldImg={cld.image(userInfo.profile_image_id || 'samples/man-portrait').resize(fill().width(200).height(200))}
+                                cldImg={cld.image(store.userProfilePublicId || 'samples/man-portrait').resize(fill().width(200).height(200))}
                                 alt="Profile"
                                 className="img-fluid mb-3"
                             />
