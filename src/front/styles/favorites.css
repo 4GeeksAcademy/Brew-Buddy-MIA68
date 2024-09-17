@@ -4,3 +4,16 @@
     /* -webkit-text-stroke-width: 1px;
     -webkit-text-stroke-color: black; */
 }
+.close-button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: red
+}
+#favBreweryCard {
+    position: relative;
+
+}
