@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import { Context } from '../store/appContext';
 
 export const ReviewForm = ({ brewery, onSaveReview }) => {
+    const {actions} = useContext(Context);
     const [overallRating, setOverallRating] = useState(0);
     const [reviewText, setReviewText] = useState("");
     const [isFavoriteBrewery, setIsFavoriteBrewery] = useState(false);
@@ -15,6 +17,10 @@ export const ReviewForm = ({ brewery, onSaveReview }) => {
         updatedReviews[index][field] = value;
         setBeerReviews(updatedReviews);
     };
+
+    const handleFavBrewery= () => {
+        actions.addFavoriteBrewery(brewery);  
+      }
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -34,7 +40,19 @@ export const ReviewForm = ({ brewery, onSaveReview }) => {
             </div>
             <div>
                 <label>
-                    <input type="checkbox" checked={isFavoriteBrewery} onChange={(e) => setIsFavoriteBrewery(e.target.checked)} />
+                    <input 
+                        type="checkbox" 
+                        checked={isFavoriteBrewery} 
+                        // onChange={(e) => setIsFavoriteBrewery(e.target.checked)} 
+                        onChange={(e) => {
+                            setIsFavoriteBrewery(e.target.checked);
+                            if (e.target.checked) {
+                                handleFavBrewery();
+                                
+                            }
+                        } } 
+
+                    />
                     Mark as Favorite Brewery
                 </label>
             </div>

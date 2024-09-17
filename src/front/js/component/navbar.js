@@ -4,8 +4,6 @@ import { Link, useNavigate } from "react-router-dom";
 import BBLogo from "../../img/BB-Logo.jpg"
 import "../../styles/navbar.css"
 import { Cloudinary } from '@cloudinary/url-gen';
-import { AdvancedImage } from '@cloudinary/react';
-import { fill } from '@cloudinary/url-gen/actions/resize';
 
 export const Navbar = () => {
 	const { store, actions } = useContext(Context);
@@ -36,10 +34,11 @@ export const Navbar = () => {
                         <>
                             <span className="me-3">Hello {store.userEmail}!</span>
                             {store.userProfileImageId && (
-                                <AdvancedImage
-                                    cldImg={cld.image(store.userProfileImageId).resize(fill().width(40).height(40))}
+                                <img
+                                    src={store.userProfileImageId}
                                     alt="Profile"
                                     className="rounded-circle me-3"
+                                    style={{ width: '40px', height: '40px', objectFit: 'cover' }}
                                 />
                             )}
                             <Link to="/UserProfile"><button className="btn btn-dark me-3">Profile</button></Link>
