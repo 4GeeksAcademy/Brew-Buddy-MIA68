@@ -54,6 +54,7 @@ export const FavoriteBeers = () => {
     setItems(store.favoriteBeers)
     setBeersList(store.allBeers)
   }, [store.favoriteBeers, store.allBeers])
+
   return (
     <div>
       <select value={sortOption} onChange={handleSortChange}>
@@ -116,10 +117,17 @@ export const FavoriteBeers = () => {
           <button className="btn btn-primary" type="submit">Submit</button>
         </form> */}
         {items.map((item, index) => {
+          const handleRemoveFavorite = (item) => {
+            actions.deleteFavoriteBeers(item);
+            alert(`${item.beer_name} has been removed from your favorites`); 
+        }
           return (
-            <div class="card text-center mb-3 mx-auto" style={{ width: "18rem" }}>
+            <div id="favBeerCard" className="card text-center mb-3 mx-auto" style={{ width: "18rem" }} key={index}>
               <div class="card-body">
-                <h5 class="card-title">{item.beer_name}</h5>
+              <button type="button" className="close-button-beers" onClick={() => handleRemoveFavorite(item)}>
+                                    <i className="fa-solid fa-x"></i>
+                                </button>
+                <h5 class="card-title mt-3">{item.beer_name}</h5>
                 <p class="card-text">{item.flavor}</p>
                 <p class="card-text">{item.type}</p>
                 <p class="card-text">{item.ABV}</p>

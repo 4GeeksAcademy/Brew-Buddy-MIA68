@@ -543,6 +543,29 @@ const getState = ({ getStore, getActions, setStore }) => {
 					return false;
 				}
 			},
+			deleteFavoriteBeers: async (beerId) => {
+				console.log(beerId)
+				try {
+					const response = await fetch(`${process.env.BACKEND_URL}/api/favorite_beers/${beerId}`, {
+						method: "DELETE",
+						headers: {
+							"Content-Type": "application/json",
+							Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+						},
+					});
+					if (response.ok) {
+						await getActions().deleteFavoriteBeers();
+						console.log("Favorite beer deleted successfully");
+						return true;
+					} else {
+						console.error("Error deleting favorite beer");
+						return false;
+					}
+				} catch (error) {
+					console.error("Error deleting favorite beer", error);
+					return false;
+				}
+			},
 			getFavoritePeople: async () => {
 				let response = await fetch(process.env.BACKEND_URL + "/api/favorite_users", {
 					headers: {

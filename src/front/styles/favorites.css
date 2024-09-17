@@ -17,3 +17,15 @@
     position: relative;
 
 }
+.close-button-beers {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: red
+}
+#favBeerCard {
+    position: relative;
+}
