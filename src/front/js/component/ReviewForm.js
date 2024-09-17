@@ -60,7 +60,7 @@ export const ReviewForm = ({ brewery, onSaveReview }) => {
                 </div>
             ))}
             <button type="button" onClick={addBeerReview}>Add Another Beer</button>
-            <button type="submit" className="btn btn-primary" onClick={actions.addBreweryReview}>Save Review</button>
+            <button type="submit" className="btn btn-primary">Save Review</button>
         </form>
     );
 };

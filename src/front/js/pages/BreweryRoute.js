@@ -82,7 +82,7 @@ export const BreweryRoutes = () => {
         <div className="text-center mt-5">
             <h1>Hello Brew Buddy!!</h1>
             <div>
-                <img src={brewbuddyimg} alt="Brew Buddy" />
+                <img src={brewbuddyimg} className="home-logo-img" alt="Brew Buddy" />
             </div>
             {/* Flex container for journeys and map */}
             <div className="journey-map-container">
