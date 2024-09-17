@@ -253,7 +253,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					let data = await resp.json();
 					console.log(data);
 					const breweryInfos = data.map(brewery => new BreweryInfo(brewery));
-					// Create routes based on the brewery information (for example purposes, using dummy travel times and distances)
+					// .Create routes based on the brewery information (for example purposes, using dummy travel times and distances)
 					const routes = breweryInfos.map(info => new Route(new BreweryDestination(info), Math.floor(Math.random() * 60), Math.floor(Math.random() * 20)));
 					const journey = getStore().journey;
 					routes.forEach(route => journey.addRoute(route));
@@ -606,9 +606,32 @@ const getState = ({ getStore, getActions, setStore }) => {
 				} catch (error) {
 					console.error("Error fetching favorite breweries", error);
 				}
-			}
+			},
 			// you need have a createFavoriteBeer (POST REQUEST) function then can attach it to card button
 			// probably the same thing for people
+			addNewBeer: async (name, flavor, type, ABV, brewery) => {
+				try {
+					let response = await fetch(`${process.env.BACKEND_URL}/api/beers/add`, {
+						method: 'POST',
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify(
+							{
+								"beer_name": name,
+								"flavor": flavor,
+								"type": type,
+								"ABV": ABV,
+								"brewery_Id": brewery
+							}
+						)
+					})
+
+				}
+				catch (error) {
+					console.error("Error adding new beer", error)
+				}
+			}
 		}
 	};
 };

@@ -681,3 +681,17 @@ def handle_hello():
 
     return jsonify(response_body), 200
 
+@api.route('/beers/add', methods=['POST'])
+def add_beer():
+    body = request.get_json()
+    new_Beer_Name = body["beer_name"]
+    new_Flavor = body["flavor"]
+    new_Type = body["type"]
+    new_ABV = body["ABV"]
+    new_Brewery_Id = body["brewery_Id"]
+    beer = Beer(beer_name= new_Beer_Name, flavor= new_Flavor, type= new_Type, ABV= new_ABV, brewery_Id= new_Brewery_Id)
+    db.session.add(beer)
+    db.session.commit()
+    return "msg: brewery added:", 200
+
+
