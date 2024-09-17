@@ -13,19 +13,27 @@ class User(db.Model):
     favorite_beers = db.relationship("FavoriteBeers", back_populates="owner", foreign_keys="FavoriteBeers.owner_id")
     favorite_breweries = db.relationship("FavoriteBreweries", back_populates="owner", foreign_keys="FavoriteBreweries.owner_id")
     point_transactions = db.relationship("PointTransaction", back_populates="owner")
-    user_images = db.relationship("UserImage", back_populates="owner")
-    profile_image_id = db.Column(db.String(255), default='samples/man-portrait')
+    user_images = db.relationship("UserImage", back_populates="owner", foreign_keys="UserImage.owner_id")
 
-    def __init__(self, email, password, is_active=True, profile_image_id='samples/man-portrait'):
+    def __init__(self, email, password, is_active=True):
         self.email = email
         self.password = password
         self.is_active = is_active
-        self.profile_image_id = profile_image_id
     
     # added repr to help with debugging by providing a readable string representation of the model instances
     def __repr__(self):
             return f'<User {self.email}>'
-    
+    @property
+    def profile_image(self):
+        image = list(filter(
+            lambda user_image: user_image.is_profile_image == True,
+            self.user_images
+        ))
+        if len(image) == 0: 
+            return None
+        return image[0]
+
+
     @property
     def points(self):
         total = 0
@@ -36,6 +44,15 @@ class User(db.Model):
     def change_points(self, points, action):
         transaction = PointTransaction(owner_id=self.id, points=points, action=action)
         db.session.add(transaction)
+        db.session.commit()
+
+    def set_profile_image(self, image):
+        if self.profile_image:
+            old_profile_image = self.profile_image
+            self.profile_image = image
+            db.session.delete(old_profile_image)
+        else:
+            self.profile_image = image
         db.session.commit()
     
     def serialize(self):
@@ -49,7 +66,8 @@ class User(db.Model):
             "favorite_beers": favorite_beers_dictionaries,
             "favorite_breweries": favorite_breweries_dictionaries,
             "points": self.points,
-            "profile_image_id": self.profile_image_id
+            "profile_image": self.profile_image.serialize() if self.profile_image else {"image_url": "samples/man-portrait"},
+            "user_images": [image.serialize() for image in self.user_images]
             # do not serialize the password, it's a security breach
         }
     
@@ -207,24 +225,26 @@ class PointTransaction(db.Model):
 
 # model for user uploaded images
 class UserImage(db.Model):
-    __table_args__ = (
-        db.UniqueConstraint("owner_id", name="unique_img_title_user"),
-    )
+    __table_args__ = (db.UniqueConstraint('owner_id', 'is_profile_image', name='unique_profile_image_per_user'),)
     id = db.Column(db.Integer, primary_key=True)
-    public_id = db.Column(db.String(500), nullable=False, unique=True)
-    image_url = db.Column(db.String(500), nullable=False, unique=True)
-    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    is_profile_image = db.Column(db.Boolean(), nullable=False, default=False)
+    public_id = db.Column(db.String(500), nullable=False)
+    image_url = db.Column(db.String(500), nullable=False)
+    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     owner = db.relationship("User", back_populates="user_images", foreign_keys=[owner_id])
 
-    def __init__(self, public_id, image_url, owner_id):
+    def __init__(self, public_id, image_url, owner_id, is_profile_image=False):
         self.public_id = public_id
         self.image_url = image_url
         self.owner_id = owner_id
+        self.is_profile_image = is_profile_image
 
     def serialize(self):
         return {
             "id": self.id,
-            "image_url": self.image_url
+            "public_id": self.public_id,
+            "image_url": self.image_url,
+            "is_profile_image": self.is_profile_image
         }
     
 journey_reviews = db.Table('journey_reviews',
@@ -241,6 +261,13 @@ class BreweryReview(db.Model):
     visit_date = db.Column(db.DateTime, default=datetime.utcnow)
 
     beer_reviews = db.relationship('BeerReview', backref='brewery_review', lazy=True)
+    #EJQ-line below will be for users attaching images to reviews
+    #images = db.relationship('UserImage', secondary='brewery_review_images', backref='brewery_reviews')
+
+    #EJQ - formula to add later to add images to reviews
+    #def add_image(self, image):
+        # self.images.append(image)
+        # db.session.commit()
 
     def __init__(self, brewery_name, overall_rating, review_text="", is_favorite_brewery=False):
         self.brewery_name = brewery_name
@@ -252,6 +279,23 @@ class BreweryReview(db.Model):
     # def add_beer_review(self, beer_review):
     #     self.beer_reviews.append(beer_review)
 
+    def serialize(self):
+        return {
+            "id": self.id,
+            "brewery_name": self.brewery_name,
+            "overall_rating": self.overall_rating,
+            "review_text": self.review_text,
+            "is_favorite_brewery": self.is_favorite_brewery,
+            "visit_date": self.visit_date.isoformat(),
+            # "images": [image.serialize() for image in self.images]
+        }
+
+# EJQ association table for brewery review images
+# brewery_review_images = db.Table('brewery_review_images',
+#     db.Column('brewery_review_id', db.Integer, db.ForeignKey('brewery_review.id'), primary_key=True),
+#     db.Column('user_image_id', db.Integer, db.ForeignKey('user_image.id'), primary_key=True)
+# )
+
 class BeerReview(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     brewery_review_id = db.Column(db.Integer, db.ForeignKey('brewery_review.id'), nullable=True)
@@ -260,6 +304,8 @@ class BeerReview(db.Model):
     notes = db.Column(db.String(500), nullable=True)
     is_favorite = db.Column(db.Boolean, default=False)
     date_tried = db.Column(db.DateTime, default=datetime.utcnow)
+    # EJQ-next column to add when ready to implement photo upload function for beer reviews
+    #images = db.relationship('UserImage', secondary='beer_review_images', backref='beer_reviews')
 
     def __init__(self, brewery_review_id, beer_name, rating, notes="", is_favorite=False):
         self.brewery_review_id = brewery_review_id
@@ -268,7 +314,30 @@ class BeerReview(db.Model):
         self.notes = notes
         self.is_favorite = is_favorite
         self.date_tried = datetime.now()
-        
+
+    #EJQ function to add photos to beer reviews
+    #def add_image(self, image):
+        # self.images.append(image)
+        # db.session.commit()
+
+    def serialize(self):
+        return{
+            "id": self.id,
+            "brewery_review_id": self.brewery_review_id,
+            "beer_name": self.beer_name,
+            "rating": self.rating,
+            "notes": self.notes,
+            "is_favorite": self.is_favorite,
+            "date_tried": self.date_tried,
+            #"images": [image.serialize() for image in self.images]
+        }
+
+# EJQ association table for beer reviews
+# beer_review_images = db.Table('beer_review_images',
+#     db.Column('beer_review_id', db.Integer, db.ForeignKey('beer_review.id'), primary_key=True),
+#     db.Column('user_image_id', db.Integer, db.ForeignKey('user_image.id'), primary_key=True)
+# )    
+
 class Journey(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
@@ -292,7 +361,6 @@ class Journey(db.Model):
 
     # def add_brewery_review(self, brewery_review):
     #     self.brewery_reviews.append(brewery_review)
-
 
 class Route(db.Model):
     id = db.Column(db.Integer, primary_key=True)
