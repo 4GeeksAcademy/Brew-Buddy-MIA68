@@ -7,9 +7,10 @@ export const Brewery = () => {
     const { store, actions } = useContext(Context);
     const [breweryName, setBreweryName] = useState("");
     const [beerNameValue, setBeerNameValue] = useState("");
-    const [flavorValue, setFlavorValue] = useState("")
-    const [typeValue, setTypeValue] = useState("")
-    const [ABVValue, setABVValue] = useState("")
+    const [flavorValue, setFlavorValue] = useState("");
+    const [typeValue, setTypeValue] = useState("");
+    const [ABVValue, setABVValue] = useState("");
+    const [addingFailed, setAddingFailed] = useState(false)
 
     const currentUrl = window.location.href;
     const url = new URL(currentUrl);
@@ -24,7 +25,10 @@ export const Brewery = () => {
         const brewery = dynamicId
         if (name != "" && flavor != "" && type != "" && ABV != "") {
             actions.addNewBeer(name, flavor, type, ABV, brewery)
-        } else { console.log("missing information") }
+            location.reload();
+        } else { console.log("missing information")
+            setAddingFailed(true)
+        }
     }
 
     const fetchBreweryName = async () => {
@@ -132,6 +136,12 @@ export const Brewery = () => {
                                 <label htmlFor="flavorInput">Flavor:</label>
                                 <input type="text" id="flavorInput" name="flavorInput" onChange={e => setFlavorValue(e.target.value)} required />
                             </div>
+                        </div>
+                        <div>
+                            {addingFailed 
+                            ? <p className="color-danger">Please fill all fields</p>
+                            : null
+                            }
                         </div>
                         <div className="d-flex my-4">
                             <button onClick={handleAddingNewBeer} className="mx-auto">Add New Beer</button>
