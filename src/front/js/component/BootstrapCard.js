@@ -102,9 +102,12 @@ export const BreweryCard = (props) => {
     )
 }
 
-export const JourneyCard = ({ key, breweryData, onReview, onRefocus }) => {
+export const JourneyCard = ({ breweryData, onReview, onRefocus }) => {
     const { store, actions } = useContext(Context);
     const navigate = useNavigate()
+    // const handleAddReview = () => {
+    //     onReview(breweryData)
+    // }
     return (
         <div className="card">
             <h5 className="card-header">{breweryData.name}</h5>

@@ -604,17 +604,73 @@ def add_brewery_review():
         review_text=data.get('review_text', ""),
         is_favorite_brewery=data.get('is_favorite_brewery', False)
     )
-    for beer_review_data in data['beer_reviews']:
-        beer_review = BeerReview(
-        beer_name=beer_review_data['beer_name'],
-        rating=beer_review_data['rating'],
-        notes=beer_review_data.get('notes', ""),
-        is_favorite=beer_review_data.get('is_favorite', False)
-    )
-    db.session.add(beer_review)
     db.session.add(brewery_review)
     db.session.commit()
+    for beer_review_data in data['beer_reviews']:
+        beer_review = BeerReview(
+            #add review id
+            brewery_review_id=brewery_review.id,
+            beer_name=beer_review_data.get('beer_name'),
+            rating=beer_review_data['rating'],
+            notes=beer_review_data.get('notes', ""),
+            is_favorite=beer_review_data.get('is_favorite', False)
+        )
+        db.session.add(beer_review)
+    
+    db.session.commit()
     return jsonify({"message": "Review added successfully"}), 201
+
+@api.route('/get_brewery_reviews', methods=['GET'])
+def get_brewery_reviews():
+    # Optional query parameters to filter results
+    brewery_name = request.args.get('brewery_name')
+    
+    # Query the database for brewery reviews
+    if brewery_name:
+        brewery_reviews = BreweryReview.query.filter_by(brewery_name=brewery_name).all()
+    else:
+        brewery_reviews = BreweryReview.query.all()
+
+    # Prepare the data to return
+    result = []
+    for review in brewery_reviews:
+        print(review,"in for loop")
+        beer_reviews = BeerReview.query.filter_by(brewery_review_id=review.id).all()
+        print(beer_reviews)
+        beer_reviews_data = [{
+            'beer_name': beer_review.beer_name,
+            'rating': beer_review.rating,
+            'notes': beer_review.notes,
+            'is_favorite': beer_review.is_favorite
+        } for beer_review in beer_reviews]
+        
+        result.append({
+            'brewery_name': review.brewery_name,
+            'overall_rating': review.overall_rating,
+            'review_text': review.review_text,
+            'is_favorite_brewery': review.is_favorite_brewery,
+            'beer_reviews': beer_reviews_data
+        })
+    return jsonify(result), 200
+
+@api.route('/delete_brewery_review/<int:brewery_review_id>', methods=['DELETE'])
+def delete_brewery_review(brewery_review_id):
+    # Find the brewery review by ID
+    brewery_review = BreweryReview.query.get(brewery_review_id)
+    
+    if not brewery_review:
+        return jsonify({"message": "Brewery review not found"}), 404
+    
+    # Find and delete all associated beer reviews
+    beer_reviews = BeerReview.query.filter_by(brewery_review_id=brewery_review.id).all()
+    for beer_review in beer_reviews:
+        db.session.delete(beer_review)
+    
+    # Delete the brewery review
+    db.session.delete(brewery_review)
+    db.session.commit()
+    
+    return jsonify({"message": "Brewery review and associated beer reviews deleted successfully"}), 200
 
 @api.route('/hello', methods=['POST', 'GET'])
 def handle_hello():
