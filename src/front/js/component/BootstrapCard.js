@@ -52,9 +52,14 @@ export const BreweryCard = (props) => {
             // add
             actions.addFavoriteBrewery(props.breweryData);
             alert("This Brewery has been added to your Favorites");
-            setCurrentFavorite(false)
+            setCurrentFavorite(true)
         }
     };
+    const handleAddBreweryToRoute = () => {
+        console.log(props.breweryData)
+        actions.addToCurrentJourney(props.breweryData)
+    }
+
     return (
         <div className="card">
             <div className="card-body">
@@ -79,7 +84,7 @@ export const BreweryCard = (props) => {
                 </h4>
                 <h5>{props.breweryData.city}, {props.breweryData.state}</h5>
                 <p className="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                <button className="btn btn-primary" onClick={() => actions.addToCurrentJourney(props.breweryData)}>Add to my current route</button>
+                <button className="btn btn-primary" onClick={handleAddBreweryToRoute}>Add to my current route</button>
                 {/* J.R.: A favorites button for brewery */}
                 <a href="#" className="btn btn-info"><i className={currentFavorite == true ? "fa-solid fa-star" : "fa-regular fa-star"} onClick={(e) => handleFavBrewery(e)}></i></a>
                 {/* J.R.: A button for contact information of brewery */}
