@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { Cloudinary } from '@cloudinary/url-gen';
 import { AdvancedImage } from '@cloudinary/react';
 import { fill } from '@cloudinary/url-gen/actions/resize';
-
+import UserDetails from "../component/UserDetails";
 export const UserProfile = () => {
     const { store, actions } = useContext(Context);
     const [userInfo, setUserInfo] = useState(null);
@@ -102,28 +102,11 @@ export const UserProfile = () => {
                     </div>
                 </>
             )}
-            <div className="mt-1">
-                <h2>Point History</h2>
-                <table className="table">
-                    <thead>
-                        <tr>
-                            <th>Action</th>
-                            <th>Points</th>
-                            <th>Timestamp</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {pointHistory.map((entry, index) => (
-                            <tr key={index}>
-                                <td>{entry.action}</td>
-                                <td>{entry.points}</td>
-                                <td>{new Date(entry.timestamp).toLocaleString()}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-            <div className="mt-5"><Link to="/forgot-password">Change My Password</Link></div>
+          
+            <UserDetails pointHistory={pointHistory}/>
+
+
+            <div className="mt-5"><Link to="/forgot-password">Change My Password</Link></div> {/* stay here */}
         </div>
     );
 };

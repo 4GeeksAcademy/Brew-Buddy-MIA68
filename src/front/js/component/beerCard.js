@@ -5,6 +5,7 @@ import { Context } from "../store/appContext";
 import { Link } from "react-router-dom";
 
 export const BeerCard = (props) => {
+    console.log(props)
     const { store, actions } = useContext(Context);
 
     return (
@@ -12,6 +13,7 @@ export const BeerCard = (props) => {
             <div className="card-body">
                 <div className="d-flex">
                     <h2 className="card-title mx-auto">
+                        <button onClick={(e) => actions.addFavoriteBeer(props.beerData.id)}>TEST</button>
                         {/* J.R.: A specific image for brewery types */}
                         {props.beerData.beer_name}
                     </h2>
@@ -20,6 +22,7 @@ export const BeerCard = (props) => {
                     <div className="row justify-content-between bg-danger">
                         <h5 className="col">Type:</h5>
                         <h5 className="col">{props.beerData.type}</h5>
+
 
 
                     </div>
