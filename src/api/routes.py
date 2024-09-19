@@ -610,7 +610,7 @@ def add_brewery_review():
         beer_review = BeerReview(
             #add review id
             brewery_review_id=brewery_review.id,
-            beer_name=beer_review_data['beer_name'],
+            beer_name=beer_review_data.get('beer_name'),
             rating=beer_review_data['rating'],
             notes=beer_review_data.get('notes', ""),
             is_favorite=beer_review_data.get('is_favorite', False)

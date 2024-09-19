@@ -80,6 +80,7 @@ export const BreweryRoutes = () => {
     // ));
     return (
         <div className="text-center mt-5">
+            <button onClick={actions.getBreweryReviewsFromBackend}>getReviews</button>
             <h1>Hello Brew Buddy!!</h1>
             <div>
                 <img src={brewbuddyimg} className="home-logo-img" alt="Brew Buddy" />

@@ -9,7 +9,7 @@ export const ReviewForm = ({ brewery, onSaveReview }) => {
     const { store, actions } = useContext(Context);
 
     const addBeerReview = () => {
-        setBeerReviews([...beerReviews, { beerName: "", rating: 0, notes: "", isFavorite: false }]);
+        setBeerReviews([...beerReviews, { beer_name: "", rating: 0, notes: "", isFavorite: false }]);
     };
 
     const updateBeerReview = (index, field, value) => {
@@ -25,6 +25,7 @@ export const ReviewForm = ({ brewery, onSaveReview }) => {
     const handleSubmit = (e) => {
         e.preventDefault();
         onSaveReview(brewery, overallRating, reviewText, isFavoriteBrewery, beerReviews);
+        actions.addBreweryReviewToBackend(brewery, overallRating, reviewText, isFavoriteBrewery, beerReviews)
     };
 
     return (
