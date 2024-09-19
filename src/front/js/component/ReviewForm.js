@@ -24,10 +24,6 @@ export const ReviewForm = ({ brewery, onSaveReview }) => {
         setBeerReviews(updatedReviews);
     };
 
-    const handleFavBrewery = () => {
-        actions.addFavoriteBrewery(brewery);
-    }
-
     const handleSubmit = (e) => {
         e.preventDefault();
         if (isFavoriteBrewery) {
@@ -69,15 +65,7 @@ export const ReviewForm = ({ brewery, onSaveReview }) => {
                     <input
                         type="checkbox"
                         checked={isFavoriteBrewery}
-                        // onChange={(e) => setIsFavoriteBrewery(e.target.checked)} 
-                        onChange={(e) => {
-                            setIsFavoriteBrewery(e.target.checked);
-                            if (e.target.checked) {
-                                handleFavBrewery();
-
-                            }
-                        }}
-
+                        onChange={(e) => setIsFavoriteBrewery(e.target.checked)} 
                     />
                     Mark as Favorite Brewery
                 </label>
