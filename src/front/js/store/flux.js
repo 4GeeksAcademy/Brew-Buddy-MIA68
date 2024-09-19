@@ -10,14 +10,15 @@ class BreweryInfo {
 		this.address_3 = resultFromServer.address_3;
 		this.city = resultFromServer.city;
 		this.state_province = resultFromServer.state_province;
-		this.postal_code = resultFromServer.postal_code
+		this.postal_code = resultFromServer.postal_code;
 		this.country = resultFromServer.country;
 		this.longitude = parseFloat(resultFromServer.longitude);
 		this.latitude = parseFloat(resultFromServer.latitude);
-		this.phone = resultFromServer.phone
-		this.website_url = resultFromServer.website_url
+		this.phone = resultFromServer.phone;
+		this.website_url = resultFromServer.website_url;
 		this.state = resultFromServer.state;
-		this.street = resultFromServer.street
+		this.street = resultFromServer.street;
+		this.breweryReviews = [];
 	}
 }
 class Address {
@@ -117,6 +118,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			breweryData: [],
 			beerData: [],
 			journey: new Journey(),
+			reviews: [],
 			city: "",
 			state: "",
 			type: "",
@@ -186,28 +188,28 @@ const getState = ({ getStore, getActions, setStore }) => {
 			fetchUserInfo: async () => {
 				const store = getStore();
 				try {
-				  const response = await fetch(`${process.env.BACKEND_URL}/api/user`, {
-					headers: {
-					  "Content-Type": "application/json",
-					  Authorization: `Bearer ${store.token}`
-					}
-				  });
-				  if (response.ok) {
-					const data = await response.json();
-					setStore({
-					// EJQ - user: data,
-					  userEmail: data.email,
-					  userProfileImageId: data.profile_image ? data.profile_image.image_url : null,
-					  userProfilePublicId: data.profile_image ? data.profile_image.public_id : null,
-					  userPoints: data.points
+					const response = await fetch(`${process.env.BACKEND_URL}/api/user`, {
+						headers: {
+							"Content-Type": "application/json",
+							Authorization: `Bearer ${store.token}`
+						}
 					});
-				  } else {
-					console.error("Failed to fetch user info", response.status);
-				  }
+					if (response.ok) {
+						const data = await response.json();
+						setStore({
+							// EJQ - user: data,
+							userEmail: data.email,
+							userProfileImageId: data.profile_image ? data.profile_image.image_url : null,
+							userProfilePublicId: data.profile_image ? data.profile_image.public_id : null,
+							userPoints: data.points
+						});
+					} else {
+						console.error("Failed to fetch user info", response.status);
+					}
 				} catch (error) {
-				  console.error("Error fetching user info", error);
+					console.error("Error fetching user info", error);
 				}
-			  },
+			},
 
 			// EJQ-created function to add new profile pic to user's profile
 			updateUserProfileImage: (imageUrl) => {
@@ -304,7 +306,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					const resp = await fetch(process.env.BACKEND_URL + "/api/favorite_breweries/" + brewery.id, {
 						method: "DELETE",
 						headers: {
-							"Content-Type": "application/json", 
+							"Content-Type": "application/json",
 							Authorization: "Bearer " + sessionStorage.getItem("token")
 						}
 					});
@@ -557,8 +559,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},
 			addBreweryReview: async (brewery, overallRating, reviewText, isFavoriteBrewery, beerReviews) => {
 				const store = getStore();
-				const journeys = store.journey;
-				const currentJourney = journeys[0]
+				const currentJourney = store.journey;
 
 				const breweryReview = new BreweryReview(brewery, overallRating, reviewText, isFavoriteBrewery)
 
@@ -566,7 +567,65 @@ const getState = ({ getStore, getActions, setStore }) => {
 					breweryReview.addBeerReview(new BeerReview(beerReview.beerName, beerReview.rating, beerReview.notes, beerReview.isFavorite));
 				});
 				currentJourney.addBreweryReview(breweryReview);
-				setStore({ journey: journeys });
+				setStore({ journey: currentJourney });
+			},
+			getBreweryReviewsFromBackend: async (breweryName) => {
+				const store = getStore();
+				try {
+					const response = await fetch(`${process.env.BACKEND_URL}/api/get_brewery_reviews`, {
+						method: 'GET',
+						headers: {
+							'Content-Type': 'application/json'
+						}
+					});
+
+					if (response.ok) {
+						const data = await response.json();
+						console.log("Reviews retrieved successfully:", data);
+						setStore({
+							reviews: data,
+						});
+						console.log(store.reviews)
+					} else {
+						const errorData = await response.json();
+						console.error("Failed to retrieve reviews", response.status, errorData);
+						return null;
+					}
+				} catch (error) {
+					console.error("Error fetching brewery reviews:", error);
+					return null;
+				}
+			},
+			addBreweryReviewToBackend: async (breweryData, overallRating, reviewText, isFavoriteBrewery, beerReviews = []) => {
+				console.log("breweryData:", breweryData);  // Log the data for debugging
+				const response = await fetch(process.env.BACKEND_URL + '/api/add_brewery_review', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({
+						brewery_name: breweryData.name,
+						overall_rating: overallRating || 0,
+						review_text: reviewText || "",  // Default to empty string if not provided
+						is_favorite_brewery: isFavoriteBrewery || false,  // Default to false
+						beer_reviews: beerReviews.map(beer => ({
+							beer_name: beer.beer_name || "",                //ERROR HERE i added the default to empty string and i can add them without name
+							rating: beer.rating || "",
+							notes: beer.notes || "",  // Default to empty string if not provided
+							is_favorite: beer.is_favorite || false  // Default to false
+						}))
+					})
+				});
+
+				if (response.ok) {
+					const data = await response.json();
+					console.log(data.message);  // "Review added successfully"
+					return data;
+				} else {
+					const errorData = await response.json();
+					console.error("Failed to add review", response.status, errorData);
+					return null;
+				}
 			},
 			getFavoriteBreweries: async () => {
 				const token = sessionStorage.getItem("token");

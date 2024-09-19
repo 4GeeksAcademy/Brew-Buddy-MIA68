@@ -86,7 +86,7 @@ export const BreweryCard = (props) => {
                 <p className="card-text">With supporting text below as a natural lead-in to additional content.</p>
                 <button className="btn btn-primary" onClick={handleAddBreweryToRoute}>Add to my current route</button>
                 {/* J.R.: A favorites button for brewery */}
-                <a href="#" className="btn btn-info"><i className="fa-regular fa-star" onClick={handleFavBrewery}></i></a>
+                <a href="#" className="btn btn-info"><i className={currentFavorite == true ? "fa-solid fa-star" : "fa-regular fa-star"} onClick={(e) => handleFavBrewery(e)}></i></a>
                 {/* J.R.: A button for contact information of brewery */}
                 <a href={props.breweryData.phone}>{props.breweryData.phone}</a>
                 {/* A button for website of brewery */}
@@ -103,9 +103,12 @@ export const BreweryCard = (props) => {
     )
 }
 
-export const JourneyCard = ({ key, breweryData, onReview, onRefocus }) => {
+export const JourneyCard = ({ breweryData, onReview, onRefocus }) => {
     const { store, actions } = useContext(Context);
     const navigate = useNavigate()
+    // const handleAddReview = () => {
+    //     onReview(breweryData)
+    // }
     return (
         <div className="card">
             <h5 className="card-header">{breweryData.name}</h5>
