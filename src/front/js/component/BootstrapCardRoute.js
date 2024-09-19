@@ -20,44 +20,22 @@ export const BreweryRouteCard = (props) => {
                             <ul className="vertical-menu w-100">
                                 <li className="border border-solid">
                                     <div>
-                                        Name
-                                        </div>
-                                    <div>
-                                        Address
+                                        {props.breweryData.name}
                                     </div>
                                     <div>
-                                        Number
-                                    </div>
-                                </li>
-                                <li className="border border-solid">
-                                    <div>
-                                        Name
-                                        </div>
-                                    <div>
-                                        Address
+                                        {store.journey[0].routes[0].travelTime}
                                     </div>
                                     <div>
-                                        Number
-                                    </div>
-                                </li>
-                                <li className="border border-solid">
-                                    <div>
-                                        Name
-                                        </div>
-                                    <div>
-                                        Address
-                                    </div>
-                                    <div>
-                                        Number
+                                        {store.journey[0].routes[0].miles}
                                     </div>
                                 </li>
                             </ul>
                         </div>
                     </div>
-                    {/* map side of brewery locator */}
+                    {/* map side of brewery locator
                     <div className="col-8 border border-solid">
                         <p>Map Side</p>
-                    </div>
+                    </div> */}
                 </div>
             </div>
         </div>

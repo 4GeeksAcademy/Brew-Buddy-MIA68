@@ -5,7 +5,9 @@
     one more css for each page that will contain the selected used 
     on that page only (the ones not reused in other pages).
 */
-img{
+
+/* EJQ-made the below tag to a class name as it was impacting the size of the user profile pic; udated corresponding item in the home.js file */
+.home-logo-img{
     height: 100px;
     width: 100px;
 }
