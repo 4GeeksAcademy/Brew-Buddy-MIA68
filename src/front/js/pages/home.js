@@ -6,7 +6,7 @@ import { BreweryCard } from "../component/BootstrapCard";
 import { BreweryRouteCard } from "../component/BootstrapCardRoute";
 import Modal from "../component/searchModal";
 import { Link } from "react-router-dom";
-
+import HomeLogo1 from "../../img/HomeLogo1.png"
 
 export const Home = () => {
 	const { store, actions } = useContext(Context);
@@ -25,7 +25,9 @@ export const Home = () => {
 	return (
 		<div className="text-center mt-5">
 			<h1>Hello Brew Buddy!!</h1>
-			<img src={brewbuddyimg} className="home-logo-img" />
+			{/* EJQ - Commented out the logo to put a new homepage logo*/}
+			{/* <img src={brewbuddyimg} className="home-logo-img" /> */}
+			<img src={HomeLogo1} />
 			<div className="my-2">
 				<button onClick={actions.toggleSearch}>Search</button>
 
