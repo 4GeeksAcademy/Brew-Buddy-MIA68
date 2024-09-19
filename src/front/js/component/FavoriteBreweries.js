@@ -25,7 +25,7 @@ export const FavoriteBreweries = () => {
     }
     const handleRemoveFavorite = (item) => {
         actions.deleteFavoriteBrewery(item);
-        alert(`${item.brewery_name} has been removed from your favorites`); 
+        // alert(`${item.brewery_name} has been removed from your favorites`); 
     }
     return (
         <div>
