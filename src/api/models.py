@@ -33,7 +33,6 @@ class User(db.Model):
             return None
         return image[0]
 
-
     @property
     def points(self):
         total = 0
