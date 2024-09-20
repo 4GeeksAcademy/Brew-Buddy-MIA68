@@ -23,6 +23,10 @@ export const FavoriteBreweries = () => {
         }
         setItems(sortedItems);
     }
+    const handleRemoveFavorite = (item) => {
+        actions.deleteFavoriteBrewery(item);
+        // alert(`${item.brewery_name} has been removed from your favorites`); 
+    }
     return (
         <div>
             
@@ -37,9 +41,12 @@ export const FavoriteBreweries = () => {
                     <p>No favorite breweries found.</p>
                 ) : (
                    items.map((item, index) => (
-                        <div className="card text-center mb-3 mx-auto" style={{ width: "18rem" }} key={index}>
+                        <div id="favBreweryCard" className="card text-center mb-3 mx-auto" style={{ width: "18rem" }} key={index}>
                             <div className="card-body">
-                                <h5 className="card-title">{item.brewery_name || "Unknown Brewery"}</h5> {/* Display brewery name */}
+                                <button type="button" className="close-button" onClick={() => handleRemoveFavorite(item)}>
+                                    <i className="fa-solid fa-x"></i>
+                                </button>
+                                <h5 className="card-title mt-3">{item.brewery_name || "Unknown Brewery"}</h5> {/* Display brewery name */}
                                 <p className="card-text">
                                     {item.address || item.address_1 || "No address available"}
                                 </p> {/* Display address */}
