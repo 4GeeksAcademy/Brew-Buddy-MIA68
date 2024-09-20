@@ -308,22 +308,29 @@ const getState = ({ getStore, getActions, setStore }) => {
 						headers: {
 							"Content-Type": "application/json",
 							Authorization: "Bearer " + sessionStorage.getItem("token")
-						}
+
+						},
 					});
 					if (resp.ok) {
 						const data = await resp.json();
-						console.log("brewery added favorites: ", data);
+						console.log("brewery deleted from favorites: ", data);
 
 						const store = getStore();
+
 						setStore({
-							favoriteBreweries: [...store.favoriteBreweries, brewery]
+							favoriteBreweries: getStore().favoriteBreweries.filter((x) => {
+								return x != brewery;
+							})
 						});
+						console.log(getStore().favoriteBreweries)
+						alert("This brewery has been deleted from your Favorites");
+
 					} else {
 						const errorData = await resp.json();
 						console.error("failed to add", errorData);
 					}
 				} catch (error) {
-					console.error("error adding brewery", error);
+					console.error("error deleting brewery", error);
 				}
 			},
 			searchFunctionWithCity: async () => {
