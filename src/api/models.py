@@ -253,6 +253,7 @@ journey_reviews = db.Table('journey_reviews',
 
 class BreweryReview(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    brewery_id = db.Column(db.Integer)
     brewery_name = db.Column(db.String, nullable=False)
     overall_rating = db.Column(db.Float, nullable=False)
     review_text = db.Column(db.String(500), nullable=True)

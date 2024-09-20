@@ -18,7 +18,11 @@ class BreweryInfo {
 		this.website_url = resultFromServer.website_url;
 		this.state = resultFromServer.state;
 		this.street = resultFromServer.street;
-		this.breweryReviews = [];
+		this.reviews = [];
+	}
+
+	addReviews(reviewsArray) {
+		this.reviews = reviewsArray
 	}
 }
 class Address {
@@ -255,6 +259,11 @@ const getState = ({ getStore, getActions, setStore }) => {
 					let data = await resp.json();
 					console.log(data);
 					const breweryInfos = data.map(brewery => new BreweryInfo(brewery));
+					const storeReviews = getStore().reviews;
+					breweryInfos.forEach(brewery => {
+						const breweryReviews = storeReviews.filter(review => review.brewery_id === brewery.id);
+						brewery.addReviews(breweryReviews);
+					});
 					// .Create routes based on the brewery information (for example purposes, using dummy travel times and distances)
 					const routes = breweryInfos.map(info => new Route(new BreweryDestination(info), Math.floor(Math.random() * 60), Math.floor(Math.random() * 20)));
 					const journey = getStore().journey;
