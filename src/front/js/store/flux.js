@@ -23,6 +23,7 @@ class BreweryInfo {
 
 	addReviews(reviewsArray) {
 		this.reviews = reviewsArray
+		console.log("setting reviews to " + reviewsArray.length)
 	}
 }
 class Address {
@@ -260,6 +261,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					console.log(data);
 					const breweryInfos = data.map(brewery => new BreweryInfo(brewery));
 					const storeReviews = getStore().reviews;
+
 					breweryInfos.forEach(brewery => {
 						const breweryReviews = storeReviews.filter(review => review.brewery_id === brewery.id);
 						brewery.addReviews(breweryReviews);
@@ -585,7 +587,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				currentJourney.addBreweryReview(breweryReview);
 				setStore({ journey: currentJourney });
 			},
-			getBreweryReviewsFromBackend: async (breweryName) => {
+			getBreweryReviewsFromBackend: async () => {
 				const store = getStore();
 				try {
 					const response = await fetch(`${process.env.BACKEND_URL}/api/get_brewery_reviews`, {
@@ -621,6 +623,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					},
 					body: JSON.stringify({
 						brewery_name: breweryData.name,
+						brewery_id: breweryData.id,
 						overall_rating: overallRating || 0,
 						review_text: reviewText || "",  // Default to empty string if not provided
 						is_favorite_brewery: isFavoriteBrewery || false,  // Default to false

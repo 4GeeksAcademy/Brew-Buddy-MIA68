@@ -65,7 +65,7 @@ export const ReviewForm = ({ brewery, onSaveReview }) => {
                     <input
                         type="checkbox"
                         checked={isFavoriteBrewery}
-                        onChange={(e) => setIsFavoriteBrewery(e.target.checked)} 
+                        onChange={(e) => setIsFavoriteBrewery(e.target.checked)}
                     />
                     Mark as Favorite Brewery
                 </label>
