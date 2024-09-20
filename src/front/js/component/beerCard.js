@@ -8,7 +8,7 @@ export const BeerCard = (props) => {
     const { store, actions } = useContext(Context);
 
     return (
-        <div className="card col-sm-6 col-md-4 my-2">
+        <div className="card col-12 my-2">
             <div className="card-body">
                 <div className="d-flex">
                     <h2 className="card-title mx-auto">
