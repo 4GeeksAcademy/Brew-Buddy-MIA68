@@ -1,15 +1,21 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { Context } from '../store/appContext';
 
 export const ReviewForm = ({ brewery, onSaveReview }) => {
-    const {actions} = useContext(Context);
     const [overallRating, setOverallRating] = useState(0);
     const [reviewText, setReviewText] = useState("");
     const [isFavoriteBrewery, setIsFavoriteBrewery] = useState(false);
     const [beerReviews, setBeerReviews] = useState([]);
+    const { store, actions } = useContext(Context);
+
+    useEffect(() => {
+        console.log("Brewery Coming in From Brewery Route", brewery)
+
+    })
+
 
     const addBeerReview = () => {
-        setBeerReviews([...beerReviews, { beerName: "", rating: 0, notes: "", isFavorite: false }]);
+        setBeerReviews([...beerReviews, { beer_name: "", rating: 0, notes: "", isFavorite: false }]);
     };
 
     const updateBeerReview = (index, field, value) => {
@@ -18,13 +24,29 @@ export const ReviewForm = ({ brewery, onSaveReview }) => {
         setBeerReviews(updatedReviews);
     };
 
-    const handleFavBrewery= () => {
-        actions.addFavoriteBrewery(brewery);  
-      }
-
     const handleSubmit = (e) => {
         e.preventDefault();
+        if (isFavoriteBrewery) {
+            const checkedFavBreweryData = {
+                name: brewery.name,
+                id: brewery.id,
+                latitude: brewery.latitude,
+                longitude: brewery.longitude,
+                phone: brewery.phone,
+                brewery_type: brewery.brewery_type,
+                website_url: brewery.website_url,
+                address_1: brewery.address.street,
+                city: brewery.address.city,
+                state_province: brewery.address.state,
+                postal_code: brewery.address.postal_code,
+                country: brewery.address.country,
+
+            }
+            actions.addFavoriteBrewery(checkedFavBreweryData);
+        }
+
         onSaveReview(brewery, overallRating, reviewText, isFavoriteBrewery, beerReviews);
+        actions.addBreweryReviewToBackend(brewery, overallRating, reviewText, isFavoriteBrewery, beerReviews)
     };
 
     return (
@@ -40,18 +62,10 @@ export const ReviewForm = ({ brewery, onSaveReview }) => {
             </div>
             <div>
                 <label>
-                    <input 
-                        type="checkbox" 
-                        checked={isFavoriteBrewery} 
-                        // onChange={(e) => setIsFavoriteBrewery(e.target.checked)} 
-                        onChange={(e) => {
-                            setIsFavoriteBrewery(e.target.checked);
-                            if (e.target.checked) {
-                                handleFavBrewery();
-                                
-                            }
-                        } } 
-
+                    <input
+                        type="checkbox"
+                        checked={isFavoriteBrewery}
+                        onChange={(e) => setIsFavoriteBrewery(e.target.checked)} 
                     />
                     Mark as Favorite Brewery
                 </label>

@@ -33,7 +33,6 @@ class User(db.Model):
             return None
         return image[0]
 
-
     @property
     def points(self):
         total = 0
@@ -307,7 +306,8 @@ class BeerReview(db.Model):
     # EJQ-next column to add when ready to implement photo upload function for beer reviews
     #images = db.relationship('UserImage', secondary='beer_review_images', backref='beer_reviews')
 
-    def __init__(self, beer_name, rating, notes="", is_favorite=False):
+    def __init__(self, brewery_review_id, beer_name, rating, notes="", is_favorite=False):
+        self.brewery_review_id = brewery_review_id
         self.beer_name = beer_name
         self.rating = rating
         self.notes = notes
