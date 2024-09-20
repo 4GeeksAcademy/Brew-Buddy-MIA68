@@ -66,12 +66,10 @@ export const Navbar = () => {
 
 					</Link>
 				</li>
-				<li className="nav-item">
-					<a className="nav-link" href="#">Brews Near Me</a>
-				</li>
+				
 				<li className="nav-item">
 					<Link to="/routes" className="nav-link">
-						Current Route
+						BYO Brewery Routes
 					</Link>
 				</li>
 			</ul>
