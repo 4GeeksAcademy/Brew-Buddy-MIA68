@@ -7,7 +7,7 @@ import { Cloudinary } from '@cloudinary/url-gen';
 import HomeLogo2 from "../../img/HomeLogo2.png"
 
 export const Navbar = () => {
-	const { store, actions } = useContext(Context);
+    const { store, actions } = useContext(Context);
     const navigate = useNavigate();
 
     const cld = new Cloudinary({ cloud: { cloudName: 'dprmqr54a' } });
@@ -53,26 +53,27 @@ export const Navbar = () => {
                 </div>
             </div>
 
-			<ul className="nav nav-tabs mt-2 ps-3">
-				<li className="nav-item">
-					<Link style={{ textDecoration: "none" }} to="/">
-						<button className="nav-link">Home</button>
-
-					</Link>
-				</li>
-				<li className="nav-item">
-					<Link style={{ textDecoration: "none" }} to="/favorites">
-						<button className="nav-link">Favorites</button>
-
-					</Link>
-				</li>
-				
-				<li className="nav-item">
-					<Link to="/routes" className="nav-link">
-						BYO Brewery Routes
-					</Link>
-				</li>
-			</ul>
-		</nav >
-	);
+            <ul className="nav nav-tabs mt-2 ps-3">
+                <li className="nav-item">
+                    <Link style={{ textDecoration: "none" }} to="/">
+                        <button className="nav-link">Home</button>
+                    </Link>
+                </li>
+                {store.token && (
+                    <>
+                        <li className="nav-item">
+                            <Link style={{ textDecoration: "none" }} to="/favorites">
+                                <button className="nav-link">Favorites</button>
+                            </Link>
+                        </li>
+                        <li className="nav-item">
+                            <Link to="/routes" className="nav-link">
+                                BYO Brewery Routes
+                            </Link>
+                        </li>
+                    </>
+                )}
+            </ul>
+        </nav>
+    );
 };
