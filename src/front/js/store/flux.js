@@ -651,7 +651,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 						review_text: reviewText || "",  // Default to empty string if not provided
 						is_favorite_brewery: isFavoriteBrewery || false,  // Default to false
 						beer_reviews: beerReviews.map(beer => ({
-							beer_name: beer.beer_name || "",                //ERROR HERE i added the default to empty string and i can add them without name
+							beer_name: beer.beer_name || "",
 							rating: beer.rating || "",
 							notes: beer.notes || "",  // Default to empty string if not provided
 							is_favorite: beer.is_favorite || false  // Default to false

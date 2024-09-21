@@ -63,7 +63,7 @@ export const BreweryCard = (props) => {
     return (
         <div className="card">
             <div className="card-body">
-                <h4 className="card-title">
+                <h1 className="card-title">
                     <a href={props.breweryData.brewery_type}>
                         <img
                             src={breweryTypeIcons[breweryType]}
@@ -81,9 +81,8 @@ export const BreweryCard = (props) => {
                             style={{ width: '30px', height: '30px', marginLeft: '8px' }}
                         />
                     </a>
-                </h4>
+                </h1>
                 <h5>{props.breweryData.city}, {props.breweryData.state}</h5>
-                <p className="card-text">With supporting text below as a natural lead-in to additional content.</p>
                 <button className="btn btn-primary" onClick={handleAddBreweryToRoute}>Add to my current route</button>
                 {/* J.R.: A favorites button for brewery */}
                 <a className="btn btn-info"><i className={currentFavorite == true ? "fa-solid fa-star" : "fa-regular fa-star"} onClick={(e) => handleFavBrewery(e)}></i></a>                {/* J.R.: A button for contact information of brewery */}

@@ -45,6 +45,7 @@ export const ReviewForm = ({ brewery, onSaveReview }) => {
 
         onSaveReview(brewery, overallRating, reviewText, isFavoriteBrewery, beerReviews);
         actions.addBreweryReviewToBackend(brewery, overallRating, reviewText, isFavoriteBrewery, beerReviews)
+        alert("Review added succesfully!")
     };
 
     return (
@@ -72,7 +73,7 @@ export const ReviewForm = ({ brewery, onSaveReview }) => {
             {beerReviews.map((beerReview, index) => (
                 <div key={index}>
                     <label>Beer Name:</label>
-                    <input type="text" value={beerReview.beerName} onChange={(e) => updateBeerReview(index, 'beerName', e.target.value)} />
+                    <input type="text" value={beerReview.beer_name} onChange={(e) => updateBeerReview(index, 'beer_name', e.target.value)} />
                     <label>Rating:</label>
                     <input type="number" value={beerReview.rating} onChange={(e) => updateBeerReview(index, 'rating', e.target.value)} />
                     <label>Notes:</label>
