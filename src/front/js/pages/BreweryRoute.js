@@ -57,34 +57,8 @@ export const BreweryRoutes = () => {
         actions.addBreweryReview(brewery, overallRating, reviewText, isFavoriteBrewery, beerReviews);
         setSelectedBrewery(null); //hide the form after saving the review
     }
-    // const breweryRoute = store.routes.map((brewery, index) => (
-    //     <BreweryCard key={index} breweryData={brewery} />
-    // ))
-    // const breweryRoute = store.routes.map((route, index) => (
-    //     <BreweryCard key={index} breweryData={route.breweryDestination} />
-    // ));
-
-
-    // const journeystest = store.journey.map((journey, journeyIndex) => (
-    //     <div key={journeyIndex}>
-    //         <h2>Current Journey</h2>
-    //         {journey.routes.map((route, routeIndex) => (
-    //             <BreweryRouteCard key={routeIndex} breweryData={route.breweryDestination} />
-    //         ))}
-
-    //     </div>
-    // ));
-
-    // const eachBrewery = store.breweryData.map((breweryData, index) => (
-    // 	<BreweryRouteCard key={index} breweryData={breweryData} />
-    // ));
     return (
         <div className="text-center mt-5">
-            <button onClick={actions.getBreweryReviewsFromBackend}>getReviews</button>
-            <h1>Hello Brew Buddy!!</h1>
-            <div>
-                <img src={brewbuddyimg} className="home-logo-img" alt="Brew Buddy" />
-            </div>
             {/* Flex container for journeys and map */}
             <div className="journey-map-container">
                 <div className="journeys-section">
@@ -113,9 +87,6 @@ export const BreweryRoutes = () => {
                     ) : null}
                 </div>
             </div>
-
-            <button onClick={actions.fetchBreweryInfo}>Fetch Brewery Info</button>
-
             {selectedBrewery && (
                 <ReviewForm
                     brewery={selectedBrewery}
