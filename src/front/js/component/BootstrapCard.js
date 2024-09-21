@@ -8,6 +8,7 @@ import nanoIcon from '../../img/nano1.png';
 import regionalIcon from '../../img/regional1.png';
 import largeIcon from '../../img/large1.png';
 import brewpubIcon from '../../img/brewpub1.png';
+import '../../styles/JourneyCard.css'
 
 
 const breweryTypeIcons = {
@@ -103,21 +104,22 @@ export const BreweryCard = (props) => {
 }
 
 export const JourneyCard = ({ breweryData, onReview, onRefocus }) => {
-    const { store, actions } = useContext(Context);
+    const { store } = useContext(Context);
+
     return (
-        <div className="card mb-3 shadow-sm">
-            <div className="card-header bg-primary text-white">
-                <h5 className="mb-0">{breweryData.name}</h5>
+        <div className="journey-card fun-card">
+            <div className="journey-card-header">
+                <h5 className="brewery-name">{breweryData.name}</h5>
             </div>
-            <div className="card-body">
-                <p className="card-text">Travel Time: {store.journey.routes[0].travelTime} Minutes</p>
-                <p className="card-text">Distance: {store.journey.routes[0].miles} Miles</p>
-                <div className="d-flex justify-content-between">
-                    <button className="btn btn-outline-primary" onClick={() => onReview(breweryData)}>
-                        Add Review
+            <div className="journey-card-body">
+                <p className="info-text">🚗 Travel Time: {store.journey.routes[0].travelTime} Minutes</p>
+                <p className="info-text">📍 Distance: {store.journey.routes[0].miles} Miles</p>
+                <div className="card-actions">
+                    <button className="review-button" onClick={() => onReview(breweryData)}>
+                        ⭐ Add Review
                     </button>
-                    <button className="btn btn-outline-secondary" onClick={() => onRefocus(breweryData.latitude, breweryData.longitude)}>
-                        Navigate
+                    <button className="navigate-button" onClick={() => onRefocus(breweryData.latitude, breweryData.longitude)}>
+                        🎯 Navigate
                     </button>
                 </div>
             </div>

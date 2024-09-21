@@ -17,6 +17,7 @@ export const Home = () => {
 	useEffect(() => {
 		actions.getBreweryReviewsFromBackend()
 	}, []); // Empty array ensures it runs only once
+
 	const eachBrewery = store.breweryData.map((breweryData, index) => (
 		<div className="col-12 col-md-6 col-lg-4 mb-4" key={index}>
 			<BreweryCard breweryData={breweryData} />
