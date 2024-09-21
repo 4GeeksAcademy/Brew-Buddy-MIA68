@@ -18,13 +18,12 @@ class BreweryInfo {
 		this.website_url = resultFromServer.website_url;
 		this.state = resultFromServer.state;
 		this.street = resultFromServer.street;
-		this.reviews = [];
 	}
 
-	addReviews(reviewsArray) {
-		this.reviews = reviewsArray
-		console.log("setting reviews to " + reviewsArray.length)
-	}
+	// addReviews(reviewsArray) {
+	// 	this.reviews = reviewsArray
+	// 	console.log("setting reviews to " + reviewsArray.length) DONT NEED ANYMORE I DONT THINK
+	// }
 }
 class Address {
 	constructor(breweryInfo) {
@@ -123,7 +122,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			breweryData: [],
 			beerData: [],
 			journey: new Journey(),
-			reviews: [],
+			reviewsObject: {},
 			city: "",
 			state: "",
 			type: "",
@@ -262,10 +261,10 @@ const getState = ({ getStore, getActions, setStore }) => {
 					const breweryInfos = data.map(brewery => new BreweryInfo(brewery));
 					const storeReviews = getStore().reviews;
 
-					breweryInfos.forEach(brewery => {
-						const breweryReviews = storeReviews.filter(review => review.brewery_id === brewery.id);
-						brewery.addReviews(breweryReviews);
-					});
+					// breweryInfos.forEach(brewery => {
+					// 	const breweryReviews = storeReviews.filter(review => review.brewery_id === brewery.id); OLD CODE FOR ADDING REVIEWS INTO ARRAY THAT IS NO MORE
+					// 	brewery.addReviews(breweryReviews);
+					// });
 					// .Create routes based on the brewery information (for example purposes, using dummy travel times and distances)
 					const routes = breweryInfos.map(info => new Route(new BreweryDestination(info), Math.floor(Math.random() * 60), Math.floor(Math.random() * 20)));
 					const journey = getStore().journey;
@@ -575,6 +574,22 @@ const getState = ({ getStore, getActions, setStore }) => {
 				let data = await response.json()
 				setStore({ favoritePeople: data })
 			},
+			getReviewsOnFrontEnd: async (breweryID) => {
+				const store = getStore();
+
+				// Ensure reviews are loaded in the store
+				if (!store.reviewsObject || !store.reviewsObject[breweryID]) {
+					console.log(`No reviews found for brewery with ID: ${breweryID}`);
+					return;
+				}
+				// Get reviews for the specific breweryID
+				const breweryReviews = store.reviewsObject[breweryID];
+
+				breweryReviews.forEach(review => {
+					console.log(`Review for Brewery ${breweryID}:`, review);
+				});
+			},
+
 			addBreweryReview: async (brewery, overallRating, reviewText, isFavoriteBrewery, beerReviews) => {
 				const store = getStore();
 				const currentJourney = store.journey;
@@ -587,6 +602,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				currentJourney.addBreweryReview(breweryReview);
 				setStore({ journey: currentJourney });
 			},
+
 			getBreweryReviewsFromBackend: async () => {
 				const store = getStore();
 				try {
@@ -596,14 +612,21 @@ const getState = ({ getStore, getActions, setStore }) => {
 							'Content-Type': 'application/json'
 						}
 					});
-
 					if (response.ok) {
 						const data = await response.json();
+						const dataObject = {};
+						for (const review of data) {
+							if (review.brewery_id in dataObject) {
+								dataObject[review.brewery_id].push(review)
+							}
+							else {
+								dataObject[review.brewery_id] = [review]
+							}
+						}
 						console.log("Reviews retrieved successfully:", data);
 						setStore({
-							reviews: data,
+							reviewsObject: dataObject,
 						});
-						console.log(store.reviews)
 					} else {
 						const errorData = await response.json();
 						console.error("Failed to retrieve reviews", response.status, errorData);

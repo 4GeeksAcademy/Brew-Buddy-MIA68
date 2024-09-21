@@ -8,12 +8,10 @@ export const ReviewForm = ({ brewery, onSaveReview }) => {
     const [beerReviews, setBeerReviews] = useState([]);
     const { store, actions } = useContext(Context);
 
-    useEffect(() => {
-        console.log("Brewery Coming in From Brewery Route", brewery)
+    // useEffect(() => {
+    //     console.log("Brewery Coming in From Brewery Route", brewery)
 
-    })
-
-
+    // }) 
     const addBeerReview = () => {
         setBeerReviews([...beerReviews, { beer_name: "", rating: 0, notes: "", isFavorite: false }]);
     };

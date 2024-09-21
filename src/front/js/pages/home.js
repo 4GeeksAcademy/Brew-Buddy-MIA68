@@ -8,9 +8,13 @@ import Modal from "../component/searchModal";
 import { Link } from "react-router-dom";
 import HomeLogo1 from "../../img/HomeLogo1.png"
 
+
 export const Home = () => {
 	const { store, actions } = useContext(Context);
 
+	useEffect(() => {
+		actions.getBreweryReviewsFromBackend()
+	}, []); // Empty array ensures it runs only once
 	const eachBrewery = store.breweryData.map((breweryData, index) => (
 		<BreweryCard key={index} breweryData={breweryData} />
 	))
