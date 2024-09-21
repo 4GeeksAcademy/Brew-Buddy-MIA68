@@ -5,6 +5,7 @@ import BBLogo from "../../img/BB-Logo.jpg"
 import "../../styles/navbar.css"
 import { Cloudinary } from '@cloudinary/url-gen';
 import HomeLogo2 from "../../img/HomeLogo2.png"
+import finalLogo2 from "../../img/finalLogo2.png"
 
 export const Navbar = () => {
     const { store, actions } = useContext(Context);
@@ -27,7 +28,7 @@ export const Navbar = () => {
         <nav className="navbar navbar-light bg-light p-0">
             <div className="container-fluid px-3">
                 <div className="logoDiv d-flex align-items-center">
-                    <img id="BBLogo" src={BBLogo} alt="logo-img"></img>
+                    <img id="BBLogo" src={finalLogo2} alt="logo-img"></img>
                     <img src={HomeLogo2} className="home-logo" />
                 </div>
                 <div className="ml-auto navbarButtons d-flex align-items-center">
