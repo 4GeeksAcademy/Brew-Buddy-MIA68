@@ -10,9 +10,13 @@ import HomeLogo1 from "../../img/HomeLogo1.png"
 import HomeLogo2 from "../../img/HomeLogo2.png"
 import background1 from "../../img/DALL·E 2024-09-04.webp"
 
+
 export const Home = () => {
 	const { store, actions } = useContext(Context);
 
+	useEffect(() => {
+		actions.getBreweryReviewsFromBackend()
+	}, []); // Empty array ensures it runs only once
 	const eachBrewery = store.breweryData.map((breweryData, index) => (
 		<BreweryCard key={index} breweryData={breweryData} />
 	))
