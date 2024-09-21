@@ -1,5 +1,9 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { Context } from '../store/appContext';
+import { Link } from "react-router-dom";
+import { Cloudinary } from '@cloudinary/url-gen';
+import { AdvancedImage } from '@cloudinary/react';
+import { fill } from '@cloudinary/url-gen/actions/resize';
 
 export const ReviewForm = ({ brewery, onSaveReview }) => {
     const [overallRating, setOverallRating] = useState(0);
@@ -7,12 +11,14 @@ export const ReviewForm = ({ brewery, onSaveReview }) => {
     const [isFavoriteBrewery, setIsFavoriteBrewery] = useState(false);
     const [beerReviews, setBeerReviews] = useState([]);
     const { store, actions } = useContext(Context);
+    const [imageFile, setImageFile] = useState(null);
+
+    const cld = new Cloudinary({ cloud: { cloudName: 'dprmqr54a' } });
 
     useEffect(() => {
         console.log("Brewery Coming in From Brewery Route", brewery)
 
     })
-
 
     const addBeerReview = () => {
         setBeerReviews([...beerReviews, { beer_name: "", rating: 0, notes: "", isFavorite: false }]);
@@ -47,6 +53,10 @@ export const ReviewForm = ({ brewery, onSaveReview }) => {
 
         onSaveReview(brewery, overallRating, reviewText, isFavoriteBrewery, beerReviews);
         actions.addBreweryReviewToBackend(brewery, overallRating, reviewText, isFavoriteBrewery, beerReviews)
+    };
+
+    const handleImageChange = (event) => {
+        setImageFile(event.target.files[0]);
     };
 
     return (
