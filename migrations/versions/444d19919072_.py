@@ -1,8 +1,14 @@
 """empty message
 
-Revision ID: f4b3eeb86073
+<<<<<<<< HEAD:migrations/versions/9432e1fde488_.py
+Revision ID: 9432e1fde488
 Revises: 
-Create Date: 2024-09-14 01:11:22.456825
+Create Date: 2024-09-19 23:53:56.263133
+========
+Revision ID: 444d19919072
+Revises: 
+Create Date: 2024-09-20 00:10:14.025706
+>>>>>>>> develop:migrations/versions/444d19919072_.py
 
 """
 from alembic import op
@@ -10,7 +16,11 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'f4b3eeb86073'
+<<<<<<<< HEAD:migrations/versions/9432e1fde488_.py
+revision = '9432e1fde488'
+========
+revision = '444d19919072'
+>>>>>>>> develop:migrations/versions/444d19919072_.py
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -114,12 +124,10 @@ def upgrade():
     sa.Column('is_profile_image', sa.Boolean(), nullable=False),
     sa.Column('public_id', sa.String(length=500), nullable=False),
     sa.Column('image_url', sa.String(length=500), nullable=False),
-    sa.Column('owner_id', sa.Integer(), nullable=False),
+    sa.Column('owner_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['owner_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('image_url'),
-    sa.UniqueConstraint('owner_id', name='unique_img_title_user'),
-    sa.UniqueConstraint('public_id')
+    sa.UniqueConstraint('owner_id', 'is_profile_image', name='unique_profile_image_per_user')
     )
     op.create_table('journey_reviews',
     sa.Column('journey_id', sa.Integer(), nullable=False),

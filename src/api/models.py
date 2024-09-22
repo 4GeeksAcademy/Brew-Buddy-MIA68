@@ -34,7 +34,6 @@ class User(db.Model):
             return None
         return image[0]
 
-
     @property
     def points(self):
         total = 0
@@ -287,6 +286,7 @@ journey_reviews = db.Table('journey_reviews',
 
 class BreweryReview(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    brewery_id = db.Column(db.String(250))
     brewery_name = db.Column(db.String, nullable=False)
     overall_rating = db.Column(db.Float, nullable=False)
     review_text = db.Column(db.String(500), nullable=True)
@@ -302,8 +302,9 @@ class BreweryReview(db.Model):
         # self.images.append(image)
         # db.session.commit()
 
-    def __init__(self, brewery_name, overall_rating, review_text="", is_favorite_brewery=False):
+    def __init__(self, brewery_name, brewery_id, overall_rating, review_text="", is_favorite_brewery=False):
         self.brewery_name = brewery_name
+        self.brewery_id = brewery_id
         self.overall_rating = overall_rating
         self.review_text = review_text
         self.is_favorite_brewery = is_favorite_brewery
@@ -316,6 +317,7 @@ class BreweryReview(db.Model):
         return {
             "id": self.id,
             "brewery_name": self.brewery_name,
+            "brewery_id": self.brewery_id,
             "overall_rating": self.overall_rating,
             "review_text": self.review_text,
             "is_favorite_brewery": self.is_favorite_brewery,
@@ -340,7 +342,8 @@ class BeerReview(db.Model):
     # EJQ-next column to add when ready to implement photo upload function for beer reviews
     #images = db.relationship('UserImage', secondary='beer_review_images', backref='beer_reviews')
 
-    def __init__(self, beer_name, rating, notes="", is_favorite=False):
+    def __init__(self, brewery_review_id, beer_name, rating, notes="", is_favorite=False):
+        self.brewery_review_id = brewery_review_id
         self.beer_name = beer_name
         self.rating = rating
         self.notes = notes

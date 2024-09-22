@@ -104,13 +104,13 @@ const Modal = () => {
                         <option value="nano">Nano</option>
                     </select>
                 </div>
-                <div>
+                {/* <div>
                     <button className="close-button m-1" onClick={actions.toggleSearch}>
                         Cancel
                     </button>
 
 
-                </div>
+                </div> */}
             </div>
         </div>
     );

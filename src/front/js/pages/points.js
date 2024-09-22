@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Context } from "../store/appContext";
+import { Reward } from "../store/flux";
 
 export const Points = () => {
     const [selectedSize, setSelectedSize] = useState("Size");
@@ -8,6 +9,7 @@ export const Points = () => {
     const [showAlert, setShowAlert] = useState(false);
     const [alertMessage, setAlertMessage] = useState("");
     const [currentReward, setCurrentReward] = useState([]);
+    const [userRewards, setUserRewards] = useState([{}]);
 
     useEffect(() => {
         actions.fetchUserInfo();
@@ -63,6 +65,9 @@ export const Points = () => {
         }
     };
 
+    
+    
+
 
     const handleSizeSelect = (size) => {
         setSelectedSize(size);
@@ -91,9 +96,9 @@ export const Points = () => {
                     <button 
                         style={{ backgroundColor: 'green', color: 'white', padding: '10px', border: 'none', borderRadius: '5px' }}
                         onClick={() => handleSubmit(
-                            'A Coupon',
+                            'Coupon',
                             5,
-                            'coupon',
+                            'Coupon',
                             5,
                         )}
                     >
@@ -107,9 +112,9 @@ export const Points = () => {
                     <button 
                         style={{ backgroundColor: 'green', color: 'white', padding: '10px', border: 'none', borderRadius: '5px' }}
                         onClick={() => redeemReward(
-                            'A Coupon',
+                            'Coupon',
                             10,
-                            'coupon',
+                            'Coupon',
                             10,
                         )}
                     >
@@ -134,9 +139,9 @@ export const Points = () => {
                     <button 
                         style={{ backgroundColor: 'green', color: 'white', padding: '10px', border: 'none', borderRadius: '5px', marginTop: '10px' }}
                         onClick={() => redeemReward(
-                            'A shirt',
+                            'T-SHIRT',
                             25,
-                            'clothing',
+                            'Clothing Item',
                             25,
                         )}
                     >

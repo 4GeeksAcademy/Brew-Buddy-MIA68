@@ -2,19 +2,18 @@ import React, { useState, useContext, useEffect } from 'react';
 import { Context } from '../store/appContext';
 
 export const ReviewForm = ({ brewery, onSaveReview }) => {
-    const {actions} = useContext(Context);
     const [overallRating, setOverallRating] = useState(0);
     const [reviewText, setReviewText] = useState("");
     const [isFavoriteBrewery, setIsFavoriteBrewery] = useState(false);
     const [beerReviews, setBeerReviews] = useState([]);
+    const { store, actions } = useContext(Context);
 
-useEffect(() => {
-    console.log("Brewery Coming in From Brewery Route", brewery)
-    
-})
+    // useEffect(() => {
+    //     console.log("Brewery Coming in From Brewery Route", brewery)
 
+    // }) 
     const addBeerReview = () => {
-        setBeerReviews([...beerReviews, { beerName: "", rating: 0, notes: "", isFavorite: false }]);
+        setBeerReviews([...beerReviews, { beer_name: "", rating: 0, notes: "", isFavorite: false }]);
     };
 
     const updateBeerReview = (index, field, value) => {
@@ -22,8 +21,6 @@ useEffect(() => {
         updatedReviews[index][field] = value;
         setBeerReviews(updatedReviews);
     };
-
-    
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -43,10 +40,12 @@ useEffect(() => {
                 country: brewery.address.country,
 
             }
-            actions.addFavoriteBrewery(checkedFavBreweryData);  
+            actions.addFavoriteBrewery(checkedFavBreweryData);
         }
 
         onSaveReview(brewery, overallRating, reviewText, isFavoriteBrewery, beerReviews);
+        actions.addBreweryReviewToBackend(brewery, overallRating, reviewText, isFavoriteBrewery, beerReviews)
+        alert("Review added succesfully!")
     };
 
     return (
@@ -62,10 +61,10 @@ useEffect(() => {
             </div>
             <div>
                 <label>
-                    <input 
-                        type="checkbox" 
-                        checked={isFavoriteBrewery} 
-                        onChange={(e) => setIsFavoriteBrewery(e.target.checked)} 
+                    <input
+                        type="checkbox"
+                        checked={isFavoriteBrewery}
+                        onChange={(e) => setIsFavoriteBrewery(e.target.checked)}
                     />
                     Mark as Favorite Brewery
                 </label>
@@ -74,7 +73,7 @@ useEffect(() => {
             {beerReviews.map((beerReview, index) => (
                 <div key={index}>
                     <label>Beer Name:</label>
-                    <input type="text" value={beerReview.beerName} onChange={(e) => updateBeerReview(index, 'beerName', e.target.value)} />
+                    <input type="text" value={beerReview.beer_name} onChange={(e) => updateBeerReview(index, 'beer_name', e.target.value)} />
                     <label>Rating:</label>
                     <input type="number" value={beerReview.rating} onChange={(e) => updateBeerReview(index, 'rating', e.target.value)} />
                     <label>Notes:</label>

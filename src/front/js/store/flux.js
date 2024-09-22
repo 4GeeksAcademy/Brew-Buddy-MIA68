@@ -10,15 +10,20 @@ class BreweryInfo {
 		this.address_3 = resultFromServer.address_3;
 		this.city = resultFromServer.city;
 		this.state_province = resultFromServer.state_province;
-		this.postal_code = resultFromServer.postal_code
+		this.postal_code = resultFromServer.postal_code;
 		this.country = resultFromServer.country;
 		this.longitude = parseFloat(resultFromServer.longitude);
 		this.latitude = parseFloat(resultFromServer.latitude);
-		this.phone = resultFromServer.phone
-		this.website_url = resultFromServer.website_url
+		this.phone = resultFromServer.phone;
+		this.website_url = resultFromServer.website_url;
 		this.state = resultFromServer.state;
-		this.street = resultFromServer.street
+		this.street = resultFromServer.street;
 	}
+
+	// addReviews(reviewsArray) {
+	// 	this.reviews = reviewsArray
+	// 	console.log("setting reviews to " + reviewsArray.length) DONT NEED ANYMORE I DONT THINK
+	// }
 }
 class Address {
 	constructor(breweryInfo) {
@@ -103,11 +108,24 @@ class BreweryReview {
 		this.visitDate = new Date();
 	}
 
+
 	// Method to add a beer review
 	addBeerReview(beerReview) {
 		this.beerReviews.push(beerReview);
 	}
 }
+
+export class Reward {
+	constructor(rewardData) {
+		this.reward_name = rewardData.reward_name;
+		this.reward_type = rewardData.reward_type;
+		this.reward_value = rewardData.reward_value;
+		this.point_cost = rewardData.point_cost;
+	
+	}
+}
+
+
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
@@ -117,6 +135,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			breweryData: [],
 			beerData: [],
 			journey: new Journey(),
+			reviewsObject: {},
 			city: "",
 			state: "",
 			type: "",
@@ -125,7 +144,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 			favoriteBreweries: [],
 			favoriteBeers: [],
 			allBeers: [],
-			favoritePeople: []
+			favoritePeople: [],
+			userRewards: [],
 
 		},
 		actions: {
@@ -186,28 +206,28 @@ const getState = ({ getStore, getActions, setStore }) => {
 			fetchUserInfo: async () => {
 				const store = getStore();
 				try {
-				  const response = await fetch(`${process.env.BACKEND_URL}/api/user`, {
-					headers: {
-					  "Content-Type": "application/json",
-					  Authorization: `Bearer ${store.token}`
-					}
-				  });
-				  if (response.ok) {
-					const data = await response.json();
-					setStore({
-					// EJQ - user: data,
-					  userEmail: data.email,
-					  userProfileImageId: data.profile_image ? data.profile_image.image_url : null,
-					  userProfilePublicId: data.profile_image ? data.profile_image.public_id : null,
-					  userPoints: data.points
+					const response = await fetch(`${process.env.BACKEND_URL}/api/user`, {
+						headers: {
+							"Content-Type": "application/json",
+							Authorization: `Bearer ${store.token}`
+						}
 					});
-				  } else {
-					console.error("Failed to fetch user info", response.status);
-				  }
+					if (response.ok) {
+						const data = await response.json();
+						setStore({
+							// EJQ - user: data,
+							userEmail: data.email,
+							userProfileImageId: data.profile_image ? data.profile_image.image_url : null,
+							userProfilePublicId: data.profile_image ? data.profile_image.public_id : null,
+							userPoints: data.points
+						});
+					} else {
+						console.error("Failed to fetch user info", response.status);
+					}
 				} catch (error) {
-				  console.error("Error fetching user info", error);
+					console.error("Error fetching user info", error);
 				}
-			  },
+			},
 
 			// EJQ-created function to add new profile pic to user's profile
 			updateUserProfileImage: (imageUrl) => {
@@ -253,6 +273,12 @@ const getState = ({ getStore, getActions, setStore }) => {
 					let data = await resp.json();
 					console.log(data);
 					const breweryInfos = data.map(brewery => new BreweryInfo(brewery));
+					const storeReviews = getStore().reviews;
+
+					// breweryInfos.forEach(brewery => {
+					// 	const breweryReviews = storeReviews.filter(review => review.brewery_id === brewery.id); OLD CODE FOR ADDING REVIEWS INTO ARRAY THAT IS NO MORE
+					// 	brewery.addReviews(breweryReviews);
+					// });
 					// .Create routes based on the brewery information (for example purposes, using dummy travel times and distances)
 					const routes = breweryInfos.map(info => new Route(new BreweryDestination(info), Math.floor(Math.random() * 60), Math.floor(Math.random() * 20)));
 					const journey = getStore().journey;
@@ -304,24 +330,31 @@ const getState = ({ getStore, getActions, setStore }) => {
 					const resp = await fetch(process.env.BACKEND_URL + "/api/favorite_breweries/" + brewery.id, {
 						method: "DELETE",
 						headers: {
-							"Content-Type": "application/json", 
+							"Content-Type": "application/json",
 							Authorization: "Bearer " + sessionStorage.getItem("token")
-						}
+
+						},
 					});
 					if (resp.ok) {
 						const data = await resp.json();
-						console.log("brewery added favorites: ", data);
+						console.log("brewery deleted from favorites: ", data);
 
 						const store = getStore();
+
 						setStore({
-							favoriteBreweries: [...store.favoriteBreweries, brewery]
+							favoriteBreweries: getStore().favoriteBreweries.filter((x) => {
+								return x != brewery;
+							})
 						});
+						console.log(getStore().favoriteBreweries)
+						alert("This brewery has been deleted from your Favorites");
+
 					} else {
 						const errorData = await resp.json();
 						console.error("failed to add", errorData);
 					}
 				} catch (error) {
-					console.error("error adding brewery", error);
+					console.error("error deleting brewery", error);
 				}
 			},
 			searchFunctionWithCity: async () => {
@@ -555,10 +588,25 @@ const getState = ({ getStore, getActions, setStore }) => {
 				let data = await response.json()
 				setStore({ favoritePeople: data })
 			},
+			getReviewsOnFrontEnd: async (breweryID) => {
+				const store = getStore();
+
+				// Ensure reviews are loaded in the store
+				if (!store.reviewsObject || !store.reviewsObject[breweryID]) {
+					console.log(`No reviews found for brewery with ID: ${breweryID}`);
+					return;
+				}
+				// Get reviews for the specific breweryID
+				const breweryReviews = store.reviewsObject[breweryID];
+
+				breweryReviews.forEach(review => {
+					console.log(`Review for Brewery ${breweryID}:`, review);
+				});
+			},
+
 			addBreweryReview: async (brewery, overallRating, reviewText, isFavoriteBrewery, beerReviews) => {
 				const store = getStore();
-				const journeys = store.journey;
-				const currentJourney = journeys[0]
+				const currentJourney = store.journey;
 
 				const breweryReview = new BreweryReview(brewery, overallRating, reviewText, isFavoriteBrewery)
 
@@ -566,7 +614,74 @@ const getState = ({ getStore, getActions, setStore }) => {
 					breweryReview.addBeerReview(new BeerReview(beerReview.beerName, beerReview.rating, beerReview.notes, beerReview.isFavorite));
 				});
 				currentJourney.addBreweryReview(breweryReview);
-				setStore({ journey: journeys });
+				setStore({ journey: currentJourney });
+			},
+
+			getBreweryReviewsFromBackend: async () => {
+				const store = getStore();
+				try {
+					const response = await fetch(`${process.env.BACKEND_URL}/api/get_brewery_reviews`, {
+						method: 'GET',
+						headers: {
+							'Content-Type': 'application/json'
+						}
+					});
+					if (response.ok) {
+						const data = await response.json();
+						const dataObject = {};
+						for (const review of data) {
+							if (review.brewery_id in dataObject) {
+								dataObject[review.brewery_id].push(review)
+							}
+							else {
+								dataObject[review.brewery_id] = [review]
+							}
+						}
+						console.log("Reviews retrieved successfully:", data);
+						setStore({
+							reviewsObject: dataObject,
+						});
+					} else {
+						const errorData = await response.json();
+						console.error("Failed to retrieve reviews", response.status, errorData);
+						return null;
+					}
+				} catch (error) {
+					console.error("Error fetching brewery reviews:", error);
+					return null;
+				}
+			},
+			addBreweryReviewToBackend: async (breweryData, overallRating, reviewText, isFavoriteBrewery, beerReviews = []) => {
+				console.log("breweryData:", breweryData);  // Log the data for debugging
+				const response = await fetch(process.env.BACKEND_URL + '/api/add_brewery_review', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({
+						brewery_name: breweryData.name,
+						brewery_id: breweryData.id,
+						overall_rating: overallRating || 0,
+						review_text: reviewText || "",  // Default to empty string if not provided
+						is_favorite_brewery: isFavoriteBrewery || false,  // Default to false
+						beer_reviews: beerReviews.map(beer => ({
+							beer_name: beer.beer_name || "",
+							rating: beer.rating || "",
+							notes: beer.notes || "",  // Default to empty string if not provided
+							is_favorite: beer.is_favorite || false  // Default to false
+						}))
+					})
+				});
+
+				if (response.ok) {
+					const data = await response.json();
+					console.log(data.message);  // "Review added successfully"
+					return data;
+				} else {
+					const errorData = await response.json();
+					console.error("Failed to add review", response.status, errorData);
+					return null;
+				}
 			},
 			getFavoriteBreweries: async () => {
 				const token = sessionStorage.getItem("token");
@@ -654,32 +769,30 @@ const getState = ({ getStore, getActions, setStore }) => {
                 }
             },
 
-            fetchUserInfo: async () => {
-                const store = getStore();
-                try {
-                  const response = await fetch(`${process.env.BACKEND_URL}/api/user`, {
-                    headers: {
-                      "Content-Type": "application/json",
-                      Authorization: `Bearer ${store.token}`
-                    }
-                  });
-                  if (response.ok) {
-                    const data = await response.json();
-                    setStore({
-                      userEmail: data.email,
-                      userProfileImageId: data.profile_image ? data.profile_image.image_url : null,
-                      userProfilePublicId: data.profile_image ? data.profile_image.public_id : null,
-                      userPoints: data.points // Ensure points are updated
-                    });
-                  } else {
-                    console.error("Failed to fetch user info", response.status);
-                  }
-                } catch (error) {
-                  console.error("Error fetching user info", error);
-                }
-            },
-
+			getRewardsFromBackend: async () => {
+				const store = getStore();
+				try {
+					const response = await fetch(`${process.env.BACKEND_URL}/api/get_user_rewards`, {
+						method: "GET",
+						headers: {
+							"Content-Type": "application/json",
+							Authorization: `Bearer ${store.token}`, // Ensure token is sent in headers
+						},
+					});
 			
+					if (response.ok) {
+						const data = await response.json();
+						const eachReward = data.rewards.map((rewardData) => 
+								 new Reward(rewardData)
+						)
+						store.userRewards = eachReward
+					} else {
+						console.error("Failed to fetch rewards:", response.statusText);
+					}
+				} catch (error) {
+					console.error("Error fetching user rewards:", error);
+				}
+			},
 
 		}
 	};
