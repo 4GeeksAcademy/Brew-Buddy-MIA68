@@ -63,7 +63,7 @@ export const BreweryCard = (props) => {
     return (
         <div className="card">
             <div className="card-body">
-                <h4 className="card-title">
+                <h1 className="card-title">
                     <a href={props.breweryData.brewery_type}>
                         <img
                             src={breweryTypeIcons[breweryType]}
@@ -81,9 +81,8 @@ export const BreweryCard = (props) => {
                             style={{ width: '30px', height: '30px', marginLeft: '8px' }}
                         />
                     </a>
-                </h4>
+                </h1>
                 <h5>{props.breweryData.city}, {props.breweryData.state}</h5>
-                <p className="card-text">With supporting text below as a natural lead-in to additional content.</p>
                 <button className="btn btn-primary" onClick={handleAddBreweryToRoute}>Add to my current route</button>
                 {/* J.R.: A favorites button for brewery */}
                 <a className="btn btn-info"><i className={currentFavorite == true ? "fa-solid fa-star" : "fa-regular fa-star"} onClick={(e) => handleFavBrewery(e)}></i></a>                {/* J.R.: A button for contact information of brewery */}
@@ -96,6 +95,7 @@ export const BreweryCard = (props) => {
                     <Link to={"/brewery/" + props.breweryData.id} className="btn btn-secondary">
                         See Brews
                     </Link>
+                    <Link to={"/brewery_reviews/" + props.breweryData.id} className="btn btn-secondary" onClick={(e) => actions.getReviewsOnFrontEnd(props.breweryData.id)}>Check Reviews</Link>
                 </p>
             </div>
         </div>
@@ -104,24 +104,56 @@ export const BreweryCard = (props) => {
 
 export const JourneyCard = ({ breweryData, onReview, onRefocus }) => {
     const { store, actions } = useContext(Context);
-    const navigate = useNavigate()
-    // const handleAddReview = () => {
-    //     onReview(breweryData)
-    // }
     return (
-        <div className="card">
-            <h5 className="card-header">{breweryData.name}</h5>
+        <div className="card mb-3 shadow-sm">
+            <div className="card-header bg-primary text-white">
+                <h5 className="mb-0">{breweryData.name}</h5>
+            </div>
             <div className="card-body">
-                <h5 className="card-title">Special title treatment</h5>
-                <p className="card-text">Travel Time: {store.journey.routes.travelTime} Minutes</p>
-                <p className="card-text">Distance: {store.journey.routes.miles} Miles</p>
-                <button className="btn btn-primary" onClick={() => onReview(breweryData)}>
-                    Add Review
-                </button>
-                <button className="btn btn-primary" onClick={() => onRefocus(breweryData.latitude, breweryData.longitude)}>
-                    Navigate
-                </button>
+                <p className="card-text">Travel Time: {store.journey.routes[0].travelTime} Minutes</p>
+                <p className="card-text">Distance: {store.journey.routes[0].miles} Miles</p>
+                <div className="d-flex justify-content-between">
+                    <button className="btn btn-outline-primary" onClick={() => onReview(breweryData)}>
+                        Add Review
+                    </button>
+                    <button className="btn btn-outline-secondary" onClick={() => onRefocus(breweryData.latitude, breweryData.longitude)}>
+                        Navigate
+                    </button>
+                </div>
             </div>
         </div>
-    )
-}
+    );
+};
+
+export const ReviewCard = (props) => {
+    const { review, reviewNumber } = props;
+    return (
+        <div className="card mb-3">
+            <h5 className="card-header">{review.brewery_name} - Review #{reviewNumber}</h5>
+            <div className="card-body">
+                <h5 className="card-title">Overall Rating: {review.overall_rating}</h5>
+                <p className="card-text">{review.review_text}</p>
+
+                {/* Favorite Brewery Indicator */}
+                {review.is_favorite_brewery && (
+                    <p className="text-success">🌟 This is a favorite brewery!</p>
+                )}
+
+                <h6>Beers Reviewed:</h6>
+                <ul className="list-group">
+                    {review.beer_reviews.map((beerReview, index) => (
+                        <li className="list-group-item" key={index}>
+                            <strong>Beer Name:</strong> {beerReview.beer_name} <br />
+                            <strong>Rating:</strong> {beerReview.rating}<br />
+                            <strong>Notes:</strong> {beerReview.notes} <br />
+                            {/* Favorite Beer Indicator */}
+                            {beerReview.is_favorite && (
+                                <span className="text-warning">⭐ Favorite Beer</span>
+                            )}
+                        </li>
+                    ))}
+                </ul>
+            </div>
+        </div>
+    );
+};
