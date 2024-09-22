@@ -114,6 +114,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 		store: {
 			token: sessionStorage.getItem("token") || "",
 			userEmail: sessionStorage.getItem("userEmail") || null,
+			// userData: null,
 			userProfileImageId: null,
 			breweryData: [],
 			beerData: [],
@@ -138,7 +139,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 						headers: {
 							"Content-type": "application/json"
 						},
-						body: JSON.stringify({ email, password })
+						body: JSON.stringify({email, password })
 					})
 					if (response.ok) {
 						const data = await response.json();
@@ -198,6 +199,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 						const data = await response.json();
 						setStore({
 							// EJQ - user: data,
+							// userData: data,
 							userEmail: data.email,
 							userProfileImageId: data.profile_image ? data.profile_image.image_url : null,
 							userProfilePublicId: data.profile_image ? data.profile_image.public_id : null,
@@ -539,7 +541,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 					if (response.ok) {
 						await getActions().getFavoriteBeers();
-						console.log("Favorite beer added successfully");
+						let json=await response.json()
+						alert(json.message);
 						return true;
 					} else {
 						console.error("Error adding favorite beer");

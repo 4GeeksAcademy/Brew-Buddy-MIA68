@@ -85,7 +85,7 @@ export const UserProfile = () => {
                 <>
                     <div className="row align-items-center mb-1">
                         <div className="col-9">
-                            <h1>Hello and welcome {userInfo.email}!</h1>
+                            <h1>Hello and welcome {store.userEmail.split('@')[0]}!</h1>
                             <p>You have {userInfo.points} points. Congratulations!</p>
                         </div>
                         <div className="col-2 d-flex flex-column align-items-center">
@@ -106,7 +106,6 @@ export const UserProfile = () => {
             <UserDetails pointHistory={pointHistory}/>
 
 
-            <div className="mt-5"><Link to="/forgot-password">Change My Password</Link></div> {/* stay here */}
         </div>
     );
 };

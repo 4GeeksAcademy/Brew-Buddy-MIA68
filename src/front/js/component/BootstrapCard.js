@@ -26,24 +26,29 @@ export const BreweryCard = (props) => {
     const [currentFavorite, setCurrentFavorite] = useState(false)
     const [favoriteBrewery, setFavoriteBrewery] = useState("")
 
+    const isLoggedIn = sessionStorage.getItem("token");
 
     useEffect(() => {
-        let getData = async () => {
-            await actions.getFavoriteBreweries()
-            for (let fav in store.favoriteBreweries) {
-                if (store.favoriteBreweries[fav].phone === props.breweryData.phone) {
-                    setFavoriteBrewery(store.favoriteBreweries[fav])
-                    setCurrentFavorite(true);
-                    break; // exit loop once a match is found
+        if (isLoggedIn) {
+            let getData = async () => {
+                await actions.getFavoriteBreweries()
+                for (let fav in store.favoriteBreweries) {
+                    if (store.favoriteBreweries[fav].phone === props.breweryData.phone) {
+                        setFavoriteBrewery(store.favoriteBreweries[fav])
+                        setCurrentFavorite(true);
+                        break; // exit loop once a match is found
+                    }
                 }
-            }
+            };
+            getData();
         }
-        getData()
+
     }, [])
 
     const handleFavBrewery = (e) => {
         e.preventDefault();
-        console.log(currentFavorite)
+        if (isLoggedIn) {
+         console.log(currentFavorite)
         if (currentFavorite == true) {
             // remove
             actions.deleteFavoriteBrewery(favoriteBrewery);
@@ -53,7 +58,11 @@ export const BreweryCard = (props) => {
             actions.addFavoriteBrewery(props.breweryData);
             alert("This Brewery has been added to your Favorites");
             setCurrentFavorite(true)
+        }   
+        } else {
+            alert("Please login to add or remove favorites")
         }
+        
     };
     const handleAddBreweryToRoute = () => {
         console.log(props.breweryData)

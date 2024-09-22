@@ -33,7 +33,8 @@ export const Navbar = () => {
                 <div className="ml-auto navbarButtons d-flex align-items-center">
                     {store.token ? (
                         <>
-                            <span className="me-3">Hello {store.userEmail}!</span>
+                            <span className="me-3">Hello {store.userEmail.split('@')[0]
+                        }!</span>
                             {store.userProfileImageId && (
                                 <img
                                     src={store.userProfileImageId}

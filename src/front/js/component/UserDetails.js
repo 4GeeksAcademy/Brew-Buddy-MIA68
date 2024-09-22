@@ -1,17 +1,20 @@
-import React from 'react'
-
+import React, { useContext } from 'react'
+import { Context } from "../store/appContext";
+import { Link } from 'react-router-dom';
 export default function UserDetails(props) {
+    
+    const { store, actions } = useContext(Context);
     return (
         <div>
             <ul class="nav nav-pills nav-fill">
                 <li class="nav-item">
-                    <a class="nav-link active" role="tab" aria-current="page" aria-controls="info" data-bs-toggle="tab" href="#info">Profile Information</a>
+                    <a class="nav-link active mb-3" role="tab" aria-current="page" aria-controls="info" data-bs-toggle="tab" href="#info">Profile Information</a>
                 </li>
                 <li class="nav-item" role="presentation" >
                     <a class="nav-link" role="tab" href="#rewards" aria-controls="rewards" data-bs-toggle="tab">Rewards</a>
                 </li>
                 <li class="nav-item" role="presentation" >
-                    <a class="nav-link" role="tab" href="#rewards" aria-controls="rewards" data-bs-toggle="tab">Friends</a>
+                    <a class="nav-link" role="tab" href="#friends" aria-controls="friends" data-bs-toggle="tab">Friends</a>
                 </li>
                 <li class="nav-item" role="presentation" >
                     <a class="nav-link" role="tab" href="#privacy" aria-controls="rewards" data-bs-toggle="tab">Privacy</a>
@@ -22,7 +25,10 @@ export default function UserDetails(props) {
             </ul>
 
             <div class="tab-content">
-                <div role="tabpanel" aria-labelledby="info" tabindex="0" class="tab-pane fade show active" id="info">info</div>
+                <div role="tabpanel" aria-labelledby="info" tabindex="0" class="tab-pane fade show active" id="info">
+                    {/* <p>Name: {store.userData&&store.userData.name} </p> */}
+                    <p>Email: {store.userEmail} </p>
+                </div>
                 <div role="tabpanel" aria-labelledby="rewards" tabindex="0" class="tab-pane fade" id="rewards">
                     <div className="mt-1"> 
                         <h2>Point History</h2>
@@ -46,9 +52,11 @@ export default function UserDetails(props) {
                         </table>
                     </div>
                 </div>
-                <div role="tabpanel" aria-labelledby="friends" tabindex="0" class="tab-pane fade" id="friends">friends</div>
+                <div role="tabpanel" aria-labelledby="friends" tabindex="0" class="tab-pane fade" id="friends">John Doe</div>
                 <div role="tabpanel" aria-labelledby="privacy" tabindex="0" class="tab-pane fade" id="privacy">privacy</div>
-                <div role="tabpanel" aria-labelledby="settings" tabindex="0" class="tab-pane fade" id="settings">settings</div>
+                <div role="tabpanel" aria-labelledby="settings" tabindex="0" class="tab-pane fade" id="settings">
+                <div className="mt-5 "><Link className='btn btn-secondary' to="/forgot-password">Change My Password</Link></div> {/* stay here */}
+                </div>
             </div>
         </div>
     )

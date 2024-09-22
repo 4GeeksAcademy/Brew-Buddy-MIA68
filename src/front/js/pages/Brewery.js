@@ -24,6 +24,7 @@ export const Brewery = () => {
         const brewery = dynamicId
         if (name != "" && flavor != "" && type != "" && ABV != "") {
             actions.addNewBeer(name, flavor, type, ABV, brewery)
+            
         } else { console.log("missing information") }
     }
 

@@ -3,17 +3,18 @@ import PropTypes from "prop-types";
 import { useNavigate } from "react-router-dom";
 import { Context } from "../store/appContext";
 import { Link } from "react-router-dom";
+import { solid } from "@cloudinary/url-gen/actions/border";
 
 export const BeerCard = (props) => {
     console.log(props)
     const { store, actions } = useContext(Context);
-
+console.log(store.favoriteBeers)
     return (
         <div className="card col-sm-6 col-md-4 my-2">
             <div className="card-body">
                 <div className="d-flex">
                     <h2 className="card-title mx-auto">
-                        <button onClick={(e) => actions.addFavoriteBeer(props.beerData.id)}>TEST</button>
+                        <button className={`btn btn-outline-dark me-2 fa-${store.favoriteBeers.find(beer=>beer.beer_name==props.beerData.beer_name)?"solid":"regular"} fa-star`} onClick={(e) => actions.addFavoriteBeer(props.beerData.id)}></button>
                         {/* J.R.: A specific image for brewery types */}
                         {props.beerData.beer_name}
                     </h2>
