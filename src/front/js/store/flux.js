@@ -614,7 +614,73 @@ const getState = ({ getStore, getActions, setStore }) => {
 				catch (error) {
 					console.error("Error adding new beer", error)
 				}
-			}
+			},
+
+			// Add the redeemReward action here:
+            redeemReward: async (rewardName) => {
+                const store = getStore();
+                const token = store.token; // Fetch the token from the store
+
+                try {
+                    const response = await fetch(`${process.env.BACKEND_URL}/points`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `Bearer ${token}` // Include token in headers
+                        },
+                        body: JSON.stringify({
+                            owner_id: store.userEmail, // Assuming userEmail is being used as an identifier
+                            reward_name: rewardName
+                        })
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        console.log(`Reward redeemed: ${result.message}`);
+
+                        // Fetch updated points after successful redemption
+                        getActions().fetchUserInfo();
+
+                        return { success: true, message: result.message };
+                    } else {
+                        const errorResult = await response.json();
+                        console.error("Error redeeming reward:", errorResult);
+
+                        return { success: false, error: errorResult.error };
+                    }
+                } catch (error) {
+                    console.error("Error redeeming reward:", error);
+                    return { success: false, error: error.message };
+                }
+            },
+
+            fetchUserInfo: async () => {
+                const store = getStore();
+                try {
+                  const response = await fetch(`${process.env.BACKEND_URL}/api/user`, {
+                    headers: {
+                      "Content-Type": "application/json",
+                      Authorization: `Bearer ${store.token}`
+                    }
+                  });
+                  if (response.ok) {
+                    const data = await response.json();
+                    setStore({
+                      userEmail: data.email,
+                      userProfileImageId: data.profile_image ? data.profile_image.image_url : null,
+                      userProfilePublicId: data.profile_image ? data.profile_image.public_id : null,
+                      userPoints: data.points // Ensure points are updated
+                    });
+                  } else {
+                    console.error("Failed to fetch user info", response.status);
+                  }
+                } catch (error) {
+                  console.error("Error fetching user info", error);
+                }
+            },
+
+			
+
 		}
 	};
 };

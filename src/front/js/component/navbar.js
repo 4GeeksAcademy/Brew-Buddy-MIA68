@@ -73,6 +73,11 @@ export const Navbar = () => {
 						Current Route
 					</Link>
 				</li>
+                <li className="nav-item">
+					<Link to="/points" className="nav-link">
+						Redeem Points
+					</Link>
+				</li>
 			</ul>
 		</nav >
 	);
