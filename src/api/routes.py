@@ -607,6 +607,7 @@ def add_brewery_review():
     data = request.json
     brewery_review = BreweryReview(
         brewery_name=data.get('brewery_name'),
+        brewery_id=data.get('brewery_id'),
         overall_rating=data['overall_rating'],
         review_text=data.get('review_text', ""),
         is_favorite_brewery=data.get('is_favorite_brewery', False)
@@ -653,6 +654,7 @@ def get_brewery_reviews():
         
         result.append({
             'brewery_name': review.brewery_name,
+            'brewery_id': review.brewery_id,
             'overall_rating': review.overall_rating,
             'review_text': review.review_text,
             'is_favorite_brewery': review.is_favorite_brewery,
