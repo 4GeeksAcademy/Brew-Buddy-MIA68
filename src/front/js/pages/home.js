@@ -10,9 +10,9 @@ import HomeLogo1 from "../../img/HomeLogo1.png"
 import HomeLogo2 from "../../img/HomeLogo2.png"
 import background1 from "../../img/DALL·E 2024-09-04.webp"
 
-
 export const Home = () => {
 	const { store, actions } = useContext(Context);
+	const [showAgeVerification, setShowAgeVerification] = useState(true);
 
 	useEffect(() => {
 		actions.getBreweryReviewsFromBackend()
@@ -23,6 +23,16 @@ export const Home = () => {
 			<BreweryCard breweryData={breweryData} />
 		</div>
 	));
+
+	const handleAgeVerification = (isOver21) => {
+		if (isOver21) {
+			setShowAgeVerification(false);
+		} else {
+			// Redirect to Google if user is not 21 or older
+			window.location.href = "https://www.google.com/";
+		}
+	};
+
 	// useEffect(() => {
 	// 	actions.fetchBreweryInfoTEST().then(journey => {
 	// 		console.log("Active Route:", journey.getActiveRoute());
@@ -55,11 +65,50 @@ export const Home = () => {
 					<button onClick={actions.fetchBreweryInfoTEST}>Fetch Brewery Info</button>
 				</div>
 			</div>
-			{/* <footer className="footer mt-auto py-3">
-				<div className="container text-center">
-					<span classnName="text-muted">&copy; Brew Buddy 2024</span>
+			{showAgeVerification && (
+				<div
+					style={{
+						position: "fixed",
+						top: 0,
+						left: 0,
+						width: "100%",
+						height: "100%",
+						backgroundColor: "rgba(0, 0, 0, 0.5)",
+						display: "flex",
+						justifyContent: "center",
+						alignItems: "center",
+						zIndex: 1000,
+					}}
+				>
+					<div
+						style={{
+							backgroundColor: "white",
+							padding: "20px",
+							borderRadius: "10px",
+							width: "50%",
+							maxWidth: "400px",
+							textAlign: "center",
+						}}
+					>
+						<h2>Age Verification</h2>
+						<p>Are you 21 or older?</p>
+						<div>
+							<button
+								onClick={() => handleAgeVerification(true)}
+								style={{ margin: "10px", padding: "10px 20px" }}
+							>
+								Yes
+							</button>
+							<button
+								onClick={() => handleAgeVerification(false)}
+								style={{ margin: "10px", padding: "10px 20px" }}
+							>
+								No
+							</button>
+						</div>
+					</div>
 				</div>
-			</footer> */}
+			)}
 		</div>
 	);
-};
+}
