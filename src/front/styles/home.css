@@ -7,7 +7,7 @@
 */
 
 /* EJQ-made the below tag to a class name as it was impacting the size of the user profile pic; udated corresponding item in the home.js file */
-.home-logo-img{
+.home-logo-img {
     height: 100px;
     width: 100px;
 }
@@ -34,4 +34,47 @@
     position: relative;
     z-index: 1;
     /* Add any additional styling for your content here */
+}
+
+/* Age Verification Popup Styles */
+.age-verification-popup {
+    display: flex;
+    width: 80%; /* Adjust width as needed */
+    max-width: 800px; /* Limit maximum width */
+    background-color: white;
+    border-radius: 10px;
+    overflow: hidden; /* Prevent content from overflowing */
+}
+
+.image-section {
+    flex: 1; /* Take half of the popup */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.image-section img {
+    width: 100%; /* Make the image responsive */
+    height: auto; /* Maintain aspect ratio */
+}
+
+.text-section {
+    flex: 1; /* Take the other half of the popup */
+    padding: 20px; /* Add some padding */
+    display: flex;
+    flex-direction: column; /* Stack content vertically */
+    justify-content: center; /* Center the content vertically */
+    align-items: center; /* Center the content horizontally */
+    text-align: center; /* Center text */
+}
+
+.age-verification-button {
+    margin: 10px;
+    padding: 10px 20px;
+    border: none; /* Remove default border */
+    border-radius: 5px; /* Add border radius */
+    cursor: pointer; /* Change cursor to pointer */
+    background-color: #FFBF00; /* Use an appealing color */
+    color: white; /* Text color */
+    font-size: 1rem; /* Adjust font size */
 }
