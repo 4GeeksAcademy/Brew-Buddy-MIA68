@@ -597,13 +597,18 @@ def allowed_file(filename):
 
 @api.route('/add_brewery_review', methods=['Post'])
 def add_brewery_review():
+    # EJQ - this needs to be added to only allow users to post reviews
+    # current_user = get_current_user()
+    # if not current_user:
+    #     return jsonify({"error": "User not authenticated"}), 401
     data = request.json
     brewery_review = BreweryReview(
         brewery_name=data.get('brewery_name'),
         brewery_id=data.get('brewery_id'),
         overall_rating=data['overall_rating'],
         review_text=data.get('review_text', ""),
-        is_favorite_brewery=data.get('is_favorite_brewery', False)
+        is_favorite_brewery=data.get('is_favorite_brewery', False),
+        image_url=data.get('image_url')
     )
     db.session.add(brewery_review)
     db.session.commit()
@@ -619,7 +624,17 @@ def add_brewery_review():
         db.session.add(beer_review)
     
     db.session.commit()
-    return jsonify({"message": "Review added successfully"}), 201
+
+    # EJQ - to award points for submitting a brewery review
+    # points_earned = 10
+    # current_user.change_points(points_earned, "Submitted a brewery review")
+
+    return jsonify({
+        "message": "Review added successfully",
+        # EJQ - this needs to be added after current user is established
+        # "points_earned": points_earned,
+        # "total_points": current_user.points
+    }), 201
 
 @api.route('/get_brewery_reviews', methods=['GET'])
 def get_brewery_reviews():

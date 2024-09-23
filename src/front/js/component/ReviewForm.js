@@ -1,5 +1,9 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { Context } from '../store/appContext';
+import { Link } from "react-router-dom";
+import { Cloudinary } from '@cloudinary/url-gen';
+import { AdvancedImage } from '@cloudinary/react';
+import { fill } from '@cloudinary/url-gen/actions/resize';
 
 export const ReviewForm = ({ brewery, onSaveReview }) => {
     const [overallRating, setOverallRating] = useState(0);
@@ -7,11 +11,15 @@ export const ReviewForm = ({ brewery, onSaveReview }) => {
     const [isFavoriteBrewery, setIsFavoriteBrewery] = useState(false);
     const [beerReviews, setBeerReviews] = useState([]);
     const { store, actions } = useContext(Context);
+    const [imageFile, setImageFile] = useState(null);
+    const [uploadedImageUrl, setUploadedImageUrl] = useState(null);
+
+    const cld = new Cloudinary({ cloud: { cloudName: 'dprmqr54a' } });
 
     // useEffect(() => {
     //     console.log("Brewery Coming in From Brewery Route", brewery)
+    // })
 
-    // }) 
     const addBeerReview = () => {
         setBeerReviews([...beerReviews, { beer_name: "", rating: 0, notes: "", isFavorite: false }]);
     };
@@ -22,7 +30,38 @@ export const ReviewForm = ({ brewery, onSaveReview }) => {
         setBeerReviews(updatedReviews);
     };
 
-    const handleSubmit = (e) => {
+    const handleImageChange = (event) => {
+        setImageFile(event.target.files[0]);
+    };
+
+    const handleImageUpload = async () => {
+        if (!imageFile) return;
+
+        const formData = new FormData();
+        formData.append('file', imageFile);
+
+        try {
+            const response = await fetch(`${process.env.BACKEND_URL}/api/images`, {
+                method: 'POST',
+                headers: { 
+                    Authorization: `Bearer ${store.token}`
+                },
+                body: formData
+            });
+            if (response.ok) {
+                const data = await response.json();
+                setUploadedImageUrl(data.image.image_url);
+                setImageFile(null);
+            } else {
+                console.error("Failed to upload image:", response.status, response.statusText);
+            }
+        } catch (error) {
+            console.error("Error uploading image:", error);
+        }
+    };
+
+    // EJQ - updated the handleSubmit to include images
+    const handleSubmit = async (e) => {
         e.preventDefault();
         if (isFavoriteBrewery) {
             const checkedFavBreweryData = {
@@ -38,14 +77,16 @@ export const ReviewForm = ({ brewery, onSaveReview }) => {
                 state_province: brewery.address.state,
                 postal_code: brewery.address.postal_code,
                 country: brewery.address.country,
-
             }
-            actions.addFavoriteBrewery(checkedFavBreweryData);
+            await actions.addFavoriteBrewery(checkedFavBreweryData);
         }
 
-        onSaveReview(brewery, overallRating, reviewText, isFavoriteBrewery, beerReviews);
-        actions.addBreweryReviewToBackend(brewery, overallRating, reviewText, isFavoriteBrewery, beerReviews)
-        alert("Review added succesfully!")
+        if (imageFile) {
+            await handleImageUpload();
+        }
+
+        onSaveReview(brewery, overallRating, reviewText, isFavoriteBrewery, beerReviews, uploadedImageUrl);
+        actions.addBreweryReviewToBackend(brewery, overallRating, reviewText, isFavoriteBrewery, beerReviews, uploadedImageUrl);
     };
 
     return (
@@ -68,6 +109,11 @@ export const ReviewForm = ({ brewery, onSaveReview }) => {
                     />
                     Mark as Favorite Brewery
                 </label>
+            </div>
+            <div>
+                <label>Upload Image:</label>
+                <input type="file" accept="image/*" onChange={handleImageChange} />
+                {uploadedImageUrl && <img src={uploadedImageUrl} alt="Uploaded brewery" style={{maxWidth: '200px'}} />}
             </div>
             <h3>Beers Tried</h3>
             {beerReviews.map((beerReview, index) => (
