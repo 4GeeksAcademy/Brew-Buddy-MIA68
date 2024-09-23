@@ -17,6 +17,7 @@ export const Home = () => {
 	useEffect(() => {
 		actions.getBreweryReviewsFromBackend()
 	}, []); // Empty array ensures it runs only once
+
 	const eachBrewery = store.breweryData.map((breweryData, index) => (
 		<div className="col-12 col-md-6 col-lg-4 mb-4" key={index}>
 			<BreweryCard breweryData={breweryData} />
@@ -25,12 +26,12 @@ export const Home = () => {
 
 	const handleAgeVerification = (isOver21) => {
 		if (isOver21) {
-		  setShowAgeVerification(false);
+			setShowAgeVerification(false);
 		} else {
-		  // Redirect to Google if user is not 21 or older
-		  window.location.href = "https://www.google.com/";
+			// Redirect to Google if user is not 21 or older
+			window.location.href = "https://www.google.com/";
 		}
-	  };
+	};
 
 	// useEffect(() => {
 	// 	actions.fetchBreweryInfoTEST().then(journey => {
