@@ -50,6 +50,11 @@ export const Navbar = () => {
                                 <li className="nav-item">
                                     <Link to="/routes" className="nav-link">Build A Brewery Tour Route</Link>
                                 </li>
+                                <li className="nav-item">
+                                    <Link to="/points" className="nav-link">
+                                        Redeem Points
+                                    </Link>
+                                </li>
                             </>
                         )}
                     </ul>
@@ -77,6 +82,8 @@ export const Navbar = () => {
                     </div>
                 </div>
             </div>
-        </nav>
+
+
+        </nav >
     );
 };

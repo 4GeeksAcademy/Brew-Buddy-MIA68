@@ -17,6 +17,7 @@ export const Home = () => {
 	useEffect(() => {
 		actions.getBreweryReviewsFromBackend()
 	}, []); // Empty array ensures it runs only once
+
 	const eachBrewery = store.breweryData.map((breweryData, index) => (
 		<div className="col-12 col-md-6 col-lg-4 mb-4" key={index}>
 			<BreweryCard breweryData={breweryData} />
@@ -25,12 +26,12 @@ export const Home = () => {
 
 	const handleAgeVerification = (isOver21) => {
 		if (isOver21) {
-		  setShowAgeVerification(false);
+			setShowAgeVerification(false);
 		} else {
-		  // Redirect to Google if user is not 21 or older
-		  window.location.href = "https://www.google.com/";
+			// Redirect to Google if user is not 21 or older
+			window.location.href = "https://www.google.com/";
 		}
-	  };
+	};
 
 	// useEffect(() => {
 	// 	actions.fetchBreweryInfoTEST().then(journey => {
@@ -52,49 +53,49 @@ export const Home = () => {
 				</div>
 			</div>
 			{showAgeVerification && (
-			<div
-			style={{
-				position: "fixed",
-				top: 0,
-				left: 0,
-				width: "100%",
-				height: "100%",
-				backgroundColor: "rgba(0, 0, 0, 0.5)",
-				display: "flex",
-				justifyContent: "center",
-				alignItems: "center",
-				zIndex: 1000,
-			}}
-			>
-			<div
-				style={{
-				backgroundColor: "white",
-				padding: "20px",
-				borderRadius: "10px",
-				width: "50%",
-				maxWidth: "400px",
-				textAlign: "center",
-				}}
-			>
-            <h2>Age Verification</h2>
-            <p>Are you 21 or older?</p>
-            <div>
-              <button
-                onClick={() => handleAgeVerification(true)}
-                style={{ margin: "10px", padding: "10px 20px" }}
-              >
-                Yes
-              </button>
-              <button
-                onClick={() => handleAgeVerification(false)}
-                style={{ margin: "10px", padding: "10px 20px" }}
-              >
-                No
-				</button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
+				<div
+					style={{
+						position: "fixed",
+						top: 0,
+						left: 0,
+						width: "100%",
+						height: "100%",
+						backgroundColor: "rgba(0, 0, 0, 0.5)",
+						display: "flex",
+						justifyContent: "center",
+						alignItems: "center",
+						zIndex: 1000,
+					}}
+				>
+					<div
+						style={{
+							backgroundColor: "white",
+							padding: "20px",
+							borderRadius: "10px",
+							width: "50%",
+							maxWidth: "400px",
+							textAlign: "center",
+						}}
+					>
+						<h2>Age Verification</h2>
+						<p>Are you 21 or older?</p>
+						<div>
+							<button
+								onClick={() => handleAgeVerification(true)}
+								style={{ margin: "10px", padding: "10px 20px" }}
+							>
+								Yes
+							</button>
+							<button
+								onClick={() => handleAgeVerification(false)}
+								style={{ margin: "10px", padding: "10px 20px" }}
+							>
+								No
+							</button>
+						</div>
+					</div>
+				</div>
+			)}
+		</div>
+	);
+}

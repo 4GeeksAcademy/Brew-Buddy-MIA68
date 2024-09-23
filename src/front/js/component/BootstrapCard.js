@@ -8,6 +8,7 @@ import nanoIcon from '../../img/nano1.png';
 import regionalIcon from '../../img/regional1.png';
 import largeIcon from '../../img/large1.png';
 import brewpubIcon from '../../img/brewpub1.png';
+import '../../styles/JourneyCard.css'
 
 
 const breweryTypeIcons = {
@@ -61,63 +62,67 @@ export const BreweryCard = (props) => {
     }
 
     return (
-        <div className="card col-md-4 col-sm-6">
+        <div className="card brewery-card text-center col-md-4 col-sm-6">
             <div className="card-body">
-                <h1 className="card-title">
+                <h1 className="card-title brewery-title">
                     <a href={props.breweryData.brewery_type}>
                         <img
                             src={breweryTypeIcons[breweryType]}
-                            title="brewery type icon"
                             alt={`${breweryType} icon`}
-                            style={{ width: '30px', height: '30px', marginRight: '8px' }}
+                            className="brewery-icon"
                         />
                     </a>
                     {props.breweryData.name}
-                    <a href={props.breweryData.brewery_type}>
-                        <img
-                            src={breweryTypeIcons[breweryType]}
-                            title="brewery type icon"
-                            alt={`${breweryType} icon`}
-                            style={{ width: '30px', height: '30px', marginLeft: '8px' }}
-                        />
-                    </a>
                 </h1>
-                <h5>{props.breweryData.city}, {props.breweryData.state}</h5>
-                <button className="btn btn-primary" onClick={handleAddBreweryToRoute}>Add to my current route</button>
-                {/* J.R.: A favorites button for brewery */}
-                <a className="btn btn-info"><i className={currentFavorite == true ? "fa-solid fa-star" : "fa-regular fa-star"} onClick={(e) => handleFavBrewery(e)}></i></a>                {/* J.R.: A button for contact information of brewery */}
-                <a href={props.breweryData.phone}>{props.breweryData.phone}</a>
-                {/* A button for website of brewery */}
-                <p>
-                    <a href={props.breweryData.website_url} target="blank">
-                        <button className="btn btn-secondary">Visit Our Website!</button>
+                <h5 className="card-subtitle mb-2 text-muted">
+                    {props.breweryData.city}, {props.breweryData.state}
+                </h5>
+                <div className="brewery-buttons">
+                    <button className="btn btn-primary btn-block fun-button" onClick={handleAddBreweryToRoute}>
+                        Add to Route <i className="fas fa-route"></i>
+                    </button>
+                    <button className={`btn ${currentFavorite ? "btn-warning" : "btn-light"} btn-block fun-button`} onClick={(e) => handleFavBrewery(e)}>
+                        {currentFavorite ? "Favorite" : "Add to Favorites"} <i className={currentFavorite ? "fas fa-star" : "far fa-star"}></i>
+                    </button>
+                </div>
+                <div className="brewery-contact">
+                    <a href={`tel:${props.breweryData.phone}`} className="btn btn-info btn-block fun-button">
+                        Call <i className="fas fa-phone"></i>
                     </a>
-                    <Link to={"/brewery/" + props.breweryData.id} className="btn btn-secondary">
-                        See Brews
+                    <a href={props.breweryData.website_url} target="_blank" rel="noopener noreferrer" className="btn btn-success btn-block fun-button">
+                        Visit Website <i className="fas fa-external-link-alt"></i>
+                    </a>
+                </div>
+                <div className="brewery-extras mt-3">
+                    <Link to={`/brewery/${props.breweryData.id}`} className="btn btn-secondary fun-button">
+                        See Brews <i className="fas fa-beer"></i>
                     </Link>
-                    <Link to={"/brewery_reviews/" + props.breweryData.id} className="btn btn-secondary" onClick={(e) => actions.getReviewsOnFrontEnd(props.breweryData.id)}>Check Reviews</Link>
-                </p>
+                    <Link to={`/brewery_reviews/${props.breweryData.id}`} className="btn btn-secondary fun-button" onClick={() => actions.getReviewsOnFrontEnd(props.breweryData.id)}>
+                        Check Reviews <i className="fas fa-comments"></i>
+                    </Link>
+                </div>
             </div>
         </div>
     )
 }
 
 export const JourneyCard = ({ breweryData, onReview, onRefocus }) => {
-    const { store, actions } = useContext(Context);
+    const { store } = useContext(Context);
+
     return (
-        <div className="card mb-3 shadow-sm">
-            <div className="card-header bg-primary text-white">
-                <h5 className="mb-0">{breweryData.name}</h5>
+        <div className="journey-card fun-card">
+            <div className="journey-card-header">
+                <h5 className="brewery-name">{breweryData.name}</h5>
             </div>
-            <div className="card-body">
-                <p className="card-text">Travel Time: {store.journey.routes[0].travelTime} Minutes</p>
-                <p className="card-text">Distance: {store.journey.routes[0].miles} Miles</p>
-                <div className="d-flex justify-content-between">
-                    <button className="btn btn-outline-primary" onClick={() => onReview(breweryData)}>
-                        Add Review
+            <div className="journey-card-body">
+                <p className="info-text">🚗 Travel Time: {store.journey.routes[0].travelTime} Minutes</p>
+                <p className="info-text">📍 Distance: {store.journey.routes[0].miles} Miles</p>
+                <div className="card-actions">
+                    <button className="review-button" onClick={() => onReview(breweryData)}>
+                        ⭐ Add Review
                     </button>
-                    <button className="btn btn-outline-secondary" onClick={() => onRefocus(breweryData.latitude, breweryData.longitude)}>
-                        Navigate
+                    <button className="navigate-button" onClick={() => onRefocus(breweryData.latitude, breweryData.longitude)}>
+                        🎯 Navigate
                     </button>
                 </div>
             </div>

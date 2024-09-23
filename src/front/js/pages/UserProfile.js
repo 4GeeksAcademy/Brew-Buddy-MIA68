@@ -16,6 +16,7 @@ export const UserProfile = () => {
     useEffect(() => {
         fetchUserInfo();
         fetchPointHistory();
+        actions.getRewardsFromBackend();
     }, []);
 
     const fetchUserInfo = async () => {
@@ -118,6 +119,26 @@ export const UserProfile = () => {
                                 <td>{entry.action}</td>
                                 <td>{entry.points}</td>
                                 <td>{new Date(entry.timestamp).toLocaleString()}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+                <table className="table">
+                    <thead>
+                        <tr>
+                            <th>Reward Name</th>
+                            <th>Reward Type</th>
+                            <th>Reward Value</th>
+                            <th>Point Cost</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {store.userRewards.map((reward, index) => (
+                            <tr key={index}>
+                                <td>{reward.reward_name}</td>
+                                <td>{reward.reward_type}</td>
+                                <td>{reward.reward_value}</td>
+                                <td>{reward.point_cost}</td>
                             </tr>
                         ))}
                     </tbody>

@@ -14,6 +14,7 @@ class User(db.Model):
     favorite_breweries = db.relationship("FavoriteBreweries", back_populates="owner", foreign_keys="FavoriteBreweries.owner_id")
     point_transactions = db.relationship("PointTransaction", back_populates="owner")
     user_images = db.relationship("UserImage", back_populates="owner", foreign_keys="UserImage.owner_id")
+    user_rewards = db.relationship("UserRewards", back_populates="owner")
 
     def __init__(self, email, password, is_active=True):
         self.email = email
@@ -66,7 +67,8 @@ class User(db.Model):
             "favorite_breweries": favorite_breweries_dictionaries,
             "points": self.points,
             "profile_image": self.profile_image.serialize() if self.profile_image else {"image_url": "samples/man-portrait"},
-            "user_images": [image.serialize() for image in self.user_images]
+            "user_images": [image.serialize() for image in self.user_images],
+            "user_rewards": [reward.serialize() for reward in self.user_rewards]
             # do not serialize the password, it's a security breach
         }
     
@@ -221,6 +223,39 @@ class PointTransaction(db.Model):
             "action": self.action,
             "timestamp": self.timestamp.isoformat()
         }
+class UserRewards(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    reward_name = db.Column(db.String(250))
+    reward_value = db.Column(db.Integer)
+    reward_type = db.Column(db.String(250))
+    point_cost = db.Column(db.Integer)
+    
+     # will need to revisit at a later time to see if the below needs to be owner = db.relationship("User", back_populates="point_transactions")
+    owner = db.relationship('User', )
+
+    def __init__(self, reward_name, reward_value, reward_type, point_cost, owner_id):
+        self.owner_id = owner_id
+        self.reward_name = reward_name
+        self.reward_value = reward_value
+        self.reward_type = reward_type
+        self.point_cost = point_cost
+
+    # added repr to help with debugging by providing a readable string representation of the model instances
+    #def __repr__(self):
+     #   return f'<Beer {self.reward_name}>'
+     # commit for funsies
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "owner_id": self.owner_id,
+            "reward_name": self.reward_name,
+            "reward_value": self.reward_value,
+            "reward_type": self.reward_type,
+            "point_cost": self.point_cost,
+        }
+    
 
 # model for user uploaded images
 class UserImage(db.Model):

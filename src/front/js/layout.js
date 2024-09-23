@@ -15,6 +15,7 @@ import { UserProfile } from "./pages/UserProfile";
 import { Navbar } from "./component/navbar";
 import { BreweryRoutes } from "./pages/BreweryRoute";
 import { Brewery } from "./pages/Brewery";
+import { Points } from "./pages/points";
 import { MyMap } from "./pages/MapTest";
 import { BreweryReviews } from "./pages/BreweryReviwsPage";
 import { Search } from "./pages/Search";
@@ -38,6 +39,7 @@ const Layout = () => {
                         <Route element={<Login />} path="/login" />
                         <Route element={<BreweryRoutes />} path="/routes" />
                         <Route element={<MyMap />} path="/maptest" />
+                        <Route element={<Points />} path="/points" />
                         <Route element={<BreweryReviews />} path="/brewery_reviews/:id" />
                         <Route element={<h1>Not found!</h1>} />
                         <Route element={<Favorites />} path="/favorites" />
