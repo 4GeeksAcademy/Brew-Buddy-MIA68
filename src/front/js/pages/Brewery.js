@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, } from "react";
 import { Link } from "react-router-dom";
 import { Context } from "../store/appContext";
 import { BeerCard } from "../component/beerCard";
@@ -9,11 +9,13 @@ export const Brewery = () => {
     const [beerNameValue, setBeerNameValue] = useState("");
     const [flavorValue, setFlavorValue] = useState("");
     const [typeValue, setTypeValue] = useState("");
-    const [ABVValue, setABVValue] = useState("");
+    const [ABVValue, setABVValue] = useState();
     const [addingFailed, setAddingFailed] = useState(false);
     const [nameSearch, setNameSearch] = useState("");
-    const [abvSearch, setAbvSearch] = useState("");
+    const [abvSearch, setAbvSearch] = useState();
     const [typeSearch, setTypeSearch] = useState("");
+    const [filteredSearchedBeers, setFilteredSearchedBeers] = useState([]);
+    const [searchDone, setSearchDone] = useState(0)
 
     const currentUrl = window.location.href;
     const url = new URL(currentUrl);
@@ -36,21 +38,80 @@ export const Brewery = () => {
     }
 
     const handleBeerSearch = async () => {
-        const name = nameSearch
-        const type = typeSearch
-        const ABV = abvSearch
-        await actions.getBreweryBeers(dynamicId)
-        const beers = store.beerData
-        console.log("beers: ", beers)
-        const filteredBeers = []
-        for (const beer in beers) {
-            if (name != "") {
-                if (beer.beer_name = name) {
-                    filteredBeers.push(beer)
-                }
+        const name = nameSearch;
+        const type = typeSearch;
+        const ABV = abvSearch;
+        let filteredBeers = []
+        setFilteredSearchedBeers([]);
+        const response = await fetch(`${process.env.BACKEND_URL}/api/brewery/beers/` + dynamicId, {
+            method: "GET",
+            headers: {
+                "Content-type": "application/json"
             }
-            console.log(filteredBeers)
-        };
+        })
+        const data = await response.json();
+        const beers = data;
+        console.log("beers: ", beers);
+        if (name != "") {
+            filteredBeers.push(nameBeerSearch(beers, name))
+        }
+        console.log("name search done: ", filteredBeers)
+        if (ABV != undefined) {
+            if (filteredBeers != []) {
+                filteredBeers = abvBeerSearch(filteredBeers, ABV)
+                console.log("abv search done: ", filteredBeers)
+            } else {
+                abvBeerSearch(beers, ABV)
+            }
+        }
+        if (type != "") {
+            if (filteredSearchedBeers != []) {
+                typeBeerSearch(filteredSearchedBeers, type)
+            } else {
+                typeBeerSearch(beers, type)
+            }
+        }
+        actions.updateFilteredBeers(filteredBeers)
+        setSearchDone(searchDone + 1)
+    }
+
+    const nameBeerSearch = (beers, name) => {
+        const filteredBeers = []
+        beers.forEach(beer => {
+            if (beer.beer_name.toLowerCase().includes(name.toLowerCase())) {
+                filteredBeers.push(beer)
+            }
+        });
+        if (filteredBeers != []) {
+            console.log("internal variable array: ", filteredBeers)
+            return filteredBeers
+        }
+    }
+
+
+    const abvBeerSearch = (beers, abv) => {
+        const filteredBeers = []
+        beers.forEach(beer => {
+            if (beer.ABV <= abv) {
+                filteredBeers.push(beer)
+            }
+        });
+        if (filteredBeers != []) {
+            return filteredBeers
+        }
+    }
+
+    const typeBeerSearch = (beers, type) => {
+        const filteredBeers = []
+        beers.forEach(beer => {
+            if (beer.type.toLowerCase().includes(type.toLowerCase())) {
+                filteredBeers.push(beer)
+            }
+        });
+        if (filteredBeers != []) {
+            setFilteredSearchedBeers(filteredBeers)
+        }
+        console.log("type search done: ", filteredSearchedBeers)
     }
 
     const fetchBreweryName = async () => {
@@ -85,7 +146,7 @@ export const Brewery = () => {
                             <h2>Search For Your Brew</h2>
                             <label htmlFor="beerName">Name:</label>
                             <input type="text" id="beerName" name="beerName" onChange={e => setNameSearch(e.target.value)} required />
-                            <label htmlFor="ABVInput">ABV:</label>
+                            <label htmlFor="ABVInput">Max ABV:</label>
                             <input type="number" id="ABVInput" name="ABVInput" onChange={e => setAbvSearch(e.target.value)} required step=".1" />
                             <label htmlFor="typeInput">Type:</label>
                             <select className="mx-2" onChange={e => setTypeSearch(e.target.value)}>

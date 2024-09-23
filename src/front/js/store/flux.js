@@ -507,6 +507,11 @@ const getState = ({ getStore, getActions, setStore }) => {
 					console.error("Error fetching beer info", error);
 				}
 			},
+			updateFilteredBeers: (filteredSearch) => {
+				const store = getStore();
+				setStore({ beerData: filteredSearch })
+				console.log("store data: ", store.beerData)
+			},
 			getAllBeers: async () => {
 				try {
 					const response = await fetch(`${process.env.BACKEND_URL}/api/beers`, {
