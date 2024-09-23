@@ -1,27 +1,12 @@
-#BBLogo {
-    width: 70px;
-    height: 70px;
-}
-
-.home-logo {
-    width: 90px;
-    height: 70px;
-}
 .navbar {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    padding: 1rem 2rem;
-    background-color: #343a40; /* Dark background for professional look */
+    padding: 0.5rem 2rem;
+    background: linear-gradient(90deg, #FFBF00, #a83b00); /* Amber to Dark Brown */
 }
 
 .navbar-logo {
-    width: 50px;
+    width: 90px;
     height: auto;
-}
-
-.navbar-title {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: #fff;
 }
 
 .nav-link {
