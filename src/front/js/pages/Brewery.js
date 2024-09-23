@@ -71,56 +71,7 @@ export const Brewery = () => {
                             </div>
                             <div>
                                 <label htmlFor="typeInput">Type:</label>
-                                <select className="mx-2" onChange={e => setTypeValue(e.target.value)}>
-                                    <option value="">Select Type</option>
-                                    <option value="Altbier">Altbier</option>
-                                    <option value="Amber ale">Amber ale</option>
-                                    <option value="Barley wine">Barley wine</option>
-                                    <option value="Berliner Weisse">Berliner Weisse</option>
-                                    <option value="Bière de Garde">Bière de Garde</option>
-                                    <option value="Bitter">Bitter</option>
-                                    <option value="Blonde Ale">Blonde Ale</option>
-                                    <option value="Bock">Bock</option>
-                                    <option value="Brown ale">Brown ale</option>
-                                    <option value="California Common">California Common</option>
-                                    <option value="Cream Ale">Cream Ale</option>
-                                    <option value="Dortmunder">Dortmunder</option>
-                                    <option value="Doppelbock">Doppelbock</option>
-                                    <option value="Dunkel">Dunkel</option>
-                                    <option value="Dunkelweizen">Dunkelweizen</option>
-                                    <option value="Eisbock">Eisbock</option>
-                                    <option value="Flanders red ale">Flanders red ale</option>
-                                    <option value="Summer ale">Summer ale</option>
-                                    <option value="Gose">Gose</option>
-                                    <option value="Gueuze">Gueuze</option>
-                                    <option value="Hefeweizen">Hefeweizen</option>
-                                    <option value="Helles">Helles</option>
-                                    <option value="IPA">IPA</option>
-                                    <option value="Kölsch">Kölsch</option>
-                                    <option value="Lager">Lager</option>
-                                    <option value="Lambic">Lambic</option>
-                                    <option value="Light ale">Light ale</option>
-                                    <option value="Maibock">Maibock</option>
-                                    <option value="Malt liquor">Malt liquor</option>
-                                    <option value="Mild ale">Mild ale</option>
-                                    <option value="Oktoberfestbier">Oktoberfestbier</option>
-                                    <option value="Old ale">Old ale</option>
-                                    <option value="Oud bruin">Oud bruin</option>
-                                    <option value="Pale ale">Pale ale</option>
-                                    <option value="Pilsner">Pilsner</option>
-                                    <option value="Porter">Porter</option>
-                                    <option value="Red ale">Red ale</option>
-                                    <option value="Roggenbier">Roggenbier</option>
-                                    <option value="Saison">Saison</option>
-                                    <option value="Scotch ale">Scotch ale</option>
-                                    <option value="Stout">Stout</option>
-                                    <option value="Schwarzbier">Schwarzbier</option>
-                                    <option value="Vienna lager">Vienna lager</option>
-                                    <option value="Witbier">Witbier</option>
-                                    <option value="Weissbier">Weissbier</option>
-                                    <option value="Weizenbock">Weizenbock</option>
-
-                                </select>
+                                <input type="text" id="beerType" name="beerType" onChange={e => setBeerTypeValue(e.target.value)} required />
                             </div>
                         </div>
                         <div className="d-flex">

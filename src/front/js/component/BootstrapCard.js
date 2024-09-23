@@ -61,7 +61,7 @@ export const BreweryCard = (props) => {
     }
 
     return (
-        <div className="card">
+        <div className="card col-md-4 col-sm-6">
             <div className="card-body">
                 <h1 className="card-title">
                     <a href={props.breweryData.brewery_type}>

@@ -17,6 +17,7 @@ import { BreweryRoutes } from "./pages/BreweryRoute";
 import { Brewery } from "./pages/Brewery";
 import { MyMap } from "./pages/MapTest";
 import { BreweryReviews } from "./pages/BreweryReviwsPage";
+import { Search } from "./pages/Search";
 // import { Footer } from "./component/footer";
 
 //create your first component
@@ -45,6 +46,7 @@ const Layout = () => {
                         <Route element={<SignUp />} path="/sign-up" />
                         <Route element={<UserProfile />} path="/UserProfile" />
                         <Route element={<Brewery />} path="/brewery/:id" />
+                        <Route element={<Search />} path="/search" />
                     </Routes>
                     {/* <Footer /> */}
                 </ScrollToTop>

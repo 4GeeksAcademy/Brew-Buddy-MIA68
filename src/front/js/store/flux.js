@@ -127,7 +127,6 @@ const getState = ({ getStore, getActions, setStore }) => {
 			state: "",
 			type: "",
 			searchedBreweryData: [],
-			modalIsOpen: false,
 			favoriteBreweries: [],
 			favoriteBeers: [],
 			allBeers: [],
