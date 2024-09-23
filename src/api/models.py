@@ -68,7 +68,8 @@ class User(db.Model):
             "favorite_breweries": favorite_breweries_dictionaries,
             "points": self.points,
             "profile_image": self.profile_image.serialize() if self.profile_image else {"image_url": "samples/man-portrait"},
-            "user_images": [image.serialize() for image in self.user_images]
+            "user_images": [image.serialize() for image in self.user_images],
+            "user_rewards": [reward.serialize() for reward in self.user_rewards]
             # do not serialize the password, it's a security breach
         }
     
@@ -249,6 +250,7 @@ class UserRewards(db.Model):
     def serialize(self):
         return {
             "id": self.id,
+            "owner_id": self.owner_id,
             "reward_name": self.reward_name,
             "reward_value": self.reward_value,
             "reward_type": self.reward_type,
