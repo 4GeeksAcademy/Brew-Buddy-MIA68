@@ -14,6 +14,7 @@ class User(db.Model):
     favorite_breweries = db.relationship("FavoriteBreweries", back_populates="owner", foreign_keys="FavoriteBreweries.owner_id")
     point_transactions = db.relationship("PointTransaction", back_populates="owner")
     user_images = db.relationship("UserImage", back_populates="owner", foreign_keys="UserImage.owner_id")
+    # brewery_reviews = db.relationship("BreweryReview", back_populates="owner", foreign_keys="BreweryReview.owner_id")
     user_rewards = db.relationship("UserRewards", back_populates="owner")
 
     def __init__(self, email, password, is_active=True):
@@ -293,23 +294,24 @@ class BreweryReview(db.Model):
     overall_rating = db.Column(db.Float, nullable=False)
     review_text = db.Column(db.String(500), nullable=True)
     is_favorite_brewery = db.Column(db.Boolean, default=False)
+    image_url = db.Column(db.String(255))
     visit_date = db.Column(db.DateTime, default=datetime.utcnow)
 
+    # EJQ - relationship with User model needs to be established
+    # owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    # owner = relationship('User', back_populates='brewery_reviews')
+
     beer_reviews = db.relationship('BeerReview', backref='brewery_review', lazy=True)
-    #EJQ-line below will be for users attaching images to reviews
-    #images = db.relationship('UserImage', secondary='brewery_review_images', backref='brewery_reviews')
 
-    #EJQ - formula to add later to add images to reviews
-    #def add_image(self, image):
-        # self.images.append(image)
-        # db.session.commit()
-
-    def __init__(self, brewery_name, brewery_id, overall_rating, review_text="", is_favorite_brewery=False):
+    def __init__(self, brewery_name, brewery_id, overall_rating, review_text="", is_favorite_brewery=False, image_url=None):
         self.brewery_name = brewery_name
         self.brewery_id = brewery_id
         self.overall_rating = overall_rating
         self.review_text = review_text
         self.is_favorite_brewery = is_favorite_brewery
+        self.image_url = image_url
+        # EJQ - owner id needs to be included
+        # self.owner_id = owner_id
 
     # Method to add a beer review
     # def add_beer_review(self, beer_review):
@@ -323,8 +325,10 @@ class BreweryReview(db.Model):
             "overall_rating": self.overall_rating,
             "review_text": self.review_text,
             "is_favorite_brewery": self.is_favorite_brewery,
+            "image_url": self.image_url,
             "visit_date": self.visit_date.isoformat(),
-            # "images": [image.serialize() for image in self.images]
+            # EJQ - also need owner id
+            # "owner_id": self.owner_id,
         }
 
 # EJQ association table for brewery review images
@@ -341,8 +345,6 @@ class BeerReview(db.Model):
     notes = db.Column(db.String(500), nullable=True)
     is_favorite = db.Column(db.Boolean, default=False)
     date_tried = db.Column(db.DateTime, default=datetime.utcnow)
-    # EJQ-next column to add when ready to implement photo upload function for beer reviews
-    #images = db.relationship('UserImage', secondary='beer_review_images', backref='beer_reviews')
 
     def __init__(self, brewery_review_id, beer_name, rating, notes="", is_favorite=False):
         self.brewery_review_id = brewery_review_id
@@ -351,11 +353,6 @@ class BeerReview(db.Model):
         self.notes = notes
         self.is_favorite = is_favorite
         self.date_tried = datetime.now()
-
-    #EJQ function to add photos to beer reviews
-    #def add_image(self, image):
-        # self.images.append(image)
-        # db.session.commit()
 
     def serialize(self):
         return{
@@ -366,14 +363,7 @@ class BeerReview(db.Model):
             "notes": self.notes,
             "is_favorite": self.is_favorite,
             "date_tried": self.date_tried,
-            #"images": [image.serialize() for image in self.images]
-        }
-
-# EJQ association table for beer reviews
-# beer_review_images = db.Table('beer_review_images',
-#     db.Column('beer_review_id', db.Integer, db.ForeignKey('beer_review.id'), primary_key=True),
-#     db.Column('user_image_id', db.Integer, db.ForeignKey('user_image.id'), primary_key=True)
-# )    
+        } 
 
 class Journey(db.Model):
     id = db.Column(db.Integer, primary_key=True)
