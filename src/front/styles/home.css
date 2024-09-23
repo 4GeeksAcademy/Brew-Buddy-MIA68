@@ -35,3 +35,35 @@
     z-index: 1;
     /* Add any additional styling for your content here */
 }
+html, body {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* The home-container will grow to fill available space */
+  .home-container {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+  
+  /* The content will take the available space between header and footer */
+  .content {
+    flex-grow: 1;
+  }
+  
+  /* Footer styles
+  .footer {
+    background-color: #f8f9fa;
+    color: #333;
+    border-top: 1px solid #eaeaea;
+    text-align: center;
+    padding: 10px 0;
+    font-size: 14px;
+  }
+  
+  .footer .container {
+    padding: 10px 0;
+  } */

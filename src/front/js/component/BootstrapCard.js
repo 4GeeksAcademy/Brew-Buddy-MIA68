@@ -62,42 +62,45 @@ export const BreweryCard = (props) => {
     }
 
     return (
-        <div className="card">
+        <div className="card brewery-card text-center">
             <div className="card-body">
-                <h1 className="card-title">
+                <h1 className="card-title brewery-title">
                     <a href={props.breweryData.brewery_type}>
                         <img
                             src={breweryTypeIcons[breweryType]}
-                            title="brewery type icon"
                             alt={`${breweryType} icon`}
-                            style={{ width: '30px', height: '30px', marginRight: '8px' }}
+                            className="brewery-icon"
                         />
                     </a>
                     {props.breweryData.name}
-                    <a href={props.breweryData.brewery_type}>
-                        <img
-                            src={breweryTypeIcons[breweryType]}
-                            title="brewery type icon"
-                            alt={`${breweryType} icon`}
-                            style={{ width: '30px', height: '30px', marginLeft: '8px' }}
-                        />
-                    </a>
                 </h1>
-                <h5>{props.breweryData.city}, {props.breweryData.state}</h5>
-                <button className="btn btn-primary" onClick={handleAddBreweryToRoute}>Add to my current route</button>
-                {/* J.R.: A favorites button for brewery */}
-                <a className="btn btn-info"><i className={currentFavorite == true ? "fa-solid fa-star" : "fa-regular fa-star"} onClick={(e) => handleFavBrewery(e)}></i></a>                {/* J.R.: A button for contact information of brewery */}
-                <a href={props.breweryData.phone}>{props.breweryData.phone}</a>
-                {/* A button for website of brewery */}
-                <p>
-                    <a href={props.breweryData.website_url} target="blank">
-                        <button className="btn btn-secondary">Visit Our Website!</button>
+                <h5 className="card-subtitle mb-2 text-muted">
+                    {props.breweryData.city}, {props.breweryData.state}
+                </h5>
+                <div className="brewery-buttons">
+                    <button className="btn btn-primary btn-block fun-button" onClick={handleAddBreweryToRoute}>
+                        Add to Route <i className="fas fa-route"></i>
+                    </button>
+                    <button className={`btn ${currentFavorite ? "btn-warning" : "btn-light"} btn-block fun-button`} onClick={(e) => handleFavBrewery(e)}>
+                        {currentFavorite ? "Favorite" : "Add to Favorites"} <i className={currentFavorite ? "fas fa-star" : "far fa-star"}></i>
+                    </button>
+                </div>
+                <div className="brewery-contact">
+                    <a href={`tel:${props.breweryData.phone}`} className="btn btn-info btn-block fun-button">
+                        Call <i className="fas fa-phone"></i>
                     </a>
-                    <Link to={"/brewery/" + props.breweryData.id} className="btn btn-secondary">
-                        See Brews
+                    <a href={props.breweryData.website_url} target="_blank" rel="noopener noreferrer" className="btn btn-success btn-block fun-button">
+                        Visit Website <i className="fas fa-external-link-alt"></i>
+                    </a>
+                </div>
+                <div className="brewery-extras mt-3">
+                    <Link to={`/brewery/${props.breweryData.id}`} className="btn btn-secondary fun-button">
+                        See Brews <i className="fas fa-beer"></i>
                     </Link>
-                    <Link to={"/brewery_reviews/" + props.breweryData.id} className="btn btn-secondary" onClick={(e) => actions.getReviewsOnFrontEnd(props.breweryData.id)}>Check Reviews</Link>
-                </p>
+                    <Link to={`/brewery_reviews/${props.breweryData.id}`} className="btn btn-secondary fun-button" onClick={() => actions.getReviewsOnFrontEnd(props.breweryData.id)}>
+                        Check Reviews <i className="fas fa-comments"></i>
+                    </Link>
+                </div>
             </div>
         </div>
     )

@@ -55,6 +55,11 @@ export const Home = () => {
 					<button onClick={actions.fetchBreweryInfoTEST}>Fetch Brewery Info</button>
 				</div>
 			</div>
+			{/* <footer className="footer mt-auto py-3">
+				<div className="container text-center">
+					<span classnName="text-muted">&copy; Brew Buddy 2024</span>
+				</div>
+			</footer> */}
 		</div>
 	);
 };
