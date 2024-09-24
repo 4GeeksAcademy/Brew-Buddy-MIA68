@@ -76,7 +76,7 @@ export const Brewery = () => {
                             </div>
                             <div>
                                 <label htmlFor="typeInput">Type:</label>
-                                <input type="text" id="beerType" name="beerType" onChange={e => setBeerTypeValue(e.target.value)} required />
+                                <input type="text" id="beerType" name="beerType" onChange={e => setTypeValue(e.target.value)} required />
                             </div>
                         </div>
                         <div className="d-flex">
