@@ -63,6 +63,12 @@ export const ReviewForm = ({ brewery, onSaveReview }) => {
     // EJQ - updated the handleSubmit to include images
     const handleSubmit = async (e) => {
         e.preventDefault();
+    for (let i = 0; i < beerReviews.length; i++) {
+        if (beerReviews[i].rating <= 0 || isNaN(beerReviews[i].rating)) {
+            alert(`Please enter a rating higher than 0 for beer ${i + 1}.`);
+            return;
+        }
+    }
         if (isFavoriteBrewery) {
             const checkedFavBreweryData = {
                 name: brewery.name,
