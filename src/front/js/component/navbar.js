@@ -28,6 +28,9 @@ export const Navbar = () => {
                     <img src={HomeLogo2} alt="Home Icon" className="navbar-logo" />
                     <span className="home-text mt-1">Home</span>
                 </Link>
+                <Link to="/search" className="nav-link d-flex flex-column align-items-center mt-auto">
+                    <span className="home-text mt-1">Search</span>
+                </Link>
 
                 {/* Responsive toggle for mobile */}
                 <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">

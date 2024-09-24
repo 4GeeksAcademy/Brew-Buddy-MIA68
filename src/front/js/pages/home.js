@@ -50,19 +50,6 @@ export const Home = () => {
 					{/* EJQ - Commented out the logo to put a new homepage logo */}
 					{/* <img src={brewbuddyimg} className="home-logo-img" /> */}
 					<img src={HomeLogo1} />
-					<div className="my-2">
-						<button onClick={actions.toggleSearch}>Search</button>
-						<Modal />
-					</div>
-
-					{/* Bootstrap grid for the cards */}
-					<div className="container">
-						<div className="row">
-							{eachBrewery}
-						</div>
-					</div>
-
-					<button onClick={actions.fetchBreweryInfoTEST}>Fetch Brewery Info</button>
 				</div>
 			</div>
 			{showAgeVerification && (
