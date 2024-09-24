@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: f87619ff9d13
+Revision ID: ae15814822b0
 Revises: 
-Create Date: 2024-09-24 01:10:44.814075
+Create Date: 2024-09-24 02:57:42.412701
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'f87619ff9d13'
+revision = 'ae15814822b0'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -41,17 +41,6 @@ def upgrade():
     sa.Column('website_url', sa.String(length=250), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('brewery_review',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('brewery_id', sa.String(length=250), nullable=True),
-    sa.Column('brewery_name', sa.String(), nullable=False),
-    sa.Column('overall_rating', sa.Float(), nullable=False),
-    sa.Column('review_text', sa.String(length=500), nullable=True),
-    sa.Column('is_favorite_brewery', sa.Boolean(), nullable=True),
-    sa.Column('image_url', sa.String(length=255), nullable=True),
-    sa.Column('visit_date', sa.DateTime(), nullable=True),
-    sa.PrimaryKeyConstraint('id')
-    )
     op.create_table('user',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('email', sa.String(length=120), nullable=False),
@@ -60,15 +49,16 @@ def upgrade():
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('email')
     )
-    op.create_table('beer_review',
+    op.create_table('brewery_review',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('brewery_review_id', sa.Integer(), nullable=True),
-    sa.Column('beer_name', sa.String(length=100), nullable=False),
-    sa.Column('rating', sa.Float(), nullable=False),
-    sa.Column('notes', sa.String(length=500), nullable=True),
-    sa.Column('is_favorite', sa.Boolean(), nullable=True),
-    sa.Column('date_tried', sa.DateTime(), nullable=True),
-    sa.ForeignKeyConstraint(['brewery_review_id'], ['brewery_review.id'], ),
+    sa.Column('brewery_id', sa.String(length=250), nullable=True),
+    sa.Column('brewery_name', sa.String(), nullable=False),
+    sa.Column('overall_rating', sa.Float(), nullable=False),
+    sa.Column('review_text', sa.String(length=500), nullable=True),
+    sa.Column('is_favorite_brewery', sa.Boolean(), nullable=True),
+    sa.Column('visit_date', sa.DateTime(), nullable=True),
+    sa.Column('owner_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['owner_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('favorite_beers',
@@ -111,16 +101,6 @@ def upgrade():
     sa.ForeignKeyConstraint(['owner_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
-    op.create_table('user_image',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('is_profile_image', sa.Boolean(), nullable=False),
-    sa.Column('public_id', sa.String(length=500), nullable=False),
-    sa.Column('image_url', sa.String(length=500), nullable=False),
-    sa.Column('owner_id', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['owner_id'], ['user.id'], ),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('owner_id', 'is_profile_image', name='unique_profile_image_per_user')
-    )
     op.create_table('user_rewards',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('owner_id', sa.Integer(), nullable=False),
@@ -129,6 +109,17 @@ def upgrade():
     sa.Column('reward_type', sa.String(length=250), nullable=True),
     sa.Column('point_cost', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['owner_id'], ['user.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('beer_review',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('brewery_review_id', sa.Integer(), nullable=True),
+    sa.Column('beer_name', sa.String(length=100), nullable=False),
+    sa.Column('rating', sa.Float(), nullable=False),
+    sa.Column('notes', sa.String(length=500), nullable=True),
+    sa.Column('is_favorite', sa.Boolean(), nullable=True),
+    sa.Column('date_tried', sa.DateTime(), nullable=True),
+    sa.ForeignKeyConstraint(['brewery_review_id'], ['brewery_review.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('journey_reviews',
@@ -147,23 +138,34 @@ def upgrade():
     sa.ForeignKeyConstraint(['journey_id'], ['journey.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
+    op.create_table('user_image',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('is_profile_image', sa.Boolean(), nullable=False),
+    sa.Column('public_id', sa.String(length=500), nullable=False),
+    sa.Column('image_url', sa.String(length=500), nullable=False),
+    sa.Column('owner_id', sa.Integer(), nullable=True),
+    sa.Column('review_id', sa.Integer(), nullable=True),
+    sa.ForeignKeyConstraint(['owner_id'], ['user.id'], ),
+    sa.ForeignKeyConstraint(['review_id'], ['brewery_review.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
     # ### end Alembic commands ###
 
 
 def downgrade():
     # ### commands auto generated by Alembic - please adjust! ###
+    op.drop_table('user_image')
     op.drop_table('route')
     op.drop_table('journey_reviews')
+    op.drop_table('beer_review')
     op.drop_table('user_rewards')
-    op.drop_table('user_image')
     op.drop_table('point_transaction')
     op.drop_table('journey')
     op.drop_table('favorite_users')
     op.drop_table('favorite_breweries')
     op.drop_table('favorite_beers')
-    op.drop_table('beer_review')
-    op.drop_table('user')
     op.drop_table('brewery_review')
+    op.drop_table('user')
     op.drop_table('brewery')
     op.drop_table('beer')
     # ### end Alembic commands ###
