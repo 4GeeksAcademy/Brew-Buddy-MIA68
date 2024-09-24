@@ -143,7 +143,9 @@ export const ReviewCard = (props) => {
                 {review.is_favorite_brewery && (
                     <p className="text-success">🌟 This is a favorite brewery!</p>
                 )}
-
+                {review.review_images.length>0 && (
+                    <img src={review.review_images[0].image_url} width="96" height="96" />
+                )}
                 <h6>Beers Reviewed:</h6>
                 <ul className="list-group">
                     {review.beer_reviews.map((beerReview, index) => (

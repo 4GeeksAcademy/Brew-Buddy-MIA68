@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { Cloudinary } from '@cloudinary/url-gen';
 import { AdvancedImage } from '@cloudinary/react';
 import { fill } from '@cloudinary/url-gen/actions/resize';
+import { image } from '@cloudinary/url-gen/qualifiers/source';
 
 export const ReviewForm = ({ brewery, onSaveReview }) => {
     const [overallRating, setOverallRating] = useState(0);
@@ -34,16 +35,17 @@ export const ReviewForm = ({ brewery, onSaveReview }) => {
         setImageFile(event.target.files[0]);
     };
 
-    const handleImageUpload = async () => {
+    const handleImageUpload = async (review_id) => {
         if (!imageFile) return;
 
         const formData = new FormData();
         formData.append('file', imageFile);
+        formData.append('review_id', review_id)
 
         try {
             const response = await fetch(`${process.env.BACKEND_URL}/api/images`, {
                 method: 'POST',
-                headers: { 
+                headers: {
                     Authorization: `Bearer ${store.token}`
                 },
                 body: formData
@@ -52,6 +54,7 @@ export const ReviewForm = ({ brewery, onSaveReview }) => {
                 const data = await response.json();
                 setUploadedImageUrl(data.image.image_url);
                 setImageFile(null);
+                return data;
             } else {
                 console.error("Failed to upload image:", response.status, response.statusText);
             }
@@ -81,12 +84,16 @@ export const ReviewForm = ({ brewery, onSaveReview }) => {
             await actions.addFavoriteBrewery(checkedFavBreweryData);
         }
 
+        let data = await actions.addBreweryReviewToBackend(brewery, overallRating, reviewText, isFavoriteBrewery, beerReviews, data?.id);
+        let _image;
         if (imageFile) {
-            await handleImageUpload();
+            _image = await handleImageUpload(data.id);
         }
 
-        onSaveReview(brewery, overallRating, reviewText, isFavoriteBrewery, beerReviews, uploadedImageUrl);
-        actions.addBreweryReviewToBackend(brewery, overallRating, reviewText, isFavoriteBrewery, beerReviews, uploadedImageUrl);
+        onSaveReview(brewery, overallRating, reviewText, isFavoriteBrewery, beerReviews, _image 
+            ? _image.image_url
+            : null
+        );
     };
 
     return (
@@ -113,7 +120,7 @@ export const ReviewForm = ({ brewery, onSaveReview }) => {
             <div>
                 <label>Upload Image:</label>
                 <input type="file" accept="image/*" onChange={handleImageChange} />
-                {uploadedImageUrl && <img src={uploadedImageUrl} alt="Uploaded brewery" style={{maxWidth: '200px'}} />}
+                {uploadedImageUrl && <img src={uploadedImageUrl} alt="Uploaded brewery" style={{ maxWidth: '200px' }} />}
             </div>
             <h3>Beers Tried</h3>
             {beerReviews.map((beerReview, index) => (
