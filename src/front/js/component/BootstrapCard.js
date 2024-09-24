@@ -71,7 +71,7 @@ export const BreweryCard = (props) => {
     }
 
     return (
-        <div className="card text-center" style={{ boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1)" }}>
+        <div className="card text-center col-md-12 col-sm-12 col-lg-6 col-xl-4" style={{ boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1)" }}>
             <div className="card-body">
                 <h1 className="card-title brewery-title">
                     <a href={props.breweryData.brewery_type}>
@@ -152,7 +152,9 @@ export const ReviewCard = (props) => {
                 {review.is_favorite_brewery && (
                     <p className="text-success">🌟 This is a favorite brewery!</p>
                 )}
-
+                {review.review_images.length>0 && (
+                    <img src={review.review_images[0].image_url} width="96" height="96" />
+                )}
                 <h6>Beers Reviewed:</h6>
                 <ul className="list-group">
                     {review.beer_reviews.map((beerReview, index) => (

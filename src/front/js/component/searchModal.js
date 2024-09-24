@@ -8,8 +8,6 @@ const Modal = () => {
     const [stateValue, setStateValue] = useState("")
     const [typeValue, setTypeValue] = useState("")
 
-    if (!store.modalIsOpen) return null;
-
     const beginCitySearch = () => {
         let city = cityValue
         let state = stateValue
@@ -23,12 +21,11 @@ const Modal = () => {
     }
 
     return (
-        <div className="modal-overlay container col-7 text-center border border-secondary my-1">
+        <div className="modal-overlay container col-7 text-center my-1">
             <div className="row">
                 <div className="col">
                     <h3>Search by City</h3>
-                    <label htmlFor="cityInput">City:</label>
-                    <input type="text" id="cityInput" name="cityInput" onChange={e => setCityValue(e.target.value)} />
+                    <input type="text" id="cityInput" name="cityInput" onChange={e => setCityValue(e.target.value)} placeholder="City" />
                     <select className="mx-2" onChange={e => setStateValue(e.target.value)}>
                         <option value="">Select State</option>
                         <option value="Alabama">Alabama</option>
@@ -87,15 +84,15 @@ const Modal = () => {
                         Search
                     </button>
                 </div>
-                <div className="col-1">
+                <div className="col-md-1 col-sm-12">
                     <h2 className="mt-5">OR</h2>
                 </div>
                 <div className="col">
                     <h3>Search by Location</h3>
                     <button onClick={beginLocationSearch}>Search</button>
                 </div>
-                <div className=" border-top my-2">
-                    <h4>Filter by type (optional)</h4>
+                <div className=" border-top py-2 border-dark">
+                    <h4>Filter by type</h4>
                     <select className="mx-2" onChange={e => setTypeValue(e.target.value)}>
                         <option value="">Select Type</option>
                         <option value="brewpub">Brewpub</option>
