@@ -16,14 +16,17 @@ export const Brewery = () => {
     const pathSegments = url.pathname.split('/');
     const dynamicId = pathSegments[pathSegments.length - 1];
 
-    const handleAddingNewBeer = () => {
+    const handleAddingNewBeer = async () => {
         const name = beerNameValue
         const flavor = flavorValue
         const type = typeValue
         const ABV = ABVValue
         const brewery = dynamicId
         if (name != "" && flavor != "" && type != "" && ABV != "") {
-            actions.addNewBeer(name, flavor, type, ABV, brewery)
+            let success = await actions.addNewBeer(name, flavor, type, ABV, brewery)
+            if (success) {
+                actions.getBreweryBeers(dynamicId)
+            }
             
         } else { console.log("missing information") }
     }

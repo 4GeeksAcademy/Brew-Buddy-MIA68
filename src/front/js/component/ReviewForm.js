@@ -78,10 +78,10 @@ export const ReviewForm = ({ brewery, onSaveReview }) => {
                     <input type="number" value={beerReview.rating} onChange={(e) => updateBeerReview(index, 'rating', e.target.value)} />
                     <label>Notes:</label>
                     <textarea value={beerReview.notes} onChange={(e) => updateBeerReview(index, 'notes', e.target.value)} />
-                    <label>
+                    {/* <label>
                         <input type="checkbox" checked={beerReview.isFavorite} onChange={(e) => updateBeerReview(index, 'isFavorite', e.target.checked)} />
                         Mark as Favorite Beer
-                    </label>
+                    </label> */}
                 </div>
             ))}
             <button type="button" onClick={addBeerReview}>Add Another Beer</button>

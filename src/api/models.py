@@ -16,7 +16,7 @@ class User(db.Model):
     point_transactions = db.relationship("PointTransaction", back_populates="owner")
     user_images = db.relationship("UserImage", back_populates="owner", foreign_keys="UserImage.owner_id")
 
-    def __init__(self, name, email, password, is_active=True):
+    def __init__(self, email, password, is_active=True):
         # self.name = name
         self.email = email
         self.password = password

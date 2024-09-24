@@ -36,13 +36,13 @@ export const Navbar = () => {
 
                 {/* Navbar links and user info */}
                 <div className="collapse navbar-collapse" id="navbarNav">
-                    <ul className="navbar-nav ms-auto">
+                    <ul className="navbar-nav ms-5">
                         <li className="nav-item">
-                            <Link to="/" className="nav-link">Home</Link>
+                            <Link to="/" className="nav-link me-4">Home</Link>
                         </li>
                         {store.token && (
                             <>
-                                <li className="nav-item">
+                                <li className="nav-item me-4">
                                     <Link to="/favorites" className="nav-link">Favorites</Link>
                                 </li>
                                 <li className="nav-item">
@@ -52,7 +52,7 @@ export const Navbar = () => {
                         )}
                     </ul>
                     {/* User Profile Section */}
-                    <div className="d-flex align-items-center">
+                    <div className="d-flex align-items-center ms-auto">
                         {store.token ? (
                             <>
                                 <span className="text-white me-3">Hello, {store.userEmail.split('@')[0]}!</span>

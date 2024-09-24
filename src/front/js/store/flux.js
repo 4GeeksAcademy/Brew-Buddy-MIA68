@@ -563,6 +563,38 @@ const getState = ({ getStore, getActions, setStore }) => {
 					return false;
 				}
 			},
+			deleteFavoriteBeer: async (beer) => {
+				try {
+					const resp = await fetch(process.env.BACKEND_URL + "/api/favorite_beers/" + beer.id, {
+						method: "DELETE",
+						headers: {
+							"Content-Type": "application/json",
+							Authorization: "Bearer " + sessionStorage.getItem("token")
+
+						},
+					});
+					if (resp.ok) {
+						const data = await resp.json();
+						console.log("beer deleted from favorites: ", data);
+
+						const store = getStore();
+
+						setStore({
+							favoriteBeers: getStore().favoriteBeers.filter((x) => {
+								return x != beer;
+							})
+						});
+						alert("This beer has been deleted from your Favorites");
+
+					} else {
+						const errorData = await resp.json();
+						console.error("failed to add", errorData);
+					}
+				} catch (error) {
+					console.error("error deleting beer", error);
+				}
+			},
+		
 			getFavoritePeople: async () => {
 				let response = await fetch(process.env.BACKEND_URL + "/api/favorite_users", {
 					headers: {
@@ -713,10 +745,17 @@ const getState = ({ getStore, getActions, setStore }) => {
 							}
 						)
 					})
-
+					if (response.status!=200) {
+						console.log("error occurred while adding beer")
+						return false 
+					} 
+					let data = await response.json()
+					console.log (data) 
+					return true
 				}
 				catch (error) {
 					console.error("Error adding new beer", error)
+					return false
 				}
 			}
 		}

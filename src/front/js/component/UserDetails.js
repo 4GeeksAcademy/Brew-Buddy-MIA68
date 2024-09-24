@@ -53,7 +53,7 @@ export default function UserDetails(props) {
                     </div>
                 </div>
                 <div role="tabpanel" aria-labelledby="friends" tabindex="0" class="tab-pane fade" id="friends">John Doe</div>
-                <div role="tabpanel" aria-labelledby="privacy" tabindex="0" class="tab-pane fade" id="privacy">privacy</div>
+                <div role="tabpanel" aria-labelledby="privacy" tabindex="0" class="tab-pane fade" id="privacy"><input className='me-2' id='datashare' type='checkbox'></input><label htmlFor='datashare'>Do not share my data</label></div>
                 <div role="tabpanel" aria-labelledby="settings" tabindex="0" class="tab-pane fade" id="settings">
                 <div className="mt-5 "><Link className='btn btn-secondary' to="/forgot-password">Change My Password</Link></div> {/* stay here */}
                 </div>

@@ -24,14 +24,14 @@
     color: #fff;
 }
 
-.nav-link {
-    font-size: 1.1rem;
-    color: #ddd !important;
-    transition: color 0.2s ease-in-out;
-}
+/* .nav-link {
+    font-size: 1.1rem; */
+    /* color: #201c1c !important; */
+    /* transition: color 0.2s ease-in-out;
+} */
 
-.nav-link:hover {
-    color: #fff !important;
+.nav-pills .nav-link:hover {
+    color: #151414 !important;
 }
 
 .profile-image {

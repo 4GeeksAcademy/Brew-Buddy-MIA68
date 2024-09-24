@@ -70,7 +70,7 @@ export const BreweryCard = (props) => {
     }
 
     return (
-        <div className="card">
+        <div className="card" style={{ boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1)" }}>
             <div className="card-body">
                 <h1 className="card-title">
                     <a href={props.breweryData.brewery_type}>
@@ -91,21 +91,21 @@ export const BreweryCard = (props) => {
                         />
                     </a>
                 </h1>
-                <h5>{props.breweryData.city}, {props.breweryData.state}</h5>
+                <h5 className="mb-3">{props.breweryData.city}, {props.breweryData.state}</h5>
                 <button className="btn btn-primary" onClick={handleAddBreweryToRoute}>Add to my current route</button>
                 {/* J.R.: A favorites button for brewery */}
-                <a className="btn btn-info"><i className={currentFavorite == true ? "fa-solid fa-star" : "fa-regular fa-star"} onClick={(e) => handleFavBrewery(e)}></i></a>                {/* J.R.: A button for contact information of brewery */}
+                <a className="btn btn-info mx-2"><i className={currentFavorite == true ? "fa-solid fa-star" : "fa-regular fa-star"} onClick={(e) => handleFavBrewery(e)}></i></a>                {/* J.R.: A button for contact information of brewery */}
                 <a href={props.breweryData.phone}>{props.breweryData.phone}</a>
                 {/* A button for website of brewery */}
-                <p>
+                <div className="d-flex mt-2">
                     <a href={props.breweryData.website_url} target="blank">
                         <button className="btn btn-secondary">Visit Our Website!</button>
                     </a>
-                    <Link to={"/brewery/" + props.breweryData.id} className="btn btn-secondary">
+                    <Link to={"/brewery/" + props.breweryData.id} className="btn btn-secondary mx-2">
                         See Brews
                     </Link>
                     <Link to={"/brewery_reviews/" + props.breweryData.id} className="btn btn-secondary" onClick={(e) => actions.getReviewsOnFrontEnd(props.breweryData.id)}>Check Reviews</Link>
-                </p>
+                </div>
             </div>
         </div>
     )

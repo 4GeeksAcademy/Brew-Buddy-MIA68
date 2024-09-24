@@ -701,6 +701,6 @@ def add_beer():
     beer = Beer(beer_name= new_Beer_Name, flavor= new_Flavor, type= new_Type, ABV= new_ABV, brewery_Id= new_Brewery_Id)
     db.session.add(beer)
     db.session.commit()
-    return "msg: brewery added:", 200
+    return jsonify({"msg": "beer added"}), 200
 
 

@@ -6,6 +6,7 @@ import "../../styles/favorites.css";
 import {FavoriteBeers} from "../component/FavoriteBeers"
 import craft from "../../img/craft.jpg"
 import {FavoriteBreweries} from "../component/FavoriteBreweries"
+import FavoritePeople from "../component/FavoritePeople";
 
 export const Favorites = () => {
   const { store, actions } = useContext(Context);
@@ -158,7 +159,7 @@ export const Favorites = () => {
           aria-labelledby="pills-profile-tab"
           tabindex="0"
         >
-          People
+          <FavoritePeople/> 
         </div>
         <div
           class="tab-pane text-center justify-content-center fade"
