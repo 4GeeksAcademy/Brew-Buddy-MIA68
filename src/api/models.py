@@ -6,6 +6,7 @@ db = SQLAlchemy()
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
+    # name = db.Column(db.String(120), nullable=True)
     password = db.Column(db.String(80), nullable=False)
     is_active = db.Column(db.Boolean(), unique=False, nullable=False)
     favorite_users = db.relationship("FavoriteUsers", back_populates="owner", foreign_keys="FavoriteUsers.owner_id")
@@ -18,6 +19,7 @@ class User(db.Model):
     user_rewards = db.relationship("UserRewards", back_populates="owner")
 
     def __init__(self, email, password, is_active=True):
+        # self.name = name
         self.email = email
         self.password = password
         self.is_active = is_active
@@ -63,6 +65,7 @@ class User(db.Model):
         return {
             "id": self.id,
             "email": self.email,
+            # "name" : self.name,
             "favorite_users": favorite_users_dictionaries,
             "favorite_beers": favorite_beers_dictionaries,
             "favorite_breweries": favorite_breweries_dictionaries,

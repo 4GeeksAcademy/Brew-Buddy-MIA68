@@ -35,10 +35,12 @@ if UPLOAD_FOLDER:
 def handle_signup():
     body = request.get_json()
     email = body["email"]
+    # name = body["name"]
     password = hashlib.sha256(body["password"].encode("utf-8")).hexdigest()
     
     user = User(
         email=email,
+        # name=name,
         password=password,
         is_active=True
     )
@@ -380,11 +382,16 @@ def add_favorite_beer(beer_id):
     current_user = get_current_user()
     if not current_user:
         return jsonify({"error": "User not authenticated"}), 401
-    
+    beer_exists=FavoriteBeers.query.filter_by(favorited_beer_id=beer_id).first()
+    if beer_exists: 
+        db.session.delete(beer_exists)
+        db.session.commit()
+        return jsonify(message="beer has been removed from favorites")
+
     new_favorite_beer = FavoriteBeers(owner_id=current_user.id, favorited_beer_id=beer_id)
     db.session.add(new_favorite_beer)
     db.session.commit()
-    return jsonify({"done": True}), 201
+    return jsonify({"done": True, "message": "beer has been added to favorites"}), 201
 
 # Add a favorite brewery for the current user with authentication
 @api.route('/favorite_breweries', methods=['POST'])
@@ -710,7 +717,7 @@ def add_beer():
     beer = Beer(beer_name= new_Beer_Name, flavor= new_Flavor, type= new_Type, ABV= new_ABV, brewery_Id= new_Brewery_Id)
     db.session.add(beer)
     db.session.commit()
-    return "msg: brewery added:", 200
+    return jsonify({"msg": "beer added"}), 200
 
 #Redeem Points for Rewards
 @api.route('/add_user_reward', methods=['POST'])

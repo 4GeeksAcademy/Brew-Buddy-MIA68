@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 export const SignUp = () => {
     const { store, actions } = useContext(Context);
-    const [credentials, setCredentials] = useState({ email: "", password: "" });
+    const [credentials, setCredentials] = useState({email: "", password: "" });
     const [errorMessage, setErrorMessage] = useState("");
     const navigate = useNavigate();
 
@@ -31,6 +31,10 @@ export const SignUp = () => {
         <div className="container">
             <h1 className="text-center mt-5">Sign Up</h1>
             <form onSubmit={handleSubmit}>
+                {/* <div className="form-group mt-3">
+                    <label>Name</label>
+                    <input type="text" placeholder="John Doe" className="form-control" id="name" value={credentials.name} onChange={handleChange} required />
+                </div> */}
                 <div className="form-group mt-3">
                     <label>Email</label>
                     <input type="email" placeholder="email@example.com" className="form-control" id="email" value={credentials.email} onChange={handleChange} required />

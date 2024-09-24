@@ -1,6 +1,6 @@
 .favorites-text-shadowing {
-    color: white;
-    text-shadow: 2px 2px 4px #000000;
+    color: white !important;
+    text-shadow: 2px 2px 4px #000000 !important;
     /* -webkit-text-stroke-width: 1px;
     -webkit-text-stroke-color: black; */
 }
