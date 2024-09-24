@@ -24,13 +24,12 @@ export const Navbar = () => {
         <nav className="navbar navbar-expand-lg py-3">
             <div className="container-fluid d-flex justify-content-between align-items-center">
                 {/* Logo section */}
-                <div className="d-flex flex-column align-items-center">
+                <Link to="/" className="d-flex flex-column align-items-center">
                     <img src={HomeLogo2} alt="Home Icon" className="navbar-logo" />
-                </div>
+                </Link>
                 <Link to="/search" className="nav-link d-flex flex-row align-items-center my-auto mx-3">
-                    <img src={HomeLogo2} alt="Home Icon" className="search-icon" />
                     <span className="home-text mt-1">Search</span>
-                </Link> */}
+                </Link>
 
                 {/* Responsive toggle for mobile */}
                 <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -43,11 +42,12 @@ export const Navbar = () => {
                         <li className="nav-item">
                             <Link to="/" className="nav-link me-4">Home</Link>
                         </li>
-                        {store.token && (
-                            <>
-                                <li className="nav-item me-4">
+                        <li className="nav-item me-4">
                                 <Link to="/search" className="nav-link"><span className="home-text mt-1">Search</span></Link>
                                 </li>
+                        {store.token && (
+                            <>
+                                
                                 <li className="nav-item me-4">
                                     <Link to="/favorites" className="nav-link">Favorites</Link>
                                 </li>
