@@ -14,7 +14,7 @@ class User(db.Model):
     favorite_breweries = db.relationship("FavoriteBreweries", back_populates="owner", foreign_keys="FavoriteBreweries.owner_id")
     point_transactions = db.relationship("PointTransaction", back_populates="owner")
     user_images = db.relationship("UserImage", back_populates="owner", foreign_keys="UserImage.owner_id")
-    # brewery_reviews = db.relationship("BreweryReview", back_populates="owner", foreign_keys="BreweryReview.owner_id")
+    brewery_reviews = db.relationship("BreweryReview", back_populates="owner", foreign_keys="BreweryReview.owner_id")
     user_rewards = db.relationship("UserRewards", back_populates="owner")
 
     def __init__(self, email, password, is_active=True):
@@ -260,19 +260,22 @@ class UserRewards(db.Model):
 
 # model for user uploaded images
 class UserImage(db.Model):
-    __table_args__ = (db.UniqueConstraint('owner_id', 'is_profile_image', name='unique_profile_image_per_user'),)
+    # __table_args__ = (db.UniqueConstraint('owner_id', 'is_profile_image', name='unique_profile_image_per_user'),)
     id = db.Column(db.Integer, primary_key=True)
     is_profile_image = db.Column(db.Boolean(), nullable=False, default=False)
     public_id = db.Column(db.String(500), nullable=False)
     image_url = db.Column(db.String(500), nullable=False)
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    review_id = db.Column(db.Integer, db.ForeignKey('brewery_review.id'))
     owner = db.relationship("User", back_populates="user_images", foreign_keys=[owner_id])
+    review = db.relationship("BreweryReview", back_populates="review_images", foreign_keys=[review_id])
 
-    def __init__(self, public_id, image_url, owner_id, is_profile_image=False):
+    def __init__(self, public_id, image_url, owner_id, is_profile_image=False, review_id=None):
         self.public_id = public_id
         self.image_url = image_url
         self.owner_id = owner_id
         self.is_profile_image = is_profile_image
+        self.review_id = review_id
 
     def serialize(self):
         return {
@@ -294,24 +297,21 @@ class BreweryReview(db.Model):
     overall_rating = db.Column(db.Float, nullable=False)
     review_text = db.Column(db.String(500), nullable=True)
     is_favorite_brewery = db.Column(db.Boolean, default=False)
-    image_url = db.Column(db.String(255))
+    review_images = db.relationship("UserImage", back_populates="review", foreign_keys="UserImage.review_id")
     visit_date = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # EJQ - relationship with User model needs to be established
-    # owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    # owner = relationship('User', back_populates='brewery_reviews')
+    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    owner = db.relationship('User', back_populates='brewery_reviews')
 
     beer_reviews = db.relationship('BeerReview', backref='brewery_review', lazy=True)
 
-    def __init__(self, brewery_name, brewery_id, overall_rating, review_text="", is_favorite_brewery=False, image_url=None):
+    def __init__(self, brewery_name, brewery_id, overall_rating, review_text="", is_favorite_brewery=False, owner_id=None):
         self.brewery_name = brewery_name
         self.brewery_id = brewery_id
         self.overall_rating = overall_rating
         self.review_text = review_text
         self.is_favorite_brewery = is_favorite_brewery
-        self.image_url = image_url
-        # EJQ - owner id needs to be included
-        # self.owner_id = owner_id
+        self.owner_id = owner_id
 
     # Method to add a beer review
     # def add_beer_review(self, beer_review):
@@ -325,10 +325,9 @@ class BreweryReview(db.Model):
             "overall_rating": self.overall_rating,
             "review_text": self.review_text,
             "is_favorite_brewery": self.is_favorite_brewery,
-            "image_url": self.image_url,
+            "review_images": [image.serialize() for image in self.review_images],
             "visit_date": self.visit_date.isoformat(),
-            # EJQ - also need owner id
-            # "owner_id": self.owner_id,
+            "owner_id": self.owner_id,
         }
 
 # EJQ association table for brewery review images

@@ -655,7 +655,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 				const response = await fetch(process.env.BACKEND_URL + '/api/add_brewery_review', {
 					method: 'POST',
 					headers: {
-						'Content-Type': 'application/json'
+						'Content-Type': 'application/json',
+						Authorization: `Bearer ${getStore().token}`
 					},
 					body: JSON.stringify({
 						brewery_name: breweryData.name,

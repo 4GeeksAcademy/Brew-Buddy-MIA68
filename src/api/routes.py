@@ -543,6 +543,7 @@ def handle_user_images(id=0):
                 
                 # Check if this should be the profile image
                 is_profile_image = request.form.get("mode") == "profile"
+                review_id = request.form.get("review_id", None)
                 
                 # If it's a profile image, set all other images to not be profile images
                 if is_profile_image:
@@ -553,7 +554,8 @@ def handle_user_images(id=0):
                     public_id=result['public_id'],
                     image_url=result['secure_url'],
                     owner_id=current_user.id,
-                    is_profile_image=is_profile_image
+                    is_profile_image=is_profile_image,
+                    review_id = review_id
                 )
                 
                 db.session.add(new_image)
@@ -596,11 +598,12 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @api.route('/add_brewery_review', methods=['Post'])
+@jwt_required()
 def add_brewery_review():
-    # EJQ - this needs to be added to only allow users to post reviews
-    # current_user = get_current_user()
-    # if not current_user:
-    #     return jsonify({"error": "User not authenticated"}), 401
+    current_user = get_current_user()
+    if not current_user:
+        return jsonify({"error": "User not authenticated"}), 401
+    
     data = request.json
     brewery_review = BreweryReview(
         brewery_name=data.get('brewery_name'),
@@ -608,7 +611,7 @@ def add_brewery_review():
         overall_rating=data['overall_rating'],
         review_text=data.get('review_text', ""),
         is_favorite_brewery=data.get('is_favorite_brewery', False),
-        image_url=data.get('image_url')
+        owner_id=current_user.id
     )
     db.session.add(brewery_review)
     db.session.commit()
@@ -629,12 +632,9 @@ def add_brewery_review():
     # points_earned = 10
     # current_user.change_points(points_earned, "Submitted a brewery review")
 
-    return jsonify({
-        "message": "Review added successfully",
-        # EJQ - this needs to be added after current user is established
-        # "points_earned": points_earned,
-        # "total_points": current_user.points
-    }), 201
+    return jsonify(
+        brewery_review.serialize()
+    ), 201
 
 @api.route('/get_brewery_reviews', methods=['GET'])
 def get_brewery_reviews():
@@ -666,7 +666,8 @@ def get_brewery_reviews():
             'overall_rating': review.overall_rating,
             'review_text': review.review_text,
             'is_favorite_brewery': review.is_favorite_brewery,
-            'beer_reviews': beer_reviews_data
+            'beer_reviews': beer_reviews_data,
+            'review_images': [image.serialize() for image in review.review_images]
         })
     return jsonify(result), 200
 
