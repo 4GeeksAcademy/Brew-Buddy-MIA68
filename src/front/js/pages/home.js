@@ -9,6 +9,7 @@ import { Link } from "react-router-dom";
 import HomeLogo1 from "../../img/HomeLogo1.png"
 import AgeVerificationPic2 from "../../img/AgeVerificationPic2.webp"
 import background1 from "../../img/DALL·E 2024-09-04.webp"
+import splashLogo1 from "../../img/splashLogo1.webp"
 
 export const Home = () => {
 	const { store, actions } = useContext(Context);
@@ -48,12 +49,13 @@ export const Home = () => {
 				<div className="content">
 					<div className="homepage-section">
 						<div className="left-section">
-							<img src={HomeLogo1} className="home-logo-img" alt="BrewBuddy Logo" />
+							<img src={splashLogo1} className="splash-logo-img" alt="BrewBuddy Logo" />
 						</div>
 						<div className="right-section">
 							<div className="text-box">
 								<h2>Welcome to BrewBuddy!</h2>
-								<p>Discover your next favorite brewery and explore exciting beer routes curated just for you!</p>
+								<p>Discover your next favorite brewery and curate exciting beer routes just for you!</p>
+								<img src={HomeLogo1} className="home-logo-img" alt="BrewBuddy Logo" />
 							</div>
 						</div>
 					</div>

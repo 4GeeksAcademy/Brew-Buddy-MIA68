@@ -12,6 +12,13 @@
     width: auto; /* Ensure the image scales properly */
 }
 
+.splash-logo-img {
+    height: auto;
+    max-width: 90%;
+    width: auto; /* Ensure the image scales properly */
+    border-radius: 50%;
+}
+
 .home-container {
     position: relative;
     min-height: 100vh;

@@ -24,11 +24,11 @@ export const Navbar = () => {
         <nav className="navbar navbar-expand-lg py-3">
             <div className="container-fluid d-flex justify-content-between align-items-center">
                 {/* Logo section */}
-                <Link to="/" className="nav-link d-flex flex-column align-items-center">
+                <div className="d-flex flex-column align-items-center">
                     <img src={HomeLogo2} alt="Home Icon" className="navbar-logo" />
-                    <span className="home-text mt-1">Home</span>
-                </Link>
-                <Link to="/search" className="nav-link d-flex flex-column align-items-center mt-auto">
+                </div>
+                <Link to="/search" className="nav-link d-flex flex-row align-items-center my-auto mx-3">
+                    <img src={HomeLogo2} alt="Home Icon" className="search-icon" />
                     <span className="home-text mt-1">Search</span>
                 </Link>
 

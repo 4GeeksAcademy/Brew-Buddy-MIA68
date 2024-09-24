@@ -2,10 +2,19 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     padding: 0.5rem 2rem;
     background: linear-gradient(90deg, #FFBF00, #a83b00); /* Amber to Dark Brown */
+    position: sticky;
+    width: 100%;
+    top: 0;
+    z-index: 100;
 }
 
 .navbar-logo {
     width: 90px;
+    height: auto;
+}
+
+.search-icon {
+    width: 75px;
     height: auto;
 }
 
