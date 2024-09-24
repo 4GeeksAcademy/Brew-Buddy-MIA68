@@ -7,8 +7,9 @@ import { BreweryRouteCard } from "../component/BootstrapCardRoute";
 import Modal from "../component/searchModal";
 import { Link } from "react-router-dom";
 import HomeLogo1 from "../../img/HomeLogo1.png"
-import AgeVerificationPic1 from "../../img/AgeVerificationPic1.webp"
+import AgeVerificationPic2 from "../../img/AgeVerificationPic2.webp"
 import background1 from "../../img/DALL·E 2024-09-04.webp"
+import splashLogo1 from "../../img/splashLogo1.webp"
 
 export const Home = () => {
 	const { store, actions } = useContext(Context);
@@ -50,54 +51,63 @@ export const Home = () => {
 	return (
 		<div className="home-container">
 			<img src={background1} alt="Background" className="background-image" />
-			<div className="content">
-				<div className="text-center mt-5">
-					<h1 className="text-light">Find your brewery today! Cheers!</h1>
-					{/* EJQ - Commented out the logo to put a new homepage logo */}
-					{/* <img src={brewbuddyimg} className="home-logo-img" /> */}
-					<img src={HomeLogo1} />
-				</div>
-			</div>
-			{showAgeVerification && (
-			<div
-				style={{
-					position: "fixed",
-					top: 0,
-					left: 0,
-					width: "100%",
-					height: "100%",
-					backgroundColor: "rgba(0, 0, 0, 0.5)",
-					display: "flex",
-					justifyContent: "center",
-					alignItems: "center",
-					zIndex: 1000,
-				}}
-			>
-				<div className="age-verification-popup">
-					<div className="image-section">
-						<img src={AgeVerificationPic1} alt="Age Verification Logo" />
-					</div>
-					<div className="text-section">
-						<h2>Age Verification</h2>
-						<p>Are you 21 or older?</p>
-						<div>
-							<button
-								onClick={() => handleAgeVerification(true)}
-								className="age-verification-button"
-							>
-								Yes
-							</button>
-							<button
-								onClick={() => handleAgeVerification(false)}
-								className="age-verification-button"
-							>
-								No
-							</button>
+			<Link to="/search" className="full-page-link">
+				<div className="content">
+					<div className="homepage-section">
+						<div className="left-section">
+							<img src={splashLogo1} className="splash-logo-img" alt="BrewBuddy Logo" />
+						</div>
+						<div className="right-section">
+							<div className="text-box">
+								<h2>Welcome to BrewBuddy!</h2>
+								<p>Discover your next favorite brewery and curate exciting beer routes just for you!</p>
+								<img src={HomeLogo1} className="home-logo-img" alt="BrewBuddy Logo" />
+							</div>
 						</div>
 					</div>
 				</div>
-			</div>
-		)}
-    </div>
-  );
+			</Link>
+
+			{showAgeVerification && (
+				<div
+					style={{
+						position: "fixed",
+						top: 0,
+						left: 0,
+						width: "100%",
+						height: "100%",
+						backgroundColor: "rgba(0, 0, 0, 0.5)",
+						display: "flex",
+						justifyContent: "center",
+						alignItems: "center",
+						zIndex: 1000,
+					}}
+				>
+					<div className="age-verification-popup">
+						<div className="image-section">
+							<img src={AgeVerificationPic2} alt="Age Verification Logo" />
+						</div>
+						<div className="text-section">
+							<h2>Age Verification</h2>
+							<p>Are you 21 or older?</p>
+							<div>
+								<button
+									onClick={() => handleAgeVerification(true)}
+									className="age-verification-button"
+								>
+									Yes
+								</button>
+								<button
+									onClick={() => handleAgeVerification(false)}
+									className="age-verification-button"
+								>
+									No
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			)}
+		</div>
+	);
 };

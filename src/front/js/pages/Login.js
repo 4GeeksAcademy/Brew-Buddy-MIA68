@@ -16,7 +16,7 @@ export const Login = () => {
         const response= await actions.login(credentials.email, credentials.password);
         console.log(response) 
         if (!response.success){alert("Invalid Credentials");return}
-        navigate("/");
+        navigate("/search");
 
     }
 
