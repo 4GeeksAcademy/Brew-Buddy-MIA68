@@ -112,20 +112,20 @@ export const ForgotPassword = () => {
                     </div>
                 ) : (
                     <div className="container">
-                        <h1 className="text-center mt-5">Reset Password</h1>
+                        <h1 className="text-center mt-5 fw-bold">Reset Password</h1>
                         <div className="mb-3">
-                            <label className="form-label" htmlFor="password">New Password</label>
+                            <label className="form-label fw-bold" htmlFor="password">New Password</label>
                             <input onChange={(e) => setPassword(e.target.value)} className="form-control" id="password" type="password" placeholder="New Password" required />
                         </div>
                         <div className="mb-3">
-                            <label className="form-label" htmlFor="confirm_password">Confirm New Password</label>
+                            <label className="form-label fw-bold" htmlFor="confirm_password">Confirm New Password</label>
                             <input onChange={(e) => setConfirmPassword(e.target.value)} className="form-control" id="confirm_password" type="password" placeholder="Confirm Password" required />
                         </div>
                     </div>
                 )}
                 <div className="container col-auto">
                     {error && <div className="alert alert-danger mt-3" role="alert">{error}</div>}
-                    <button type="submit" className="btn btn-dark mt-4">Submit</button>
+                    <button type="submit" className="btn btn-success mt-4">Submit</button>
                 </div>
             </form>
         </div>

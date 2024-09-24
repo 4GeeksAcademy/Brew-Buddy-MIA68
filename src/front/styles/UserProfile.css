@@ -1,0 +1,10 @@
+.profile-img {
+    border-radius: 100%;
+    border-style: solid;
+    border-width: 3px;
+    border-color: lightyellow
+}
+
+h1 {
+    color: white;
+}

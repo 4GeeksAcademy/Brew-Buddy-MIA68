@@ -3,7 +3,9 @@ import { Context } from "../store/appContext";
 import { Link } from "react-router-dom";
 import { Cloudinary } from '@cloudinary/url-gen';
 import { AdvancedImage } from '@cloudinary/react';
+import "../../styles/UserProfile.css";
 import { fill } from '@cloudinary/url-gen/actions/resize';
+import background1 from "../../img/DALL·E 2024-09-04.webp"
 
 export const UserProfile = () => {
     const { store, actions } = useContext(Context);
@@ -53,15 +55,15 @@ export const UserProfile = () => {
 
     const handleImageUpload = async () => {
         if (!imageFile) return;
-    
+
         const formData = new FormData();
         formData.append('file', imageFile);
         formData.append("mode", "profile");
-    
+
         try {
             const response = await fetch(`${process.env.BACKEND_URL}/api/images`, {
                 method: 'POST',
-                headers: { 
+                headers: {
                     Authorization: `Bearer ${store.token}`
                 },
                 body: formData
@@ -82,18 +84,19 @@ export const UserProfile = () => {
 
     return (
         <div className="container mt-4">
+            <img src={background1} alt="Background" className="background-image" />
             {userInfo && (
                 <>
                     <div className="row align-items-center mb-1">
                         <div className="col-9">
-                            <h1>Hello and welcome {userInfo.email}!</h1>
-                            <p>You have {userInfo.points} points. Congratulations!</p>
+                            <h1 className="fw-bold">Hello and welcome {userInfo.email}!</h1>
+                            <p className="fw-bold">You have {userInfo.points} points. Congratulations!</p>
                         </div>
                         <div className="col-2 d-flex flex-column align-items-center">
                             <AdvancedImage
                                 cldImg={cld.image(store.userProfilePublicId || 'samples/man-portrait').resize(fill().width(200).height(200))}
                                 alt="Profile"
-                                className="img-fluid mb-3"
+                                className="img-fluid mb-3 profile-img"
                             />
                             <div className="text-end w-100">
                                 <input type="file" accept="image/*" onChange={handleImageChange} className="form-control mb-2" />
@@ -103,48 +106,60 @@ export const UserProfile = () => {
                     </div>
                 </>
             )}
-            <div className="mt-1">
-                <h2>Point History</h2>
-                <table className="table">
-                    <thead>
-                        <tr>
-                            <th>Action</th>
-                            <th>Points</th>
-                            <th>Timestamp</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {pointHistory.map((entry, index) => (
-                            <tr key={index}>
-                                <td>{entry.action}</td>
-                                <td>{entry.points}</td>
-                                <td>{new Date(entry.timestamp).toLocaleString()}</td>
+            <div className="mt-1 row">
+                <div className="col-6">
+                    <h2 className="fw-bold">Point History</h2>
+                    <table className="table border table-warning">
+                        <thead className="table-light">
+                            <tr>
+                                <th>Action</th>
+                                <th>Points</th>
+                                <th>Timestamp</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
-                <table className="table">
-                    <thead>
-                        <tr>
-                            <th>Reward Name</th>
-                            <th>Reward Type</th>
-                            <th>Reward Value</th>
-                            <th>Point Cost</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {store.userRewards.map((reward, index) => (
-                            <tr key={index}>
-                                <td>{reward.reward_name}</td>
-                                <td>{reward.reward_type}</td>
-                                <td>{reward.reward_value}</td>
-                                <td>{reward.point_cost}</td>
+                        </thead>
+                        <tbody>
+                            {pointHistory.map((entry, index) => (
+                                <tr key={index}>
+                                    <td>{entry.action}</td>
+                                    <td>{entry.points}</td>
+                                    <td>{new Date(entry.timestamp).toLocaleString()}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+                <div className="col-6">
+                    <h2 className="fw-bold">Rewards</h2>
+                    <table className="table border table-success">
+                        <thead className="table-light">
+                            <tr>
+                                <th>Reward Name</th>
+                                <th>Reward Type</th>
+                                <th>Reward Value</th>
+                                <th>Point Cost</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {store.userRewards.map((reward, index) => (
+                                <tr key={index}>
+                                    <td>{reward.reward_name}</td>
+                                    <td>{reward.reward_type}</td>
+                                    <td>{reward.reward_value}</td>
+                                    <td>{reward.point_cost}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
-            <div className="mt-5"><Link to="/forgot-password">Change My Password</Link></div>
+            <div className="mt-5">
+                <button className="btn btn-primary">
+                    <Link to="/forgot-password" className="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-75-hover">
+                        Change My Password
+                    </Link>
+                </button>
+            </div>
         </div>
+
     );
 };
