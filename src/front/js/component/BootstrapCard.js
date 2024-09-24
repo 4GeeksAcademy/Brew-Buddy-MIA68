@@ -71,7 +71,7 @@ export const BreweryCard = (props) => {
     }
 
     return (
-        <div className="card" style={{ boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1)" }}>
+        <div className="card text-center" style={{ boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1)" }}>
             <div className="card-body">
                 <h1 className="card-title brewery-title">
                     <a href={props.breweryData.brewery_type}>
@@ -83,11 +83,11 @@ export const BreweryCard = (props) => {
                     </a>
                     {props.breweryData.name}
                 </h1>
-                <h5 className="card-subtitle mb-2 text-muted">
+                <h5 className="card-subtitle mb-3 text-muted">
                     {props.breweryData.city}, {props.breweryData.state}
                 </h5>
-                <div className="brewery-buttons">
-                    <button className="btn btn-primary btn-block fun-button" onClick={handleAddBreweryToRoute}>
+                <div className="brewery-buttons mb-2">
+                    <button className="btn btn-primary btn-block fun-button me-2" onClick={handleAddBreweryToRoute}>
                         Add to Route <i className="fas fa-route"></i>
                     </button>
                     <button className={`btn ${currentFavorite ? "btn-warning" : "btn-light"} btn-block fun-button`} onClick={(e) => handleFavBrewery(e)}>
@@ -95,15 +95,15 @@ export const BreweryCard = (props) => {
                     </button>
                 </div>
                 <div className="brewery-contact">
-                    <a href={`tel:${props.breweryData.phone}`} className="btn btn-info btn-block fun-button">
+                    <a href={`tel:${props.breweryData.phone}`} className="btn btn-info btn-block fun-button me-2">
                         Call <i className="fas fa-phone"></i>
                     </a>
                     <a href={props.breweryData.website_url} target="_blank" rel="noopener noreferrer" className="btn btn-success btn-block fun-button">
                         Visit Website <i className="fas fa-external-link-alt"></i>
                     </a>
                 </div>
-                <div className="brewery-extras mt-3">
-                    <Link to={`/brewery/${props.breweryData.id}`} className="btn btn-secondary fun-button">
+                <div className="brewery-extras mt-2">
+                    <Link to={`/brewery/${props.breweryData.id}`} className="btn btn-secondary fun-button me-2">
                         See Brews <i className="fas fa-beer"></i>
                     </Link>
                     <Link to={`/brewery_reviews/${props.breweryData.id}`} className="btn btn-secondary fun-button" onClick={() => actions.getReviewsOnFrontEnd(props.breweryData.id)}>

@@ -26,7 +26,7 @@ export const Navbar = () => {
                 {/* Logo section */}
                 <Link to="/" className="nav-link d-flex flex-column align-items-center">
                     <img src={HomeLogo2} alt="Home Icon" className="navbar-logo" />
-                    <span className="home-text mt-1">Home</span>
+                    {/* <span className="home-text mt-1">Home</span> */}
                 </Link>
 
                 {/* Responsive toggle for mobile */}

@@ -103,7 +103,7 @@ export const UserProfile = () => {
                     </div>
                 </>
             )}
-            <div className="mt-1">
+            {/* <div className="mt-1">
                 <h2>Point History</h2>
                 <table className="table">
                     <thead>
@@ -143,8 +143,9 @@ export const UserProfile = () => {
                         ))}
                     </tbody>
                 </table>
-            </div>
-            <div className="mt-5"><Link to="/forgot-password">Change My Password</Link></div>
+            </div> */}
+            {/* <div className="mt-5"><Link to="/forgot-password">Change My Password</Link></div> */}
+            <UserDetails pointHistory={pointHistory}/>
         </div>
     );
 };

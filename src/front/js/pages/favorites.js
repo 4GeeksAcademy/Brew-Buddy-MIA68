@@ -88,7 +88,7 @@ export const Favorites = () => {
               backgroundPosition: "center",
             }}
           >
-            <h1 classNameName="text-white favorites-text-shadowing">People</h1>
+            <h1 className="text-white favorites-text-shadowing">People</h1>
           </button>
         </li>
         <li className="nav-item mx-1" role="presentation">
@@ -110,7 +110,7 @@ export const Favorites = () => {
               backgroundPosition: "right 9px center",
             }}
           >
-            <h1 classNameName="text-white favorites-text-shadowing">Beers</h1>
+            <h1 className="text-white favorites-text-shadowing">Beers</h1>
           </button>
         </li>
         {/* <li className="nav-item mx-1" role="presentation">

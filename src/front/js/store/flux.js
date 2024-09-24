@@ -147,6 +147,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			allBeers: [],
 			favoritePeople: [],
 			userRewards: [],
+			over20: false, 
 
 		},
 		actions: {
@@ -835,6 +836,10 @@ const getState = ({ getStore, getActions, setStore }) => {
 					console.error("Error fetching user rewards:", error);
 				}
 			},
+			verifyAge: () => {
+				setStore({ over20: true});
+				sessionStorage.setItem("over20", true);
+			}
 
 		}
 	};
