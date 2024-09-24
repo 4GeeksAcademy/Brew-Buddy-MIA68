@@ -16,6 +16,7 @@ export const UserProfile = () => {
     useEffect(() => {
         fetchUserInfo();
         fetchPointHistory();
+        actions.getRewardsFromBackend();
     }, []);
 
     const fetchUserInfo = async () => {
@@ -102,10 +103,48 @@ export const UserProfile = () => {
                     </div>
                 </>
             )}
-          
-            <UserDetails pointHistory={pointHistory}/>
-
-
+            <div className="mt-1">
+                <h2>Point History</h2>
+                <table className="table">
+                    <thead>
+                        <tr>
+                            <th>Action</th>
+                            <th>Points</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {pointHistory.map((entry, index) => (
+                            <tr key={index}>
+                                <td>{entry.action}</td>
+                                <td>{entry.points}</td>
+                                <td>{new Date(entry.timestamp).toLocaleString()}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+                <table className="table">
+                    <thead>
+                        <tr>
+                            <th>Reward Name</th>
+                            <th>Reward Type</th>
+                            <th>Reward Value</th>
+                            <th>Point Cost</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {store.userRewards.map((reward, index) => (
+                            <tr key={index}>
+                                <td>{reward.reward_name}</td>
+                                <td>{reward.reward_type}</td>
+                                <td>{reward.reward_value}</td>
+                                <td>{reward.point_cost}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+            <div className="mt-5"><Link to="/forgot-password">Change My Password</Link></div>
         </div>
     );
 };

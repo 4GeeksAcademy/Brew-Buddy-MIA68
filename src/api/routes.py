@@ -2,7 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint, session
-from api.models import db, User, Beer, Brewery, FavoriteUsers, FavoriteBeers, FavoriteBreweries, PointTransaction, UserImage, BreweryReview, BeerReview
+from api.models import db, User, Beer, Brewery, FavoriteUsers, FavoriteBeers, FavoriteBreweries, PointTransaction, UserImage, BreweryReview, BeerReview, UserRewards
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from flask_jwt_extended import create_access_token, get_jwt_identity, jwt_required
@@ -604,13 +604,18 @@ def allowed_file(filename):
 
 @api.route('/add_brewery_review', methods=['Post'])
 def add_brewery_review():
+    # EJQ - this needs to be added to only allow users to post reviews
+    # current_user = get_current_user()
+    # if not current_user:
+    #     return jsonify({"error": "User not authenticated"}), 401
     data = request.json
     brewery_review = BreweryReview(
         brewery_name=data.get('brewery_name'),
         brewery_id=data.get('brewery_id'),
         overall_rating=data['overall_rating'],
         review_text=data.get('review_text', ""),
-        is_favorite_brewery=data.get('is_favorite_brewery', False)
+        is_favorite_brewery=data.get('is_favorite_brewery', False),
+        image_url=data.get('image_url')
     )
     db.session.add(brewery_review)
     db.session.commit()
@@ -626,7 +631,17 @@ def add_brewery_review():
         db.session.add(beer_review)
     
     db.session.commit()
-    return jsonify({"message": "Review added successfully"}), 201
+
+    # EJQ - to award points for submitting a brewery review
+    # points_earned = 10
+    # current_user.change_points(points_earned, "Submitted a brewery review")
+
+    return jsonify({
+        "message": "Review added successfully",
+        # EJQ - this needs to be added after current user is established
+        # "points_earned": points_earned,
+        # "total_points": current_user.points
+    }), 201
 
 @api.route('/get_brewery_reviews', methods=['GET'])
 def get_brewery_reviews():
@@ -703,4 +718,62 @@ def add_beer():
     db.session.commit()
     return jsonify({"msg": "beer added"}), 200
 
+#Redeem Points for Rewards
+@api.route('/add_user_reward', methods=['POST'])
+@jwt_required()
+def redeem_award():
+    owner_id = get_jwt_identity()
+    reward_name = request.json.get('reward_name')
+    reward_value = request.json.get('reward_value')
+    reward_type = request.json.get('reward_type')
+    point_cost = request.json.get('reward_cost')
+
+    total_points = db.session.query(db.func.sum(PointTransaction.points)).filter_by(owner_id=owner_id).scalar() or 0
+
+    if total_points < point_cost:
+        return jsonify({'error': 'Not enough points.'}), 400
+
+    reward = UserRewards(
+        reward_name,
+        reward_value,
+        reward_type,
+        point_cost,
+        owner_id,
+    )
+    db.session.add(reward)
+    db.session.commit()
+
+    new_transaction = PointTransaction(
+        owner_id=owner_id,
+        points=-reward.point_cost,
+        action=f'Redeemed reward: {reward.reward_name}'
+    )
+    db.session.add(new_transaction)
+
+    db.session.commit()
+
+    return jsonify({
+        'message': 'Reward redeemed successfully!',
+        'reward': reward.serialize()
+    }), 200
+
+@api.route('/get_user_rewards', methods=['GET'])
+@jwt_required()
+def get_user_rewards():
+    owner_id = get_jwt_identity()
+
+    try:
+        # Fetch all rewards for the user
+        user_rewards = UserRewards.query.filter_by(owner_id=owner_id).all()
+
+        # Serialize each reward object
+        rewards_list = [reward.serialize() for reward in user_rewards]
+
+        return jsonify({
+            'rewards': rewards_list,
+            'totalRewards': len(rewards_list)
+        }), 200
+
+    except Exception as e:
+        return jsonify({'error': 'Error retrieving rewards', 'details': str(e)}), 500
 

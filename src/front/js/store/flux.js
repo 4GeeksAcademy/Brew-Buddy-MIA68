@@ -108,11 +108,24 @@ class BreweryReview {
 		this.visitDate = new Date();
 	}
 
+
 	// Method to add a beer review
 	addBeerReview(beerReview) {
 		this.beerReviews.push(beerReview);
 	}
 }
+
+export class Reward {
+	constructor(rewardData) {
+		this.reward_name = rewardData.reward_name;
+		this.reward_type = rewardData.reward_type;
+		this.reward_value = rewardData.reward_value;
+		this.point_cost = rewardData.point_cost;
+	
+	}
+}
+
+
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
@@ -132,7 +145,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 			favoriteBreweries: [],
 			favoriteBeers: [],
 			allBeers: [],
-			favoritePeople: []
+			favoritePeople: [],
+			userRewards: [],
 
 		},
 		actions: {
@@ -757,7 +771,71 @@ const getState = ({ getStore, getActions, setStore }) => {
 					console.error("Error adding new beer", error)
 					return false
 				}
-			}
+			},
+
+			// Add the redeemReward action here:
+            redeemReward: async (rewardName) => {
+                const store = getStore();
+                const token = store.token; // Fetch the token from the store
+
+                try {
+                    const response = await fetch(`${process.env.BACKEND_URL}/points`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `Bearer ${token}` // Include token in headers
+                        },
+                        body: JSON.stringify({
+                            owner_id: store.userEmail, // Assuming userEmail is being used as an identifier
+                            reward_name: rewardName
+                        })
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        console.log(`Reward redeemed: ${result.message}`);
+
+                        // Fetch updated points after successful redemption
+                        getActions().fetchUserInfo();
+
+                        return { success: true, message: result.message };
+                    } else {
+                        const errorResult = await response.json();
+                        console.error("Error redeeming reward:", errorResult);
+
+                        return { success: false, error: errorResult.error };
+                    }
+                } catch (error) {
+                    console.error("Error redeeming reward:", error);
+                    return { success: false, error: error.message };
+                }
+            },
+
+			getRewardsFromBackend: async () => {
+				const store = getStore();
+				try {
+					const response = await fetch(`${process.env.BACKEND_URL}/api/get_user_rewards`, {
+						method: "GET",
+						headers: {
+							"Content-Type": "application/json",
+							Authorization: `Bearer ${store.token}`, // Ensure token is sent in headers
+						},
+					});
+			
+					if (response.ok) {
+						const data = await response.json();
+						const eachReward = data.rewards.map((rewardData) => 
+								 new Reward(rewardData)
+						)
+						store.userRewards = eachReward
+					} else {
+						console.error("Failed to fetch rewards:", response.statusText);
+					}
+				} catch (error) {
+					console.error("Error fetching user rewards:", error);
+				}
+			},
+
 		}
 	};
 };

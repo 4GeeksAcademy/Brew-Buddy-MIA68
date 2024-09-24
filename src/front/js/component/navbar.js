@@ -21,12 +21,12 @@ export const Navbar = () => {
     }
 
     return (
-        <nav className="navbar navbar-expand-lg navbar-dark bg-dark py-3">
+        <nav className="navbar navbar-expand-lg py-3">
             <div className="container-fluid d-flex justify-content-between align-items-center">
                 {/* Logo section */}
-                <Link to="/" className="navbar-brand d-flex align-items-center">
-                    <img id="BBLogo" src={HomeLogo2} alt="logo-img" className="navbar-logo" />
-                    <span className="navbar-title ms-3">Brew Buddy</span>
+                <Link to="/" className="nav-link d-flex flex-column align-items-center">
+                    <img src={HomeLogo2} alt="Home Icon" className="navbar-logo" />
+                    <span className="home-text mt-1">Home</span>
                 </Link>
 
                 {/* Responsive toggle for mobile */}
@@ -46,7 +46,12 @@ export const Navbar = () => {
                                     <Link to="/favorites" className="nav-link">Favorites</Link>
                                 </li>
                                 <li className="nav-item">
-                                    <Link to="/routes" className="nav-link">BYO Brewery Routes</Link>
+                                    <Link to="/routes" className="nav-link">Build A Brewery Tour Route</Link>
+                                </li>
+                                <li className="nav-item">
+                                    <Link to="/points" className="nav-link">
+                                        Redeem Points
+                                    </Link>
                                 </li>
                             </>
                         )}

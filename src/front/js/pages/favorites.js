@@ -43,13 +43,13 @@ export const Favorites = () => {
   return (
     <div className="">
       <ul
-        class="nav nav-pills mb-3 justify-content-center"
+        className="nav nav-pills mb-3 justify-content-center"
         id="pills-tab"
         role="tablist"
       >
-        <li class="nav-item mx-1" role="presentation">
+        <li className="nav-item mx-1" role="presentation">
           <button
-            class="btn"
+            className="btn"
             id="pills-home-tab"
             data-bs-toggle="pill"
             data-bs-target="#pills-home"
@@ -69,9 +69,9 @@ export const Favorites = () => {
             <h1 className="text-white favorites-text-shadowing">Breweries</h1>
           </button>
         </li>
-        <li class="nav-item mx-1" role="presentation">
+        <li className="nav-item mx-1" role="presentation">
           <button
-            class="nav-link"
+            className="nav-link"
             id="pills-profile-tab"
             data-bs-toggle="pill"
             data-bs-target="#pills-profile"
@@ -88,12 +88,12 @@ export const Favorites = () => {
               backgroundPosition: "center",
             }}
           >
-            <h1 className="text-white favorites-text-shadowing">People</h1>
+            <h1 classNameName="text-white favorites-text-shadowing">People</h1>
           </button>
         </li>
-        <li class="nav-item mx-1" role="presentation">
+        <li className="nav-item mx-1" role="presentation">
           <button
-            class="nav-link"
+            className="nav-link"
             id="pills-contact-tab"
             data-bs-toggle="pill"
             data-bs-target="#pills-contact"
@@ -110,12 +110,12 @@ export const Favorites = () => {
               backgroundPosition: "right 9px center",
             }}
           >
-            <h1 className="text-white favorites-text-shadowing">Beers</h1>
+            <h1 classNameName="text-white favorites-text-shadowing">Beers</h1>
           </button>
         </li>
-        {/* <li class="nav-item mx-1" role="presentation">
+        {/* <li className="nav-item mx-1" role="presentation">
         <button
-          class="nav-link"
+          className="nav-link"
           id="pills-disabled-tab"
           data-bs-toggle="pill"
           data-bs-target="#pills-disabled"
@@ -128,9 +128,9 @@ export const Favorites = () => {
         </button>
       </li> */}
       </ul>
-      <div class="tab-content" id="pills-tabContent">
+      <div className="tab-content" id="pills-tabContent">
         <div
-          class="tab-pane text-center  fade show active"
+          className="tab-pane text-center  fade show active"
           id="pills-disabled"
           role="tabpanel"
           aria-labelledby="pills-disabled-tab"
@@ -143,7 +143,7 @@ export const Favorites = () => {
           </p>
         </div>
         <div
-          class="tab-pane text-center justify-content-center fade "
+          className="tab-pane text-center justify-content-center fade "
           id="pills-home"
           role="tabpanel"
           aria-labelledby="pills-home-tab"
@@ -153,7 +153,7 @@ export const Favorites = () => {
           <FavoriteBreweries/>
         </div>
         <div
-          class="tab-pane text-center justify-content-center fade"
+          className="tab-pane text-center justify-content-center fade"
           id="pills-profile"
           role="tabpanel"
           aria-labelledby="pills-profile-tab"
@@ -162,7 +162,7 @@ export const Favorites = () => {
           <FavoritePeople/> 
         </div>
         <div
-          class="tab-pane text-center justify-content-center fade"
+          className="tab-pane text-center justify-content-center fade"
           id="pills-contact"
           role="tabpanel"
           aria-labelledby="pills-contact-tab"
@@ -173,14 +173,14 @@ export const Favorites = () => {
           <div>
           {/* {store.favoriteBeers?.map((item, index) => {
             return (
-              <div class="card text-center mb-3 mx-auto" style={{ width: "18rem" }}>
-                <div class="card-body">
-                  <h5 class="card-title">{item.beer_name}</h5>
-                  <p class="card-text">{item.flavor}</p>
-                  <p class="card-text">{item.type}</p>
-                  <p class="card-text">{item.ABV}</p>
-                  <a href="#" class="btn btn-primary">Go somewhere</a>
-                  <a onClick={() => actions.handleFavoriteBeer(item.id)} href="#" class="btn btn-primary">Add To Favorites</a>
+              <div className="card text-center mb-3 mx-auto" style={{ width: "18rem" }}>
+                <div className="card-body">
+                  <h5 className="card-title">{item.beer_name}</h5>
+                  <p className="card-text">{item.flavor}</p>
+                  <p className="card-text">{item.type}</p>
+                  <p className="card-text">{item.ABV}</p>
+                  <a href="#" className="btn btn-primary">Go somewhere</a>
+                  <a onClick={() => actions.handleFavoriteBeer(item.id)} href="#" className="btn btn-primary">Add To Favorites</a>
                 </div>
               </div>
             )

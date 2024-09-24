@@ -1,0 +1,106 @@
+.journey-card.fun-card {
+    border-radius: 12px;
+    background: linear-gradient(135deg, hwb(0 0% 57%), #ff9800);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    margin-bottom: 20px;
+    padding: 20px;
+    position: relative;
+}
+
+.journey-card.fun-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.journey-card {
+    margin-left: 15px;
+    width:784px;
+}
+
+/* Header Styling */
+.journey-card-header {
+    background-color: #FFD700; /* Coral */
+    border-radius: 12px 12px 0 0;
+    padding: 15px;
+    color: #fff;
+    text-align: center;
+}
+
+.brewery-name {
+    font-size: 1.5rem;
+    font-weight: bold;
+    font-family: 'Poppins', sans-serif;
+    letter-spacing: 1px;
+    margin: 0;
+    color: #1F3A93;
+}
+
+/* Body Content Styling */
+.journey-card-body {
+    padding: 15px;
+    background-color: #ffffff;
+    border-radius: 0 0 12px 12px;
+    color: #333;
+}
+
+.info-text {
+    font-size: 1.1rem;
+    font-family: 'Poppins', sans-serif;
+    color: #616161;
+    margin: 10px 0;
+}
+
+/* Actions Styling */
+.card-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+/* Fun Review Button */
+.review-button {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-family: 'Poppins', sans-serif;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.review-button:hover {
+    background-color: #e53935;
+    transform: scale(1.05);
+}
+
+/* Fun Navigate Button */
+.navigate-button {
+    background-color: #03a9f4;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-family: 'Poppins', sans-serif;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.navigate-button:hover {
+    background-color: #039be5;
+    transform: scale(1.05);
+}
+
+/* Fun Icons and Emoji */
+.info-text:before {
+    margin-right: 5px;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.journey-card:hover .brewery-name {
+    color: hsl(0, 0%, 0%);
+}
