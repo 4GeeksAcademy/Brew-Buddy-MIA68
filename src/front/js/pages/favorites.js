@@ -6,6 +6,7 @@ import "../../styles/favorites.css";
 import {FavoriteBeers} from "../component/FavoriteBeers"
 import craft from "../../img/craft.jpg"
 import {FavoriteBreweries} from "../component/FavoriteBreweries"
+import FavoritePeople from "../component/FavoritePeople";
 
 export const Favorites = () => {
   const { store, actions } = useContext(Context);
@@ -87,7 +88,7 @@ export const Favorites = () => {
               backgroundPosition: "center",
             }}
           >
-            <h1 classNameName="text-white favorites-text-shadowing">People</h1>
+            <h1 className="text-white favorites-text-shadowing">People</h1>
           </button>
         </li>
         <li className="nav-item mx-1" role="presentation">
@@ -109,7 +110,7 @@ export const Favorites = () => {
               backgroundPosition: "right 9px center",
             }}
           >
-            <h1 classNameName="text-white favorites-text-shadowing">Beers</h1>
+            <h1 className="text-white favorites-text-shadowing">Beers</h1>
           </button>
         </li>
         {/* <li className="nav-item mx-1" role="presentation">
@@ -158,7 +159,7 @@ export const Favorites = () => {
           aria-labelledby="pills-profile-tab"
           tabindex="0"
         >
-          People
+          <FavoritePeople/> 
         </div>
         <div
           className="tab-pane text-center justify-content-center fade"

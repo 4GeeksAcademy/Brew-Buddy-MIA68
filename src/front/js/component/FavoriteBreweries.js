@@ -29,7 +29,6 @@ export const FavoriteBreweries = () => {
     }
     return (
         <div>
-            
             <select value={sortOption} onChange={handleSortChange}>
                 <option value="">Sort by...</option>
                 <option value="name-asc">Name (A-Z)</option>

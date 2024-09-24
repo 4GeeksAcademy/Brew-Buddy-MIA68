@@ -13,10 +13,15 @@ import splashLogo1 from "../../img/splashLogo1.webp"
 
 export const Home = () => {
 	const { store, actions } = useContext(Context);
-	const [showAgeVerification, setShowAgeVerification] = useState(true);
+	const [showAgeVerification, setShowAgeVerification] = useState(false);
 
 	useEffect(() => {
-		actions.getBreweryReviewsFromBackend()
+		// Check sessionStorage to see if the user has already verified their age
+		const ageVerified = sessionStorage.getItem("over20");
+		if (!ageVerified) {
+			setShowAgeVerification(true);
+		}
+		actions.getBreweryReviewsFromBackend();
 	}, []); // Empty array ensures it runs only once
 
 	const eachBrewery = store.breweryData.map((breweryData, index) => (
@@ -28,6 +33,7 @@ export const Home = () => {
 	const handleAgeVerification = (isOver21) => {
 		if (isOver21) {
 			setShowAgeVerification(false);
+			actions.verifyAge()
 		} else {
 			// Redirect to Google if user is not 21 or older
 			window.location.href = "https://www.google.com/";
