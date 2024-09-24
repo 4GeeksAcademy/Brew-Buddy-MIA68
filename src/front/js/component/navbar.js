@@ -30,7 +30,7 @@ export const Navbar = () => {
                 <Link to="/search" className="nav-link d-flex flex-row align-items-center my-auto mx-3">
                     <img src={HomeLogo2} alt="Home Icon" className="search-icon" />
                     <span className="home-text mt-1">Search</span>
-                </Link>
+                </Link> */}
 
                 {/* Responsive toggle for mobile */}
                 <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -45,6 +45,9 @@ export const Navbar = () => {
                         </li>
                         {store.token && (
                             <>
+                                <li className="nav-item me-4">
+                                <Link to="/search" className="nav-link"><span className="home-text mt-1">Search</span></Link>
+                                </li>
                                 <li className="nav-item me-4">
                                     <Link to="/favorites" className="nav-link">Favorites</Link>
                                 </li>
