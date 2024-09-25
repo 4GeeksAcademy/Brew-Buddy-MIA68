@@ -14,7 +14,10 @@ console.log(store.favoriteBeers)
             <div className="card-body">
                 <div className="d-flex">
                     <h2 className="card-title mx-auto">
-                        <button className={`btn btn-outline-dark me-2 fa-${store.favoriteBeers.find(beer=>beer.beer_name==props.beerData.beer_name)?"solid":"regular"} fa-star`} onClick={(e) => actions.addFavoriteBeer(props.beerData.id)}></button>
+                        <button className={`btn btn-outline-dark me-2 fa-${store.favoriteBeers.find(beer=>beer.beer_name==props.beerData.beer_name)?"solid":"regular"} fa-star`} onClick={(e) => {
+                            if (store.token){actions.addFavoriteBeer(props.beerData.id)} 
+                            else{alert("Please login to add or remove favorites")}
+                            }}></button>
                         {/* J.R.: A specific image for brewery types */}
                         {props.beerData.beer_name}
                     </h2>
