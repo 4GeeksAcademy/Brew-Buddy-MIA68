@@ -49,25 +49,30 @@ export const BreweryCard = (props) => {
     const handleFavBrewery = (e) => {
         e.preventDefault();
         if (isLoggedIn) {
-         console.log(currentFavorite)
-        if (currentFavorite == true) {
-            // remove
-            actions.deleteFavoriteBrewery(favoriteBrewery);
-            setCurrentFavorite(false)
-        } else {
-            // add
-            actions.addFavoriteBrewery(props.breweryData);
-            alert("This Brewery has been added to your Favorites");
-            setCurrentFavorite(true)
-        }   
+            console.log(currentFavorite)
+            if (currentFavorite == true) {
+                // remove
+                actions.deleteFavoriteBrewery(favoriteBrewery);
+                setCurrentFavorite(false)
+            } else {
+                // add
+                actions.addFavoriteBrewery(props.breweryData);
+                alert("This Brewery has been added to your Favorites");
+                setCurrentFavorite(true)
+            }
         } else {
             alert("Please login to add or remove favorites")
         }
-        
+
     };
     const handleAddBreweryToRoute = () => {
         console.log(props.breweryData)
-        actions.addToCurrentJourney(props.breweryData)
+        if (isLoggedIn) {
+            actions.addToCurrentJourney(props.breweryData)
+        } else {
+            alert("Please login to add to your route")
+        }
+
     }
 
     return (
@@ -115,7 +120,7 @@ export const BreweryCard = (props) => {
     )
 }
 
-export const JourneyCard = ({ breweryData, onReview, onRefocus }) => {
+export const JourneyCard = ({ breweryData, onReview, onRefocus, route }) => {
     const { store } = useContext(Context);
 
     return (
@@ -123,9 +128,10 @@ export const JourneyCard = ({ breweryData, onReview, onRefocus }) => {
             <div className="journey-card-header">
                 <h5 className="brewery-name">{breweryData.name}</h5>
             </div>
+            {console.log("this is brewery data" + breweryData)}
             <div className="journey-card-body">
-                <p className="info-text">🚗 Travel Time: {store.journey.routes[0].travelTime} Minutes</p>
-                <p className="info-text">📍 Distance: {store.journey.routes[0].miles} Miles</p>
+                <p className="info-text">🚗 Travel Time: {route.travelTime} Minutes</p>
+                <p className="info-text">📍 Distance: {route.miles} Miles</p>
                 <div className="card-actions">
                     <button className="review-button" onClick={() => onReview(breweryData)}>
                         ⭐ Add Review
@@ -152,7 +158,7 @@ export const ReviewCard = (props) => {
                 {review.is_favorite_brewery && (
                     <p className="text-success">🌟 This is a favorite brewery!</p>
                 )}
-                {review.review_images.length>0 && (
+                {review.review_images.length > 0 && (
                     <img src={review.review_images[0].image_url} width="96" height="96" />
                 )}
                 <h6>Beers Reviewed:</h6>
