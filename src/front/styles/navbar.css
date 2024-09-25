@@ -2,6 +2,10 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     padding: 0.5rem 2rem;
     background: linear-gradient(90deg, #FFBF00, #a83b00); /* Amber to Dark Brown */
+    position: sticky;
+    width: 100%;
+    top: 0;
+    z-index: 100;
 }
 
 .navbar-logo {
@@ -9,14 +13,30 @@
     height: auto;
 }
 
-.nav-link {
-    font-size: 1.1rem;
-    color: #ddd !important;
-    transition: color 0.2s ease-in-out;
+.search-icon {
+    width: 75px;
+    height: auto;
 }
 
-.nav-link:hover {
-    color: #fff !important;
+.search-icon {
+    width: 75px;
+    height: auto;
+}
+
+.navbar-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #fff;
+}
+
+/* .nav-link {
+    font-size: 1.1rem; */
+    /* color: #201c1c !important; */
+    /* transition: color 0.2s ease-in-out;
+} */
+
+.nav-pills .profile-nav-link:hover {
+    color: #151414 !important;
 }
 
 .profile-image {

@@ -50,6 +50,10 @@ export const FavoriteBeers = () => {
     setItems(sortedItems);
   };
 
+  const handleRemoveFavorite = (item) => {
+    actions.deleteFavoriteBeer(item)
+  }
+
   useEffect(() => {
     setItems(store.favoriteBeers)
     setBeersList(store.allBeers)
@@ -118,6 +122,9 @@ export const FavoriteBeers = () => {
         {items.map((item, index) => {
           return (
             <div class="card text-center mb-3 mx-auto" style={{ width: "18rem" }}>
+              <button type="button" className="close-button" onClick={() => handleRemoveFavorite(item)}>
+                                    <i className="fa-solid fa-x"></i>
+              </button>
               <div class="card-body">
                 <h5 class="card-title">{item.beer_name}</h5>
                 <p class="card-text">{item.flavor}</p>

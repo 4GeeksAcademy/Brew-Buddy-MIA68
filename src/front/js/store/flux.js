@@ -131,6 +131,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 		store: {
 			token: sessionStorage.getItem("token") || "",
 			userEmail: sessionStorage.getItem("userEmail") || null,
+			// userData: null,
 			userProfileImageId: null,
 			breweryData: [],
 			beerData: [],
@@ -140,12 +141,12 @@ const getState = ({ getStore, getActions, setStore }) => {
 			state: "",
 			type: "",
 			searchedBreweryData: [],
-			modalIsOpen: false,
 			favoriteBreweries: [],
 			favoriteBeers: [],
 			allBeers: [],
 			favoritePeople: [],
 			userRewards: [],
+			over20: false, 
 
 		},
 		actions: {
@@ -156,7 +157,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 						headers: {
 							"Content-type": "application/json"
 						},
-						body: JSON.stringify({ email, password })
+						body: JSON.stringify({email, password })
 					})
 					if (response.ok) {
 						const data = await response.json();
@@ -216,6 +217,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 						const data = await response.json();
 						setStore({
 							// EJQ - user: data,
+							// userData: data,
 							userEmail: data.email,
 							userProfileImageId: data.profile_image ? data.profile_image.image_url : null,
 							userProfilePublicId: data.profile_image ? data.profile_image.public_id : null,
@@ -563,7 +565,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 					if (response.ok) {
 						await getActions().getFavoriteBeers();
-						console.log("Favorite beer added successfully");
+						let json=await response.json()
+						alert(json.message);
 						return true;
 					} else {
 						console.error("Error adding favorite beer");
@@ -574,6 +577,38 @@ const getState = ({ getStore, getActions, setStore }) => {
 					return false;
 				}
 			},
+			deleteFavoriteBeer: async (beer) => {
+				try {
+					const resp = await fetch(process.env.BACKEND_URL + "/api/favorite_beers/" + beer.id, {
+						method: "DELETE",
+						headers: {
+							"Content-Type": "application/json",
+							Authorization: "Bearer " + sessionStorage.getItem("token")
+
+						},
+					});
+					if (resp.ok) {
+						const data = await resp.json();
+						console.log("beer deleted from favorites: ", data);
+
+						const store = getStore();
+
+						setStore({
+							favoriteBeers: getStore().favoriteBeers.filter((x) => {
+								return x != beer;
+							})
+						});
+						alert("This beer has been deleted from your Favorites");
+
+					} else {
+						const errorData = await resp.json();
+						console.error("failed to add", errorData);
+					}
+				} catch (error) {
+					console.error("error deleting beer", error);
+				}
+			},
+		
 			getFavoritePeople: async () => {
 				let response = await fetch(process.env.BACKEND_URL + "/api/favorite_users", {
 					headers: {
@@ -656,7 +691,8 @@ const getState = ({ getStore, getActions, setStore }) => {
 				const response = await fetch(process.env.BACKEND_URL + '/api/add_brewery_review', {
 					method: 'POST',
 					headers: {
-						'Content-Type': 'application/json'
+						'Content-Type': 'application/json',
+						Authorization: `Bearer ${getStore().token}`
 					},
 					body: JSON.stringify({
 						brewery_name: breweryData.name,
@@ -724,10 +760,17 @@ const getState = ({ getStore, getActions, setStore }) => {
 							}
 						)
 					})
-
+					if (response.status!=200) {
+						console.log("error occurred while adding beer")
+						return false 
+					} 
+					let data = await response.json()
+					console.log (data) 
+					return true
 				}
 				catch (error) {
 					console.error("Error adding new beer", error)
+					return false
 				}
 			},
 
@@ -793,6 +836,10 @@ const getState = ({ getStore, getActions, setStore }) => {
 					console.error("Error fetching user rewards:", error);
 				}
 			},
+			verifyAge: () => {
+				setStore({ over20: true});
+				sessionStorage.setItem("over20", true);
+			}
 
 		}
 	};

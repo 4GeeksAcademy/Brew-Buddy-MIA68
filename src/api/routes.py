@@ -35,10 +35,12 @@ if UPLOAD_FOLDER:
 def handle_signup():
     body = request.get_json()
     email = body["email"]
+    # name = body["name"]
     password = hashlib.sha256(body["password"].encode("utf-8")).hexdigest()
     
     user = User(
         email=email,
+        # name=name,
         password=password,
         is_active=True
     )
@@ -380,11 +382,16 @@ def add_favorite_beer(beer_id):
     current_user = get_current_user()
     if not current_user:
         return jsonify({"error": "User not authenticated"}), 401
-    
+    beer_exists=FavoriteBeers.query.filter_by(favorited_beer_id=beer_id).first()
+    if beer_exists: 
+        db.session.delete(beer_exists)
+        db.session.commit()
+        return jsonify(message="beer has been removed from favorites")
+
     new_favorite_beer = FavoriteBeers(owner_id=current_user.id, favorited_beer_id=beer_id)
     db.session.add(new_favorite_beer)
     db.session.commit()
-    return jsonify({"done": True}), 201
+    return jsonify({"done": True, "message": "beer has been added to favorites"}), 201
 
 # Add a favorite brewery for the current user with authentication
 @api.route('/favorite_breweries', methods=['POST'])
@@ -543,6 +550,7 @@ def handle_user_images(id=0):
                 
                 # Check if this should be the profile image
                 is_profile_image = request.form.get("mode") == "profile"
+                review_id = request.form.get("review_id", None)
                 
                 # If it's a profile image, set all other images to not be profile images
                 if is_profile_image:
@@ -553,7 +561,8 @@ def handle_user_images(id=0):
                     public_id=result['public_id'],
                     image_url=result['secure_url'],
                     owner_id=current_user.id,
-                    is_profile_image=is_profile_image
+                    is_profile_image=is_profile_image,
+                    review_id = review_id
                 )
                 
                 db.session.add(new_image)
@@ -596,14 +605,20 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @api.route('/add_brewery_review', methods=['Post'])
+@jwt_required()
 def add_brewery_review():
+    current_user = get_current_user()
+    if not current_user:
+        return jsonify({"error": "User not authenticated"}), 401
+    
     data = request.json
     brewery_review = BreweryReview(
         brewery_name=data.get('brewery_name'),
         brewery_id=data.get('brewery_id'),
         overall_rating=data['overall_rating'],
         review_text=data.get('review_text', ""),
-        is_favorite_brewery=data.get('is_favorite_brewery', False)
+        is_favorite_brewery=data.get('is_favorite_brewery', False),
+        owner_id=current_user.id
     )
     db.session.add(brewery_review)
     db.session.commit()
@@ -619,7 +634,14 @@ def add_brewery_review():
         db.session.add(beer_review)
     
     db.session.commit()
-    return jsonify({"message": "Review added successfully"}), 201
+
+    # EJQ - to award points for submitting a brewery review
+    # points_earned = 10
+    # current_user.change_points(points_earned, "Submitted a brewery review")
+
+    return jsonify(
+        brewery_review.serialize()
+    ), 201
 
 @api.route('/get_brewery_reviews', methods=['GET'])
 def get_brewery_reviews():
@@ -651,7 +673,8 @@ def get_brewery_reviews():
             'overall_rating': review.overall_rating,
             'review_text': review.review_text,
             'is_favorite_brewery': review.is_favorite_brewery,
-            'beer_reviews': beer_reviews_data
+            'beer_reviews': beer_reviews_data,
+            'review_images': [image.serialize() for image in review.review_images]
         })
     return jsonify(result), 200
 
@@ -694,7 +717,7 @@ def add_beer():
     beer = Beer(beer_name= new_Beer_Name, flavor= new_Flavor, type= new_Type, ABV= new_ABV, brewery_Id= new_Brewery_Id)
     db.session.add(beer)
     db.session.commit()
-    return "msg: brewery added:", 200
+    return jsonify({"msg": "beer added"}), 200
 
 #Redeem Points for Rewards
 @api.route('/add_user_reward', methods=['POST'])

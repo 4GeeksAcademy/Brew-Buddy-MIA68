@@ -7,15 +7,21 @@ import { BreweryRouteCard } from "../component/BootstrapCardRoute";
 import Modal from "../component/searchModal";
 import { Link } from "react-router-dom";
 import HomeLogo1 from "../../img/HomeLogo1.png"
-import HomeLogo2 from "../../img/HomeLogo2.png"
+import AgeVerificationPic2 from "../../img/AgeVerificationPic2.webp"
 import background1 from "../../img/DALL·E 2024-09-04.webp"
+import splashLogo1 from "../../img/splashLogo1.webp"
 
 export const Home = () => {
 	const { store, actions } = useContext(Context);
-	const [showAgeVerification, setShowAgeVerification] = useState(true);
+	const [showAgeVerification, setShowAgeVerification] = useState(false);
 
 	useEffect(() => {
-		actions.getBreweryReviewsFromBackend()
+		// Check sessionStorage to see if the user has already verified their age
+		const ageVerified = sessionStorage.getItem("over20");
+		if (!ageVerified) {
+			setShowAgeVerification(true);
+		}
+		actions.getBreweryReviewsFromBackend();
 	}, []); // Empty array ensures it runs only once
 
 	const eachBrewery = store.breweryData.map((breweryData, index) => (
@@ -27,6 +33,7 @@ export const Home = () => {
 	const handleAgeVerification = (isOver21) => {
 		if (isOver21) {
 			setShowAgeVerification(false);
+			actions.verifyAge()
 		} else {
 			// Redirect to Google if user is not 21 or older
 			window.location.href = "https://www.google.com/";
@@ -44,27 +51,23 @@ export const Home = () => {
 	return (
 		<div className="home-container">
 			<img src={background1} alt="Background" className="background-image" />
-			<div className="content">
-				<div className="text-center mt-5">
-					<h1 className="text-light">Find your brewery today! Cheers!</h1>
-					{/* EJQ - Commented out the logo to put a new homepage logo */}
-					{/* <img src={brewbuddyimg} className="home-logo-img" /> */}
-					<img src={HomeLogo1} />
-					<div className="my-2">
-						<button onClick={actions.toggleSearch}>Search</button>
-						<Modal />
-					</div>
-
-					{/* Bootstrap grid for the cards */}
-					<div className="container">
-						<div className="row">
-							{eachBrewery}
+			<Link to="/search" className="full-page-link">
+				<div className="content">
+					<div className="homepage-section">
+						<div className="left-section">
+							<img src={splashLogo1} className="splash-logo-img" alt="BrewBuddy Logo" />
+						</div>
+						<div className="right-section">
+							<div className="text-box">
+								<h2>Welcome to BrewBuddy!</h2>
+								<p>Discover your next favorite brewery and curate exciting beer routes just for you!</p>
+								<img src={HomeLogo1} className="home-logo-img" alt="BrewBuddy Logo" />
+							</div>
 						</div>
 					</div>
-
-					<button onClick={actions.fetchBreweryInfoTEST}>Fetch Brewery Info</button>
 				</div>
-			</div>
+			</Link>
+
 			{showAgeVerification && (
 				<div
 					style={{
@@ -80,35 +83,31 @@ export const Home = () => {
 						zIndex: 1000,
 					}}
 				>
-					<div
-						style={{
-							backgroundColor: "white",
-							padding: "20px",
-							borderRadius: "10px",
-							width: "50%",
-							maxWidth: "400px",
-							textAlign: "center",
-						}}
-					>
-						<h2>Age Verification</h2>
-						<p>Are you 21 or older?</p>
-						<div>
-							<button
-								onClick={() => handleAgeVerification(true)}
-								style={{ margin: "10px", padding: "10px 20px" }}
-							>
-								Yes
-							</button>
-							<button
-								onClick={() => handleAgeVerification(false)}
-								style={{ margin: "10px", padding: "10px 20px" }}
-							>
-								No
-							</button>
+					<div className="age-verification-popup">
+						<div className="image-section">
+							<img src={AgeVerificationPic2} alt="Age Verification Logo" />
+						</div>
+						<div className="text-section">
+							<h2>Age Verification</h2>
+							<p>Are you 21 or older?</p>
+							<div>
+								<button
+									onClick={() => handleAgeVerification(true)}
+									className="age-verification-button"
+								>
+									Yes
+								</button>
+								<button
+									onClick={() => handleAgeVerification(false)}
+									className="age-verification-button"
+								>
+									No
+								</button>
+							</div>
 						</div>
 					</div>
 				</div>
 			)}
 		</div>
 	);
-}
+};

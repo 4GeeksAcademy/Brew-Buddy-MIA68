@@ -27,24 +27,29 @@ export const BreweryCard = (props) => {
     const [currentFavorite, setCurrentFavorite] = useState(false)
     const [favoriteBrewery, setFavoriteBrewery] = useState("")
 
+    const isLoggedIn = sessionStorage.getItem("token");
 
     useEffect(() => {
-        let getData = async () => {
-            await actions.getFavoriteBreweries()
-            for (let fav in store.favoriteBreweries) {
-                if (store.favoriteBreweries[fav].phone === props.breweryData.phone) {
-                    setFavoriteBrewery(store.favoriteBreweries[fav])
-                    setCurrentFavorite(true);
-                    break; // exit loop once a match is found
+        if (isLoggedIn) {
+            let getData = async () => {
+                await actions.getFavoriteBreweries()
+                for (let fav in store.favoriteBreweries) {
+                    if (store.favoriteBreweries[fav].phone === props.breweryData.phone) {
+                        setFavoriteBrewery(store.favoriteBreweries[fav])
+                        setCurrentFavorite(true);
+                        break; // exit loop once a match is found
+                    }
                 }
-            }
+            };
+            getData();
         }
-        getData()
+
     }, [])
 
     const handleFavBrewery = (e) => {
         e.preventDefault();
-        console.log(currentFavorite)
+        if (isLoggedIn) {
+         console.log(currentFavorite)
         if (currentFavorite == true) {
             // remove
             actions.deleteFavoriteBrewery(favoriteBrewery);
@@ -54,7 +59,11 @@ export const BreweryCard = (props) => {
             actions.addFavoriteBrewery(props.breweryData);
             alert("This Brewery has been added to your Favorites");
             setCurrentFavorite(true)
+        }   
+        } else {
+            alert("Please login to add or remove favorites")
         }
+        
     };
     const handleAddBreweryToRoute = () => {
         console.log(props.breweryData)
@@ -62,7 +71,7 @@ export const BreweryCard = (props) => {
     }
 
     return (
-        <div className="card brewery-card text-center">
+        <div className="card text-center col-md-12 col-sm-12 col-lg-6 col-xl-4" style={{ boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1)" }}>
             <div className="card-body">
                 <h1 className="card-title brewery-title">
                     <a href={props.breweryData.brewery_type}>
@@ -74,11 +83,11 @@ export const BreweryCard = (props) => {
                     </a>
                     {props.breweryData.name}
                 </h1>
-                <h5 className="card-subtitle mb-2 text-muted">
+                <h5 className="card-subtitle mb-3 text-muted">
                     {props.breweryData.city}, {props.breweryData.state}
                 </h5>
-                <div className="brewery-buttons">
-                    <button className="btn btn-primary btn-block fun-button" onClick={handleAddBreweryToRoute}>
+                <div className="brewery-buttons mb-2">
+                    <button className="btn btn-primary btn-block fun-button me-2" onClick={handleAddBreweryToRoute}>
                         Add to Route <i className="fas fa-route"></i>
                     </button>
                     <button className={`btn ${currentFavorite ? "btn-warning" : "btn-light"} btn-block fun-button`} onClick={(e) => handleFavBrewery(e)}>
@@ -86,15 +95,15 @@ export const BreweryCard = (props) => {
                     </button>
                 </div>
                 <div className="brewery-contact">
-                    <a href={`tel:${props.breweryData.phone}`} className="btn btn-info btn-block fun-button">
+                    <a href={`tel:${props.breweryData.phone}`} className="btn btn-info btn-block fun-button me-2">
                         Call <i className="fas fa-phone"></i>
                     </a>
                     <a href={props.breweryData.website_url} target="_blank" rel="noopener noreferrer" className="btn btn-success btn-block fun-button">
                         Visit Website <i className="fas fa-external-link-alt"></i>
                     </a>
                 </div>
-                <div className="brewery-extras mt-3">
-                    <Link to={`/brewery/${props.breweryData.id}`} className="btn btn-secondary fun-button">
+                <div className="brewery-extras mt-2">
+                    <Link to={`/brewery/${props.breweryData.id}`} className="btn btn-secondary fun-button me-2">
                         See Brews <i className="fas fa-beer"></i>
                     </Link>
                     <Link to={`/brewery_reviews/${props.breweryData.id}`} className="btn btn-secondary fun-button" onClick={() => actions.getReviewsOnFrontEnd(props.breweryData.id)}>
@@ -143,7 +152,9 @@ export const ReviewCard = (props) => {
                 {review.is_favorite_brewery && (
                     <p className="text-success">🌟 This is a favorite brewery!</p>
                 )}
-
+                {review.review_images.length>0 && (
+                    <img src={review.review_images[0].image_url} width="96" height="96" />
+                )}
                 <h6>Beers Reviewed:</h6>
                 <ul className="list-group">
                     {review.beer_reviews.map((beerReview, index) => (
