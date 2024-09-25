@@ -11,7 +11,7 @@ export default function UserDetails(props) {
                     <a className="nav-link profile-nav-link active mb-3" role="tab" aria-current="page" aria-controls="info" data-bs-toggle="tab" href="#info">Profile Information</a>
                 </li>
                 <li className="nav-item" role="presentation" >
-                    <a className="nav-link profile-nav-link" role="tab" href="#rewards" aria-controls="rewards" data-bs-toggle="tab">Rewards</a>
+                    <a className="nav-link profile-nav-link" role="tab" href="#rewards" aria-controls="rewards" data-bs-toggle="tab">Points & Rewards</a>
                 </li>
                 <li className="nav-item" role="presentation" >
                     <a className="nav-link profile-nav-link" role="tab" href="#privacy" aria-controls="rewards" data-bs-toggle="tab">Privacy</a>

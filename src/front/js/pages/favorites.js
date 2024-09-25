@@ -41,7 +41,7 @@ export const Favorites = () => {
   //   }
   // }
   return (
-    <div className="">
+    <div className="mt-5">
       <ul
         className="nav nav-pills mb-3 justify-content-center"
         id="pills-tab"
