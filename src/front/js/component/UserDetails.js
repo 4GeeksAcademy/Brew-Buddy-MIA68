@@ -13,6 +13,9 @@ export default function UserDetails(props) {
                 <li class="nav-item" role="presentation" >
                     <a class="nav-link profile-nav-link" role="tab" href="#rewards" aria-controls="rewards" data-bs-toggle="tab">Rewards</a>
                 </li>
+                {/* <li class="nav-item" role="presentation" >
+                    <a class="nav-link profile-nav-link" role="tab" href="#friends" aria-controls="friends" data-bs-toggle="tab">Friends</a>
+                </li> */}
                 <li class="nav-item" role="presentation" >
                     <a class="nav-link profile-nav-link" role="tab" href="#privacy" aria-controls="rewards" data-bs-toggle="tab">Privacy</a>
                 </li>
@@ -71,9 +74,9 @@ export default function UserDetails(props) {
                                 ))}
                             </tbody>
                         </table>
-                        </div>
                     </div>
                 </div>
+                {/* <div role="tabpanel" aria-labelledby="friends" tabindex="0" class="tab-pane fade" id="friends">John Doe</div> */}
                 <div role="tabpanel" aria-labelledby="privacy" tabindex="0" class="tab-pane fade" id="privacy"><input className='me-2' id='datashare' type='checkbox'></input><label htmlFor='datashare'>Do not share my data</label></div>
                 <div role="tabpanel" aria-labelledby="settings" tabindex="0" class="tab-pane fade" id="settings">
                     <div className="mt-5 ">
