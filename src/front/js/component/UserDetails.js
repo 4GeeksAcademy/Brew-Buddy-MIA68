@@ -22,11 +22,11 @@ export default function UserDetails(props) {
             </ul>
 
             <div className="tab-content">
-                <div role="tabpanel" aria-labelledby="info" tabindex="0" class="tab-pane fade show active" id="info">
+                <div role="tabpanel" aria-labelledby="info" tabindex="0" className="tab-pane fade show active" id="info">
                     {/* <p>Name: {store.userData&&store.userData.name} </p> */}
                     <p>Email: {store.userEmail} </p>
                 </div>
-                <div role="tabpanel" aria-labelledby="rewards" tabindex="0" class="tab-pane fade" id="rewards">
+                <div role="tabpanel" aria-labelledby="rewards" tabindex="0" className="tab-pane fade" id="rewards">
                     <div className="mt-1 row">
                         <div className="col-6">
                         <h2 className="fw-bold">Point History</h2>
@@ -74,8 +74,8 @@ export default function UserDetails(props) {
                         </div>
                     </div>
                 </div>
-                <div role="tabpanel" aria-labelledby="privacy" tabindex="0" class="tab-pane fade" id="privacy"><input className='me-2' id='datashare' type='checkbox'></input><label htmlFor='datashare'>Do not share my data</label></div>
-                <div role="tabpanel" aria-labelledby="settings" tabindex="0" class="tab-pane fade" id="settings">
+                <div role="tabpanel" aria-labelledby="privacy" tabindex="0" className="tab-pane fade" id="privacy"><input className='me-2' id='datashare' type='checkbox'></input><label htmlFor='datashare'>Do not share my data</label></div>
+                <div role="tabpanel" aria-labelledby="settings" tabindex="0" className="tab-pane fade" id="settings">
                     <div className="mt-5 ">
                     <button className="btn btn-primary">
                          <Link to="/forgot-password" className="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-75-hover">
