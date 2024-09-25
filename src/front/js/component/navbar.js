@@ -2,8 +2,9 @@ import React, { useContext, useEffect } from "react";
 import { Context } from "../store/appContext";
 import { Link, useNavigate } from "react-router-dom";
 import "../../styles/navbar.css";
-import finalLogo2 from "../../img/finalLogo2.png";
+import searchLogo1 from "../../img/searchLogo1.png";
 import HomeLogo2 from "../../img/HomeLogo2.png";
+import finalLogo2 from "../../img/finalLogo2.png";
 
 export const Navbar = () => {
     const { store, actions } = useContext(Context);
@@ -28,7 +29,7 @@ export const Navbar = () => {
                     <img src={HomeLogo2} alt="Home Icon" className="navbar-logo" />
                 </div>
                 <Link to="/search" className="nav-link d-flex flex-row align-items-center my-auto mx-3">
-                    <img src={HomeLogo2} alt="Home Icon" className="search-icon" />
+                    <img src={searchLogo1} alt="Search Icon" className="search-icon" />
                     <span className="home-text mt-1">Search</span>
                 </Link>
 
@@ -40,9 +41,6 @@ export const Navbar = () => {
                 {/* Navbar links and user info */}
                 <div className="collapse navbar-collapse" id="navbarNav">
                     <ul className="navbar-nav ms-5">
-                        <li className="nav-item">
-                            <Link to="/" className="nav-link me-4">Home</Link>
-                        </li>
                         {store.token && (
                             <>
                                 <li className="nav-item me-4">
