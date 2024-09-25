@@ -14,9 +14,6 @@ export default function UserDetails(props) {
                     <a class="nav-link profile-nav-link" role="tab" href="#rewards" aria-controls="rewards" data-bs-toggle="tab">Rewards</a>
                 </li>
                 <li class="nav-item" role="presentation" >
-                    <a class="nav-link profile-nav-link" role="tab" href="#friends" aria-controls="friends" data-bs-toggle="tab">Friends</a>
-                </li>
-                <li class="nav-item" role="presentation" >
                     <a class="nav-link profile-nav-link" role="tab" href="#privacy" aria-controls="rewards" data-bs-toggle="tab">Privacy</a>
                 </li>
                 <li class="nav-item" role="presentation" >
@@ -30,10 +27,11 @@ export default function UserDetails(props) {
                     <p>Email: {store.userEmail} </p>
                 </div>
                 <div role="tabpanel" aria-labelledby="rewards" tabindex="0" class="tab-pane fade" id="rewards">
-                    <div className="mt-1">
-                        <h2>Point History</h2>
-                        <table className="table">
-                            <thead>
+                    <div className="mt-1 row">
+                        <div className="col-6">
+                        <h2 className="fw-bold">Point History</h2>
+                        <table className="table table-warning">
+                            <thead className="table-light">
                                 <tr>
                                     <th>Action</th>
                                     <th>Points</th>
@@ -50,8 +48,11 @@ export default function UserDetails(props) {
                                 ))}
                             </tbody>
                         </table>
-                        <table className="table">
-                            <thead>
+                        </div>
+                        <div className="col-6">
+                        <h2 className="fw-bold">Rewards</h2>
+                        <table className="table table-success">
+                            <thead className="table table-light">
                                 <tr>
                                     <th>Reward Name</th>
                                     <th>Reward Type</th>
@@ -70,12 +71,18 @@ export default function UserDetails(props) {
                                 ))}
                             </tbody>
                         </table>
+                        </div>
                     </div>
                 </div>
-                <div role="tabpanel" aria-labelledby="friends" tabindex="0" class="tab-pane fade" id="friends">John Doe</div>
                 <div role="tabpanel" aria-labelledby="privacy" tabindex="0" class="tab-pane fade" id="privacy"><input className='me-2' id='datashare' type='checkbox'></input><label htmlFor='datashare'>Do not share my data</label></div>
                 <div role="tabpanel" aria-labelledby="settings" tabindex="0" class="tab-pane fade" id="settings">
-                    <div className="mt-5 "><Link className='btn btn-secondary' to="/forgot-password">Change My Password</Link></div> {/* stay here */}
+                    <div className="mt-5 ">
+                    <button className="btn btn-primary">
+                         <Link to="/forgot-password" className="link-light link-offset-2 link-underline-opacity-25 link-underline-opacity-75-hover">
+                            Change My Password
+                         </Link>
+                    </button>
+                        </div> {/* stay here */}
                 </div>
             </div>
         </div>

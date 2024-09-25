@@ -3,7 +3,9 @@ import { Context } from "../store/appContext";
 import { Link } from "react-router-dom";
 import { Cloudinary } from '@cloudinary/url-gen';
 import { AdvancedImage } from '@cloudinary/react';
+import "../../styles/UserProfile.css";
 import { fill } from '@cloudinary/url-gen/actions/resize';
+import background1 from "../../img/DALL·E 2024-09-04.webp"
 import UserDetails from "../component/UserDetails";
 export const UserProfile = () => {
     const { store, actions } = useContext(Context);
@@ -53,15 +55,15 @@ export const UserProfile = () => {
 
     const handleImageUpload = async () => {
         if (!imageFile) return;
-    
+
         const formData = new FormData();
         formData.append('file', imageFile);
         formData.append("mode", "profile");
-    
+
         try {
             const response = await fetch(`${process.env.BACKEND_URL}/api/images`, {
                 method: 'POST',
-                headers: { 
+                headers: {
                     Authorization: `Bearer ${store.token}`
                 },
                 body: formData
@@ -86,14 +88,14 @@ export const UserProfile = () => {
                 <>
                     <div className="row align-items-center mb-1">
                         <div className="col-9">
-                            <h1>Hello and welcome {store.userEmail.split('@')[0]}!</h1>
-                            <p>You have {userInfo.points} points. Congratulations!</p>
+                            <h1 className="fw-bold">Hello and welcome {store.userEmail.split('@')[0]}!</h1>
+                            <p className="fw-bold">You have {userInfo.points} points. Congratulations!</p>
                         </div>
                         <div className="col-2 d-flex flex-column align-items-center">
                             <AdvancedImage
                                 cldImg={cld.image(store.userProfilePublicId || 'samples/man-portrait').resize(fill().width(200).height(200))}
                                 alt="Profile"
-                                className="img-fluid mb-3"
+                                className="img-fluid mb-3 profile-img"
                             />
                             <div className="text-end w-100">
                                 <input type="file" accept="image/*" onChange={handleImageChange} className="form-control mb-2" />
@@ -147,5 +149,6 @@ export const UserProfile = () => {
             {/* <div className="mt-5"><Link to="/forgot-password">Change My Password</Link></div> */}
             <UserDetails pointHistory={pointHistory}/>
         </div>
+
     );
 };
