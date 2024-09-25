@@ -121,7 +121,7 @@ export class Reward {
 		this.reward_type = rewardData.reward_type;
 		this.reward_value = rewardData.reward_value;
 		this.point_cost = rewardData.point_cost;
-	
+
 	}
 }
 
@@ -146,7 +146,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 			allBeers: [],
 			favoritePeople: [],
 			userRewards: [],
-			over20: false, 
+			over20: false,
 
 		},
 		actions: {
@@ -157,7 +157,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 						headers: {
 							"Content-type": "application/json"
 						},
-						body: JSON.stringify({email, password })
+						body: JSON.stringify({ email, password })
 					})
 					if (response.ok) {
 						const data = await response.json();
@@ -474,7 +474,9 @@ const getState = ({ getStore, getActions, setStore }) => {
 					// Create a BreweryDestination from the breweryObject
 					const breweryDestination = new BreweryDestination(breweryObject);
 					// Create a new Route with the BreweryDestination
-					const newRoute = new Route(breweryDestination, 30, 10); // Replace 30 and 10 with actual travel time and miles
+					const travelTime = Math.floor(Math.random() * (120 - 20 + 1)) + 20; // Random number between 20 and 120 minutes
+					const miles = Math.floor(Math.random() * (50 - 5 + 1)) + 5; // Random number between 5 and 50 miles
+					const newRoute = new Route(breweryDestination, travelTime, miles); // Replace 30 and 10 with actual travel time and miles
 					// Initialize a new journey if necessary
 					let currentJourney;
 					if (store.journey.length === 0) {
@@ -565,7 +567,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 					if (response.ok) {
 						await getActions().getFavoriteBeers();
-						let json=await response.json()
+						let json = await response.json()
 						alert(json.message);
 						return true;
 					} else {
@@ -608,7 +610,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 					console.error("error deleting beer", error);
 				}
 			},
-		
+
 			getFavoritePeople: async () => {
 				let response = await fetch(process.env.BACKEND_URL + "/api/favorite_users", {
 					headers: {
@@ -760,12 +762,12 @@ const getState = ({ getStore, getActions, setStore }) => {
 							}
 						)
 					})
-					if (response.status!=200) {
+					if (response.status != 200) {
 						console.log("error occurred while adding beer")
-						return false 
-					} 
+						return false
+					}
 					let data = await response.json()
-					console.log (data) 
+					console.log(data)
 					return true
 				}
 				catch (error) {
@@ -775,42 +777,42 @@ const getState = ({ getStore, getActions, setStore }) => {
 			},
 
 			// Add the redeemReward action here:
-            redeemReward: async (rewardName) => {
-                const store = getStore();
-                const token = store.token; // Fetch the token from the store
+			redeemReward: async (rewardName) => {
+				const store = getStore();
+				const token = store.token; // Fetch the token from the store
 
-                try {
-                    const response = await fetch(`${process.env.BACKEND_URL}/points`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            Authorization: `Bearer ${token}` // Include token in headers
-                        },
-                        body: JSON.stringify({
-                            owner_id: store.userEmail, // Assuming userEmail is being used as an identifier
-                            reward_name: rewardName
-                        })
-                    });
+				try {
+					const response = await fetch(`${process.env.BACKEND_URL}/points`, {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+							Authorization: `Bearer ${token}` // Include token in headers
+						},
+						body: JSON.stringify({
+							owner_id: store.userEmail, // Assuming userEmail is being used as an identifier
+							reward_name: rewardName
+						})
+					});
 
-                    if (response.ok) {
-                        const result = await response.json();
-                        console.log(`Reward redeemed: ${result.message}`);
+					if (response.ok) {
+						const result = await response.json();
+						console.log(`Reward redeemed: ${result.message}`);
 
-                        // Fetch updated points after successful redemption
-                        getActions().fetchUserInfo();
+						// Fetch updated points after successful redemption
+						getActions().fetchUserInfo();
 
-                        return { success: true, message: result.message };
-                    } else {
-                        const errorResult = await response.json();
-                        console.error("Error redeeming reward:", errorResult);
+						return { success: true, message: result.message };
+					} else {
+						const errorResult = await response.json();
+						console.error("Error redeeming reward:", errorResult);
 
-                        return { success: false, error: errorResult.error };
-                    }
-                } catch (error) {
-                    console.error("Error redeeming reward:", error);
-                    return { success: false, error: error.message };
-                }
-            },
+						return { success: false, error: errorResult.error };
+					}
+				} catch (error) {
+					console.error("Error redeeming reward:", error);
+					return { success: false, error: error.message };
+				}
+			},
 
 			getRewardsFromBackend: async () => {
 				const store = getStore();
@@ -822,11 +824,11 @@ const getState = ({ getStore, getActions, setStore }) => {
 							Authorization: `Bearer ${store.token}`, // Ensure token is sent in headers
 						},
 					});
-			
+
 					if (response.ok) {
 						const data = await response.json();
-						const eachReward = data.rewards.map((rewardData) => 
-								 new Reward(rewardData)
+						const eachReward = data.rewards.map((rewardData) =>
+							new Reward(rewardData)
 						)
 						store.userRewards = eachReward
 					} else {
@@ -837,7 +839,7 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 			},
 			verifyAge: () => {
-				setStore({ over20: true});
+				setStore({ over20: true });
 				sessionStorage.setItem("over20", true);
 			}
 

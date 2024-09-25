@@ -68,6 +68,7 @@ export const BreweryRoutes = () => {
                             <JourneyCard
                                 key={routeIndex}
                                 breweryData={route.breweryDestination}
+                                route={route}
                                 onReview={handleReview}
                                 onRefocus={handleRefocusClick}
                             />
