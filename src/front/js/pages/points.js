@@ -82,7 +82,6 @@ export const Points = () => {
 
     return (
         <div className="text-center container my-5">
-            <img src={background1} alt="Background" className="background-image" />
             <h1 className="fw-bold">Redeem Your Points!</h1>
             <h2 className="fw-bold">Points: {store.userPoints}</h2>
 

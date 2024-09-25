@@ -29,14 +29,15 @@
     color: #fff;
 }
 
-/* .nav-link {
-    font-size: 1.1rem; */
-    /* color: #201c1c !important; */
-    /* transition: color 0.2s ease-in-out;
+/* 
+.nav-link {
+    font-size: 1.1rem;
+    color: #201c1c !important;
+    transition: color 0.2s ease-in-out;
 } */
 
 .nav-pills .profile-nav-link:hover {
-    color: #151414 !important;
+    color: hsl(0, 18%, 30%) !important;
 }
 
 .profile-image {
