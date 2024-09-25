@@ -52,7 +52,7 @@ export const Navbar = () => {
                                     <Link to="/favorites" className="nav-link">Favorites</Link>
                                 </li>
                                 <li className="nav-item">
-                                    <Link to="/routes" className="nav-link">Build A Brewery Tour Route</Link>
+                                    <Link to="/routes" className="nav-link">Build A Route</Link>
                                 </li>
                                 <li className="nav-item">
                                     <Link to="/points" className="nav-link">
