@@ -22,7 +22,6 @@ export const Home = () => {
 		if (!ageVerified) {
 			setShowAgeVerification(true);
 		}
-		actions.getBreweryReviewsFromBackend();
 	}, []); // Empty array ensures it runs only once
 
 	const eachBrewery = store.breweryData.map((breweryData, index) => (
