@@ -6,22 +6,22 @@ export default function UserDetails(props) {
     const { store, actions } = useContext(Context);
     return (
         <div className='mt-5'>
-            <ul class="nav nav-pills nav-fill">
-                <li class="nav-item">
-                    <a class="nav-link profile-nav-link active mb-3" role="tab" aria-current="page" aria-controls="info" data-bs-toggle="tab" href="#info">Profile Information</a>
+            <ul className="nav nav-pills nav-fill">
+                <li className="nav-item">
+                    <a className="nav-link profile-nav-link active mb-3" role="tab" aria-current="page" aria-controls="info" data-bs-toggle="tab" href="#info">Profile Information</a>
                 </li>
-                <li class="nav-item" role="presentation" >
-                    <a class="nav-link profile-nav-link" role="tab" href="#rewards" aria-controls="rewards" data-bs-toggle="tab">Rewards</a>
+                <li className="nav-item" role="presentation" >
+                    <a className="nav-link profile-nav-link" role="tab" href="#rewards" aria-controls="rewards" data-bs-toggle="tab">Rewards</a>
                 </li>
-                <li class="nav-item" role="presentation" >
-                    <a class="nav-link profile-nav-link" role="tab" href="#privacy" aria-controls="rewards" data-bs-toggle="tab">Privacy</a>
+                <li className="nav-item" role="presentation" >
+                    <a className="nav-link profile-nav-link" role="tab" href="#privacy" aria-controls="rewards" data-bs-toggle="tab">Privacy</a>
                 </li>
-                <li class="nav-item" role="presentation" >
-                    <a class="nav-link profile-nav-link" role="tab" href="#settings" aria-controls="settings" data-bs-toggle="tab">Settings</a>
+                <li className="nav-item" role="presentation" >
+                    <a className="nav-link profile-nav-link" role="tab" href="#settings" aria-controls="settings" data-bs-toggle="tab">Settings</a>
                 </li>
             </ul>
 
-            <div class="tab-content">
+            <div className="tab-content">
                 <div role="tabpanel" aria-labelledby="info" tabindex="0" class="tab-pane fade show active" id="info">
                     {/* <p>Name: {store.userData&&store.userData.name} </p> */}
                     <p>Email: {store.userEmail} </p>
