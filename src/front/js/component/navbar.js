@@ -42,9 +42,9 @@ export const Navbar = () => {
                         <li className="nav-item">
                             <Link to="/" className="nav-link me-4">Home</Link>
                         </li>
-                        <li className="nav-item me-4">
+                        {/* <li className="nav-item me-4">
                                 <Link to="/search" className="nav-link"><span className="home-text mt-1">Search</span></Link>
-                                </li>
+                                </li> */}
                         {store.token && (
                             <>
                                 
