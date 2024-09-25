@@ -24,11 +24,10 @@ export const Navbar = () => {
         <nav className="navbar navbar-expand-lg py-3">
             <div className="container-fluid d-flex justify-content-between align-items-center">
                 {/* Logo section */}
-                <div className="d-flex flex-column align-items-center">
+                <Link to="/" className="d-flex flex-column align-items-center">
                     <img src={HomeLogo2} alt="Home Icon" className="navbar-logo" />
-                </div>
+                </Link>
                 <Link to="/search" className="nav-link d-flex flex-row align-items-center my-auto mx-3">
-                    <img src={HomeLogo2} alt="Home Icon" className="search-icon" />
                     <span className="home-text mt-1">Search</span>
                 </Link>
 
@@ -43,13 +42,17 @@ export const Navbar = () => {
                         <li className="nav-item">
                             <Link to="/" className="nav-link me-4">Home</Link>
                         </li>
+                        {/* <li className="nav-item me-4">
+                                <Link to="/search" className="nav-link"><span className="home-text mt-1">Search</span></Link>
+                                </li> */}
                         {store.token && (
                             <>
+                                
                                 <li className="nav-item me-4">
                                     <Link to="/favorites" className="nav-link">Favorites</Link>
                                 </li>
                                 <li className="nav-item">
-                                    <Link to="/routes" className="nav-link">Build A Brewery Tour Route</Link>
+                                    <Link to="/routes" className="nav-link">Build A Route</Link>
                                 </li>
                                 <li className="nav-item">
                                     <Link to="/points" className="nav-link">

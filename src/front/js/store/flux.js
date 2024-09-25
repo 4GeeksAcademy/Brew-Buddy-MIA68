@@ -713,7 +713,11 @@ const getState = ({ getStore, getActions, setStore }) => {
 
 				if (response.ok) {
 					const data = await response.json();
-					console.log(data.message);  // "Review added successfully"
+					alert("Review added successfully");  
+					console.log (breweryData) 
+					if (breweryData.isFavorite){
+						window.location="https://cuddly-space-couscous-5gvpvvqv7v6w37g6x-3000.app.github.dev/brewery/" + breweryData.id
+					}
 					return data;
 				} else {
 					const errorData = await response.json();

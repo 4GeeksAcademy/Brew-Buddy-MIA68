@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Context } from "../store/appContext";
 import { Reward } from "../store/flux";
+import background1 from "../../img/DALL·E 2024-09-04.webp"
+import "../../styles/points.css";
 
 export const Points = () => {
     const [selectedSize, setSelectedSize] = useState("Size");
@@ -79,9 +81,10 @@ export const Points = () => {
     };
 
     return (
-        <div className="text-center my-5">
-            <h1>Redeem Your Points!</h1>
-            <h2>Points: {store.userPoints}</h2>
+        <div className="text-center container my-5">
+            <img src={background1} alt="Background" className="background-image" />
+            <h1 className="fw-bold">Redeem Your Points!</h1>
+            <h2 className="fw-bold">Points: {store.userPoints}</h2>
 
             {showAlert && (
                 <div style={{ color: 'red', padding: '10px', border: '1px solid red', borderRadius: '5px', marginBottom: '10px' }}>
@@ -89,9 +92,9 @@ export const Points = () => {
                 </div>
             )}
 
-            <div className="card">
+            <div className="card rewards-card-body">
                 <div className="card-body">
-                    <h5>$5 Off Coupon</h5>
+                    <h5 className="fw-bold">$5 Off Coupon</h5>
                     <p>Take off $5 with your next purchase using this handy Brew Buddy Coupon!</p>
                     <button 
                         style={{ backgroundColor: 'green', color: 'white', padding: '10px', border: 'none', borderRadius: '5px' }}
@@ -106,8 +109,8 @@ export const Points = () => {
                     </button>
                 </div>
 
-                <div className="card-body">
-                    <h5>$10 Off Coupon</h5>
+                <div className="card-body rounded-5">
+                    <h5 className="fw-bold">$10 Off Coupon</h5>
                     <p>Take off $10 with your next purchase using this handy Brew Buddy Coupon!</p>
                     <button 
                         style={{ backgroundColor: 'green', color: 'white', padding: '10px', border: 'none', borderRadius: '5px' }}
@@ -123,11 +126,11 @@ export const Points = () => {
                 </div>
 
                 <div className="card-body">
-                    <h5>Brew Buddy T-Shirt</h5>
+                    <h5 className="fw-bold">Brew Buddy T-Shirt</h5>
                     <p>Show off this sweet Brew Buddy Merch!</p>
 
                     <div>
-                        <select onChange={(e) => handleSizeSelect(e.target.value)} value={selectedSize}>
+                        <select onChange={(e) => handleSizeSelect(e.target.value)} value={selectedSize} className="rounded-3">
                             <option value="X SMALL">X SMALL</option>
                             <option value="SMALL">SMALL</option>
                             <option value="MEDIUM">MEDIUM</option>

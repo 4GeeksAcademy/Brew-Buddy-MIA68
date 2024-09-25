@@ -5,15 +5,18 @@ import { Cloudinary } from '@cloudinary/url-gen';
 import { AdvancedImage } from '@cloudinary/react';
 import { fill } from '@cloudinary/url-gen/actions/resize';
 import { image } from '@cloudinary/url-gen/qualifiers/source';
+import { useNavigate } from 'react-router-dom';
 
 export const ReviewForm = ({ brewery, onSaveReview }) => {
     const [overallRating, setOverallRating] = useState(0);
     const [reviewText, setReviewText] = useState("");
     const [isFavoriteBrewery, setIsFavoriteBrewery] = useState(false);
+    const [addToFavoriteBeers, setAddToFavoriteBeers] = useState(false);
     const [beerReviews, setBeerReviews] = useState([]);
     const { store, actions } = useContext(Context);
     const [imageFile, setImageFile] = useState(null);
     const [uploadedImageUrl, setUploadedImageUrl] = useState(null);
+    const navigate=useNavigate()
 
     const cld = new Cloudinary({ cloud: { cloudName: 'dprmqr54a' } });
 
@@ -100,6 +103,10 @@ export const ReviewForm = ({ brewery, onSaveReview }) => {
             ? _image.image_url
             : null
         );
+       
+        if(addToFavoriteBeers){
+            navigate("/brewery/"+brewery.id)
+        }
     };
 
     return (
@@ -141,6 +148,17 @@ export const ReviewForm = ({ brewery, onSaveReview }) => {
                         <input type="checkbox" checked={beerReview.isFavorite} onChange={(e) => updateBeerReview(index, 'isFavorite', e.target.checked)} />
                         Mark as Favorite Beer
                     </label> */}
+                    <label>
+                    {/* <input type="checkbox" checked={beerReview.isFavorite} onChange={(e) => updateBeerReview(index, 'isFavorite', e.target.checked)} /> */}
+                        <input type="checkbox"  onChange={(e)=>{
+                            if(e.target.checked){
+                                setAddToFavoriteBeers(true)
+                            }else{
+                                setAddToFavoriteBeers(false)
+                            }
+                        }} />
+                        Click here to add your Beer to favorites
+                    </label>
                 </div>
             ))}
             <button type="button" onClick={addBeerReview}>Add Another Beer</button>
