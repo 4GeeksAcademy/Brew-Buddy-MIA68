@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 export const SignUp = () => {
     const { store, actions } = useContext(Context);
-    const [credentials, setCredentials] = useState({email: "", password: "" });
+    const [credentials, setCredentials] = useState({ email: "", password: "" });
     const [errorMessage, setErrorMessage] = useState("");
     const navigate = useNavigate();
 
@@ -41,7 +41,7 @@ export const SignUp = () => {
                 </div>
                 <div className="form-group mt-3">
                     <label>Password</label>
-                    <input type="text" placeholder="type password here" className="form-control" id="password" value={credentials.password} onChange={handleChange} required />
+                    <input type="password" placeholder="type password here" className="form-control" id="password" value={credentials.password} onChange={handleChange} required />
                 </div>
                 {/* TODO: IF EXTRA TIME CONFIRM PASSWORD AND CHANGE TYPE TO PASSWORD (SHOW OR HIDE PW, FOR LOGIN AS WELL)  */}
                 {errorMessage && <div className="alert alert-danger mt-4">{errorMessage}</div>}

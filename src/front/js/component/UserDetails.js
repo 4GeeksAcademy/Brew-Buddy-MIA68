@@ -27,7 +27,7 @@ export default function UserDetails(props) {
                     <p>Email: {store.userEmail} </p>
                 </div>
                 <div role="tabpanel" aria-labelledby="rewards" tabindex="0" className="tab-pane fade" id="rewards">
-                    <div className="mt-1 row">
+                    <div className="mt-1 row d-flex container">
                         <div className="col-6">
                             <h2 className="fw-bold">Point History</h2>
                             <table className="table table-warning">
@@ -48,8 +48,11 @@ export default function UserDetails(props) {
                                     ))}
                                 </tbody>
                             </table>
-                            <table className="table">
-                                <thead>
+                        </div>
+                        <div className="col-6">
+                        <h2 className="fw-bold">Reward History</h2>
+                            <table className="table table-warning">
+                                <thead className="table-light">
                                     <tr>
                                         <th>Reward Name</th>
                                         <th>Reward Type</th>

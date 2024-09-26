@@ -12,13 +12,14 @@ export const UserProfile = () => {
     const [userInfo, setUserInfo] = useState(null);
     const [pointHistory, setPointHistory] = useState([]);
     const [imageFile, setImageFile] = useState(null);
+    const [userRewards, setUserRewards] = useState([])
 
     const cld = new Cloudinary({ cloud: { cloudName: 'dprmqr54a' } });
 
     useEffect(() => {
         fetchUserInfo();
-        fetchPointHistory();
         actions.getRewardsFromBackend();
+        fetchPointHistory();
     }, []);
 
     const fetchUserInfo = async () => {
@@ -43,6 +44,7 @@ export const UserProfile = () => {
             if (response.ok) {
                 const data = await response.json();
                 setPointHistory(data);
+                setUserRewards(store.userRewards)
             }
         } catch (error) {
             console.error("Error fetching point history:", error);
@@ -147,7 +149,7 @@ export const UserProfile = () => {
                 </table>
             </div> */}
             {/* <div className="mt-5"><Link to="/forgot-password">Change My Password</Link></div> */}
-            <UserDetails pointHistory={pointHistory}/>
+            <UserDetails pointHistory={pointHistory} />
         </div>
 
     );
