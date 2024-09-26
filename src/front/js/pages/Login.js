@@ -30,7 +30,7 @@ export const Login = () => {
                 </div>
                 <div className="form-group mt-3">
                     <label>Password</label>
-                    <input type="text" placeholder="type password here" className="form-control" id="password" value={credentials.password} onChange={handleChange} required />
+                    <input type="password" placeholder="type password here" className="form-control" id="password" value={credentials.password} onChange={handleChange} required />
                     <div className="mt-1 mb-4">
                         <Link to="/forgot-password" className="mt-3">Click here to reset your password</Link>
                     </div>
