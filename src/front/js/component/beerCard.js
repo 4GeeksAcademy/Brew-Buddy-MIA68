@@ -37,7 +37,7 @@ console.log(store.favoriteBeers)
                     </div>
                     <div className="row justify-content-between bg-secondary">
                         <h5 className="col">ABV:</h5>
-                        <h5 className="col">{props.beerData.ABV}</h5>
+                        <h5 className="col">{props.beerData.ABV} %</h5>
                     </div>
                 </div>
             </div>
