@@ -143,13 +143,13 @@ export const Favorites = () => {
           </p>
         </div>
         <div
-          className="tab-pane text-center justify-content-center fade "
+          className="tab-pane  justify-content-center fade "
           id="pills-home"
           role="tabpanel"
           aria-labelledby="pills-home-tab"
           tabindex="0"
         >
-          <h1>Breweries</h1>
+          
           <FavoriteBreweries/>
         </div>
         <div
@@ -162,13 +162,13 @@ export const Favorites = () => {
           <FavoritePeople/> 
         </div>
         <div
-          className="tab-pane text-center justify-content-center fade"
+          className="tab-pane justify-content-center fade"
           id="pills-contact"
           role="tabpanel"
           aria-labelledby="pills-contact-tab"
           tabindex="0"
         >
-          <h1>Beers</h1>
+          
           <FavoriteBeers/>
           <div>
           {/* {store.favoriteBeers?.map((item, index) => {

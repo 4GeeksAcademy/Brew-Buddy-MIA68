@@ -60,7 +60,9 @@ export const FavoriteBeers = () => {
   }, [store.favoriteBeers, store.allBeers])
   return (
     <div>
-      <select value={sortOption} onChange={handleSortChange}>
+      <div className="text-center">
+      <h1>Beers</h1>
+         <select className="mx-auto" value={sortOption} onChange={handleSortChange} >
         <option value="">Sort by...</option>
         <option value="name-asc">Name (A-Z)</option>
         <option value="name-desc">Name (Z-A)</option>
@@ -71,72 +73,32 @@ export const FavoriteBeers = () => {
         <option value="abv-asc">ABV (Low to High)</option>
         <option value="abv-desc">ABV (High to Low)</option>
       </select>
+      </div>
+       
+     
 
-      <ul>
-        {/* <form>
-          <div className="mb-3">
-            <label htmlFor="beerDropdown" className="form-label">Select a beer</label>
-            <select
-              id="beerDropdown"
-              className="form-select"
-              value={selectedBeer}
-              onChange={handleBeerChange}
-            >
-              <option value="" disabled>Select a beer</option>
-              {beersList.map((beer) => (
-                <option key={beer.id} value={beer.name}>
-                  {beer.name}
-                </option>
-              ))}
-              <option value="add_new">Add new beer</option>
-            </select>
-          </div>
-
-          {isAddingBeer && (
-            <div className="mb-3">
-              <label htmlFor="formGroupExampleInput" className="form-label">New Beer Name</label>
-              <input
-                type="text"
-                className="form-control"
-                id="formGroupExampleInput"
-                placeholder="Enter beer name"
-                value={newBeer}
-                onChange={handleNewBeerChange}
-              />
-            </div>
-          )}
-          <div class="mb-3">
-            <label for="flavor" className="form-label">Flavor</label>
-            <input type="text" class="form-control" id="flavor" placeholder="Another input placeholder" />
-          </div>
-          <div class="mb-3">
-            <label for="type" className="form-label">Type</label>
-            <input type="text" class="form-control" id="label" placeholder="Another input placeholder" />
-          </div>
-          <div class="mb-3">
-            <label for="ABV" className="form-label">ABV</label>
-            <input type="text" class="form-control" id="ABV" placeholder="Another input placeholder" />
-          </div>
-          <button className="btn btn-primary" type="submit">Submit</button>
-        </form> */}
-        {items.map((item, index) => {
-          return (
-            <div class="card text-center mb-3 mx-auto" style={{ width: "18rem" }}>
-              <button type="button" className="close-button" onClick={() => handleRemoveFavorite(item)}>
-                                    <i className="fa-solid fa-x"></i>
-              </button>
-              <div class="card-body">
-                <h5 class="card-title">{item.beer_name}</h5>
-                <p class="card-text">{item.flavor}</p>
-                <p class="card-text">{item.type}</p>
-                <p class="card-text">{item.ABV}</p>
-                <a href="#" class="btn btn-primary">Go somewhere</a>
-                {/* <a onClick={() => actions.handleFavoriteBeer(item.id)} href="#" class="btn btn-primary">Add To Favorites</a> */}
+      
+        <div className="container mt-4">
+    {items.map((item, index) => {
+      return (
+          <div className="card  shadow mb-4 mx-auto" style={{ width: "18rem" }}>
+            <button type="button" className="btn-close position-absolute top-0 end-0 m-2" aria-label="Close" onClick={() => handleRemoveFavorite(item)}></button>
+            <div className="card-body">
+              <div className="d-flex">  
+                <h5 className="card-title mt-3 me-5"><strong>{item.beer_name}</strong></h5>
+                <img className="mb-3" src="https://cdn0.iconfinder.com/data/icons/st-patrick-s-day-22/24/Beer_Mug_drink-512.png" alt="beer mug" height="50px" width="50px" />
               </div>
+             
+              <p className="card-text">Flavor: {item.flavor}</p>
+              <p className="card-text">Type: {item.type}</p>
+              <p className="card-text">ABV: {item.ABV}% </p>
             </div>
-          )
-        })}
-      </ul>
+          </div>
+      );
+    })}
+</div>
+
+     
     </div>
   );
 };
