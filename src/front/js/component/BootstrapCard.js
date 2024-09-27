@@ -151,7 +151,7 @@ export const ReviewCard = (props) => {
         <div className="card mb-3">
             <h5 className="card-header">{review.brewery_name} - Review #{reviewNumber}</h5>
             <div className="card-body">
-                <h5 className="card-title">Overall Rating: {review.overall_rating}</h5>
+                <h5 className="card-title">Overall Rating: {review.overall_rating}/10</h5>
                 <p className="card-text">{review.review_text}</p>
 
                 {/* Favorite Brewery Indicator */}
@@ -165,8 +165,8 @@ export const ReviewCard = (props) => {
                 <ul className="list-group">
                     {review.beer_reviews.map((beerReview, index) => (
                         <li className="list-group-item" key={index}>
-                            <strong>Beer Name:</strong> {beerReview.beer_name} <br />
-                            <strong>Rating:</strong> {beerReview.rating}<br />
+                            <strong>Beer Name:</strong> {beerReview.beer_name}<br />
+                            <strong>Rating:</strong> {beerReview.rating}/10<br />
                             <strong>Notes:</strong> {beerReview.notes} <br />
                             {/* Favorite Beer Indicator */}
                             {beerReview.is_favorite && (
